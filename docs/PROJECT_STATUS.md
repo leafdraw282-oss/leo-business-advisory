@@ -1,5 +1,192 @@
 # Project Status
 
+## PHASE 1 COMPLETE
+
+All Phase 1 scope from the Master Specification is built, verified, and
+documented: Header, Hero, Impact, About, Case Studies, Advisory, Career,
+Gallery, Contact (with a working `mailto:` form), and Footer — fully
+bilingual (KR/EN), responsive at 1440/1024/768/390px, and passing lint +
+build with zero console errors/warnings. See Phase 1-G directly below for
+the final QA pass, and each earlier phase's section for how every part
+was built.
+
+## Phase 1-G — Final QA
+
+**Status: complete.**
+
+Scope was QA and bugfixing only, explicitly no new design or features:
+functional QA (every nav link/CTA/mobile menu/language toggle), content
+QA (re-verify every fact against the Founder Profile source document),
+technical QA (lint, build, broken imports/images, console errors, dead
+buttons, `href="#"`, missing/duplicate section ids, horizontal overflow,
+unused components), responsive QA, accessibility QA, SEO QA, and bringing
+the documentation (`README.md`, this file) up to date with the actual
+finished project.
+
+### Content QA — facts re-verified against the source document
+
+Re-extracted `word/document.xml` from the original
+`Leo_Business_Advisory_Founder_Profile_KR_EN.docx` fresh (not reused from
+earlier phases) and diffed every fact in `src/data/profile.js` against it
+line by line: name, title, positioning, contact info, the founder-profile
+bio, all 4 impact metrics, all 8 advisory items, all 6 case-study
+summaries + figures, all 7 career entries (years/roles/companies), and
+education. Cross-checked every brand/company name's spelling for
+consistency across every field it appears in (`grep`-verified — no
+case/spelling variants found anywhere).
+
+Found and corrected three real deviations from the document:
+- `caseStudies` (RCC entry) `summaryKo` had an inserted object particle
+  ("수익성을 개선" → the document's own text reads "수익성 개선", matching
+  its telegraphic/résumé phrasing used throughout that list) — corrected.
+- `caseStudies` (LEOHOLDINGS entry) `summaryEn` had drifted from the
+  document's own English wording — it was missing "curated platform ...
+  across online and offline channels" (present in the document) and had
+  gained "personally planned, built and" (not in the document, apparently
+  influenced by the Korean line instead of the document's own English
+  section — exactly what CLAUDE.md's "do not machine-translate one into
+  the other" rule exists to prevent). Corrected to match the document's
+  English wording, keeping the same subject-first sentence structure used
+  by the other 5 case summaries.
+- `career` (Samsonite Korea, 2005–2019 entry) `roleKo` read "대표이사
+  (President & Representative Director)" — the document's Korean section
+  uses the English title verbatim with no Korean gloss, and every other
+  `roleKo` in the array also keeps the English title as-is (matching how
+  the source document itself keeps executive titles in English within its
+  Korean text). This entry was the one exception, both to the document and
+  to the site's own internal consistency — corrected to plain
+  `'President & Representative Director'`.
+
+Everything else — every number, date, company name, and market/growth/
+EBITDA/P&L figure — matched the document exactly; no further changes were
+needed. No fact was invented or estimated at any point in this pass.
+
+### Functional QA (all verified via Playwright against the production build)
+
+- Every nav link (Header desktop + mobile, Footer): `#about #impact
+  #advisory #career #contact`, matching `navigation.js` exactly.
+- Logo (Header + Footer) and Footer's dedicated "Back to top" link: all
+  three go to `#top` and land there (confirmed via `scrollY`, not just href).
+- Hero CTAs: "Explore Experience"/"성과 살펴보기" → `#impact`, "Discuss a
+  Project"/"프로젝트 문의하기" → `#contact`.
+- Final CTA ("Start a Conversation"/"대화 시작하기") moves focus to the
+  Contact form's `name` field.
+- Contact + Footer email/phone: real `mailto:leosuh00@gmail.com` /
+  `tel:+821090332237` links.
+- Mobile menu: opens, closes via Escape/outside-click/nav-link-click, and
+  locks/unlocks `body` scroll correctly every time.
+- Language: full `KR → EN → KR` round trip confirmed identical to the
+  starting state (compared all `h1`/`h2` text before and after); every
+  section, the footer, and the contact form (5 field labels, 9 dropdown
+  options, disclosure note) switch together — no partial switch.
+
+### Technical QA
+
+- `npm run lint` → 0 warnings/errors. `npm run build` → succeeds.
+- No console errors or warnings at any point across the full QA pass.
+- No `href="#"` anywhere in the codebase (grepped).
+- No duplicate HTML ids anywhere in the codebase (grepped every `id="..."`
+  across all `.jsx` files — each of the 14 ids used, used exactly once).
+- Every `<section id>` used by `navigation.js` (`about`, `impact`,
+  `advisory`, `career`, `contact`) exists exactly once; the 3 additional
+  section ids (`top`, `case-studies`, `gallery`) are valid anchor targets
+  not required to appear in nav.
+- No broken imports: every file in `src/components/` and `src/sections/`
+  is imported and rendered somewhere in the tree (`App.jsx` or a parent
+  section/component) — traced by hand, none orphaned.
+- No broken images: every `images` map entry in `profile.js` is
+  referenced by exactly one consumer and vice versa; every image (14
+  slots total — Hero, About portrait, 6 case studies, 6 gallery items)
+  correctly falls back to `ImagePlaceholder` (no real photography exists
+  yet, so all 14 currently show their placeholder — that's expected, not
+  a bug) with zero visibly-broken `<img>` icons.
+- `education` (`profile.js`) is exported but not currently rendered by any
+  section — this is intentional reserved data (captured from the source
+  document for possible future use), not a broken/orphaned component, and
+  wasn't newly surfaced since this phase excludes adding new UI.
+
+### Responsive QA (1440 / 1024 / 768 / 390px)
+
+Scripted full-DOM bounding-box scan at each width (not just a visual spot
+check): zero horizontal overflow and zero elements extending past the
+viewport edge at any of the 4 widths. Also confirmed at every width: zero
+clipped Impact-metric numbers or Hero headline text (`scrollWidth ===
+clientWidth`), Career timeline renders all 7 entries, nav/hamburger swap
+correctly at the 768px breakpoint, Gallery/Contact-form/Footer all render
+with the expected element counts.
+
+### Accessibility QA
+
+- Heading hierarchy: exactly one `<h1>` (Hero), followed only by `<h2>`s
+  (section headings) and `<h3>`s (case-study titles, career roles) — no
+  skipped levels, verified by walking every heading in DOM order.
+- All 12 rendered `<img>` elements have non-empty `alt`; both currently-
+  visible `ImagePlaceholder` fallbacks (`role="img"`) carry a matching
+  `aria-label` — same guarantee holds for all 14 image slots once
+  scrolled into view (verified in Phase 1-E/1-F).
+- Keyboard focus: tab order starts at the logo, reaches the KR/EN toggle
+  buttons, and every stop shows the shared bronze `outline` from
+  `global.css` — confirmed via computed style, not just visual inspection.
+- Button vs. link roles are correct throughout: the hamburger, KR/EN
+  toggle, Final CTA (a same-page focus action), and form submit are all
+  `<button>`; Hero CTAs and all navigation are `<a>` — verified by tag name.
+- Form: all 5 fields (`name`, `company`, `email`, `inquiryType`,
+  `message`) have an associated `<label for>` — 0 unlabeled fields.
+- Landmarks: exactly one `<header>`, one `<main>`, one `<footer>`, two
+  `<nav>` (header + footer — the mobile-menu `<nav>` only exists in the
+  DOM while open), 8 `<section>`s, 6 `<article>`s (the case studies).
+
+### SEO QA
+
+- `<title>` and meta description already existed (Phase 1-A) and match
+  the Master Specification's own specified text exactly — no change needed.
+- OpenGraph (`og:type`, `og:site_name`, `og:title`, `og:description`,
+  `og:locale` + `og:locale:alternate`) and a JSON-LD `Person` block were
+  **added** to `index.html` — these were the two SEO items from the
+  Master Specification (section 30) and CLAUDE.md's own "once content is
+  finalized enough to be worth encoding" commitment that hadn't been built
+  yet. Every JSON-LD field is sourced directly from already-verified
+  `profile.js` data (name, title, email, phone, Seoul/KR, employer name) —
+  nothing new was invented. Verified: `JSON.parse()` succeeds on the
+  rendered script content, no console errors from adding it.
+- No `og:image` was added — no real photography exists yet, and pointing
+  social crawlers at a non-existent file would produce a broken preview
+  image, which is worse than no image. Add one once a real hero/portrait
+  photo exists.
+- No `og:url` was added — the site has no canonical deployed URL yet (see
+  "Deploying to GitHub Pages" in `README.md`); add it once deployed.
+
+### Documentation
+
+- `README.md` rewritten to match the actual finished project: accurate
+  run/build/lint commands, a complete `src/` structure listing (including
+  `context/`, every component, and `index.html`'s SEO role), a "Where to
+  edit things" table plus a step-by-step "Adding photos" section, the
+  language system, the contact form's `mailto:` behavior and how to swap
+  in a real backend, and concrete GitHub Pages / custom-domain deployment
+  steps (`vite.config.js` `base`, a `CNAME` file, DNS). Previously it
+  still described the site as "Phase 1-A ... plain, unstyled" — that
+  entire status section was replaced.
+- This file (`docs/PROJECT_STATUS.md`) updated with this Phase 1-G entry
+  and a `PHASE 1 COMPLETE` marker at the top.
+
+### Issues found and fixed (summary)
+
+1. Three content deviations from the source document (see Content QA above).
+2. Missing OpenGraph metadata and JSON-LD (see SEO QA above).
+3. `README.md` was stale (still described Phase 1-A's unstyled state).
+
+No other problems were found — the site's navigation, CTAs, language
+system, responsiveness, and accessibility were already correct from
+Phases 1-A through 1-F, and were re-verified rather than changed.
+
+### Build verification
+
+```
+npm run lint  → passes, 0 warnings/errors
+npm run build → succeeds, no errors
+```
+
 ## Phase 1-F — Site-Wide QA & Consistency Pass
 
 **Status: complete.**
@@ -583,30 +770,26 @@ npm run build
 ```
 Result: succeeded, no errors. (Re-run and update this note if the result changes.)
 
-### Phase 1-C, 1-D, 1-E and 1-F are documented above (all complete).
+### Phase 1-C, 1-D, 1-E, 1-F and 1-G are documented above — PHASE 1 COMPLETE.
 
-### Next: Phase 1-G (not started — do not begin without explicit instruction)
+### Phase 2 (not started — do not begin without explicit instruction)
 
-Every section now has a full visual design and has been through one
-site-wide consistency pass. Remaining scope is new behavior/deployment:
+Phase 1 delivered the complete, QA'd, bilingual Phase 1 site. Candidate
+Phase 2 scope, none of it started:
 
 1. Active-nav-on-scroll (IntersectionObserver) highlighting the current
-   section in the header nav as the visitor scrolls — explicitly deferred
-   out of Phase 1-F since it would have been a new feature, not polish.
+   section in the header nav as the visitor scrolls.
 2. Subtle scroll-reveal animation (opacity/translateY on scroll into
    view), content visible by default if JS fails.
-3. GitHub Pages deployment config (`vite.config.js` `base`, asset paths)
-   and the README sections on GitHub upload / Pages / custom domain /
-   swapping the contact form to Formspree — all currently deferred per
-   `CLAUDE.md`.
-4. Basic SEO: OpenGraph metadata, JSON-LD (Person or ProfessionalService).
-5. Responsive QA at 1440 / 1024 / 768 / 390px for any new behavior added.
-6. `npm run build` re-verified clean.
+3. GitHub Pages deployment (`vite.config.js` `base`, a `CNAME` file for a
+   custom domain — see `README.md`'s deployment section for the exact steps).
+4. Swapping the contact form from `mailto:` to a real backend (e.g.
+   Formspree) — see `README.md`'s Contact form section.
+5. `og:image`/`og:url` once real photography and a deployed URL exist.
+6. Real photography (drop files into `public/images/`, update the
+   relevant paths in `src/data/profile.js`) and any further copywriting
+   polish — owner-driven inputs, not something to schedule as a phase.
 
-Real photography and final copywriting polish remain owner-driven inputs
-(drop files into `public/images/` and update `src/data/profile.js`) and
-are not a "phase" to schedule — they can happen at any time.
-
-Content editing locations for the next phase (no code changes needed):
+Content editing locations (no code changes needed):
 text → `src/data/profile.js`, nav/menu → `src/data/navigation.js`, photos →
 `public/images/`, colors → `src/styles/variables.css`.

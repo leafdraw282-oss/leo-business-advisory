@@ -177,7 +177,7 @@ export const caseStudies = [
     summaryKo:
       'LEOHOLDINGS 창업 후 친환경 브랜드 Just Craft Lifestyle과 플랫폼 Just Craft Mall을 직접 기획·개발·운영.',
     summaryEn:
-      'Founded LEOHOLDINGS and personally planned, built and operated eco-conscious brand Just Craft Lifestyle and platform Just Craft Mall.',
+      'Founded LEOHOLDINGS and operated eco-conscious brand Just Craft Lifestyle and curated platform Just Craft Mall across online and offline channels.',
     metrics: [],
     image: 'leoholdings',
   },
@@ -187,7 +187,7 @@ export const caseStudies = [
     titleKo: 'RCC · RAWROW · NAUTICA',
     titleEn: 'RCC · RAWROW · NAUTICA',
     summaryKo:
-      'RCC Co-CEO로 Rawrow·Nautica 사업을 재정비해 4개월 내 매출 흐름을 -2%에서 +19%로 전환하고 수익성을 개선.',
+      'RCC Co-CEO로 Rawrow·Nautica 사업을 재정비해 4개월 내 매출 흐름을 -2%에서 +19%로 전환하고 수익성 개선.',
     summaryEn:
       'As Co-CEO of RCC, reset the Rawrow and Nautica businesses, improving sales momentum from -2% to +19% within four months while restoring profitability.',
     metrics: [
@@ -263,7 +263,7 @@ export const career = [
   },
   {
     period: '2005–2019',
-    roleKo: '대표이사 (President & Representative Director)',
+    roleKo: 'President & Representative Director',
     roleEn: 'President & Representative Director',
     companyKo: 'Samsonite Korea',
     companyEn: 'Samsonite Korea',
