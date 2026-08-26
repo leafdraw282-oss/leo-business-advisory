@@ -3,10 +3,13 @@ import { createRoot } from 'react-dom/client';
 import './styles/variables.css';
 import './styles/global.css';
 import './styles/responsive.css';
+import { LanguageProvider } from './context/LanguageContext.jsx';
 import App from './App.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <LanguageProvider>
+      <App />
+    </LanguageProvider>
   </StrictMode>,
 );

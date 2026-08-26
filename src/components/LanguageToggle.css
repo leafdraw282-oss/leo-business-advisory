@@ -1,0 +1,23 @@
+.language-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+}
+
+.language-toggle button {
+  padding: 0.2rem 0.15rem;
+  opacity: 0.55;
+  transition: opacity var(--transition-base), color var(--transition-base);
+}
+
+.language-toggle button.is-active {
+  opacity: 1;
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.language-toggle span {
+  opacity: 0.35;
+}

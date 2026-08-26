@@ -188,6 +188,13 @@ export const caseStudies = [
   },
 ];
 
+// Heading copy for the case studies block (part of the "impact" flow),
+// taken verbatim from the source document's own section headings.
+export const caseStudiesSection = {
+  titleKo: '주요 경영 성과',
+  titleEn: 'SELECTED CAREER IMPACT',
+};
+
 // Advisory Focus section (id: "advisory").
 export const advisory = {
   titleKo: '핵심 자문 영역',
@@ -202,6 +209,12 @@ export const advisory = {
     { ko: 'P&L/조직/운영체계', en: 'P&L / organization / operating model' },
     { ko: '창업자·경영진 자문', en: 'Founder & executive advisory' },
   ],
+};
+
+// Heading copy for the Career section, taken from the source document.
+export const careerSection = {
+  titleKo: '주요 경력',
+  titleEn: 'EXECUTIVE CAREER',
 };
 
 // Executive Career timeline (id: "career"), chronological ascending.
@@ -266,6 +279,13 @@ export const education = {
   ],
 };
 
+// Heading copy for the Gallery / Visual Story section. Not present in the
+// source document (it has no gallery); this is placeholder section copy.
+export const gallerySection = {
+  titleKo: '비주얼 스토리',
+  titleEn: 'VISUAL STORY',
+};
+
 // Visual Story / Gallery (id within Gallery section). Empty for Phase 1 —
 // populate as photos become available:
 // { id: 'unique-id', src: '/images/example.jpg', captionKo: '...', captionEn: '...' }
@@ -312,10 +332,13 @@ export const profile = {
   impact,
   about,
   caseStudies,
+  caseStudiesSection,
   advisory,
   career,
+  careerSection,
   education,
   gallery,
+  gallerySection,
   contactCta,
   inquiryTypes,
   images,
