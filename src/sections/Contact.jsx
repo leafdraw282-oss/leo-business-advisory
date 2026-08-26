@@ -19,7 +19,7 @@ function Contact() {
   }
 
   return (
-    <section id="contact" className="contact" aria-label="Contact">
+    <section id="contact" className="contact" aria-label={t('문의', 'Contact')}>
       <div className="container">
         <div className="contact__cta">
           <h2 className="contact__headline">{t(contactCta.headlineKo, contactCta.headlineEn)}</h2>

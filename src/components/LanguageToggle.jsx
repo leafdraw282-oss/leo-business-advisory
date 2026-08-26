@@ -7,10 +7,10 @@ import './LanguageToggle.css';
  * a partial-language state on the page.
  */
 function LanguageToggle({ className = '' }) {
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
 
   return (
-    <div className={`language-toggle ${className}`.trim()} role="group" aria-label="Language">
+    <div className={`language-toggle ${className}`.trim()} role="group" aria-label={t('언어 선택', 'Language')}>
       <button
         type="button"
         className={language === 'ko' ? 'is-active' : ''}

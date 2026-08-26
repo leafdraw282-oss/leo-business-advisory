@@ -14,7 +14,7 @@ function Advisory() {
   const { t } = useLanguage();
 
   return (
-    <section id="advisory" className="advisory" aria-label="Advisory Focus">
+    <section id="advisory" className="advisory" aria-label={t('자문', 'Advisory')}>
       <div className="container">
         <SectionTitle eyebrow={t(advisory.eyebrowKo, advisory.eyebrowEn)} title={t(advisory.titleKo, advisory.titleEn)} />
         <ol className="advisory__list">

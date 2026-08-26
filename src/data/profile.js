@@ -29,6 +29,10 @@ export const person = {
   titleEn: 'FOUNDER & PRESIDENT',
   positioningKo: 'BRAND GROWTH · GLOBAL BUSINESS · RETAIL STRATEGY',
   positioningEn: 'BRAND GROWTH · GLOBAL BUSINESS · RETAIL STRATEGY',
+  // Placeholder label for the portrait ImagePlaceholder (Hero + About),
+  // shown until a real photo replaces it.
+  portraitLabelKo: '리오 포트레이트',
+  portraitLabelEn: 'LEO Portrait',
 };
 
 export const contact = {
@@ -213,6 +217,8 @@ export const caseStudies = [
 // Heading copy for the case studies block (part of the "impact" flow),
 // taken verbatim from the source document's own section headings.
 export const caseStudiesSection = {
+  eyebrowKo: '선택된 성과',
+  eyebrowEn: 'SELECTED IMPACT',
   titleKo: '주요 경영 성과',
   titleEn: 'SELECTED CAREER IMPACT',
 };
@@ -315,6 +321,8 @@ export const gallerySection = {
   eyebrowEn: 'VISUAL STORY',
   titleKo: '기록으로 남은 순간들',
   titleEn: 'Moments Along the Way',
+  emptyKo: '갤러리 사진은 추후 업데이트될 예정입니다.',
+  emptyEn: 'Gallery photos will be added in a future phase.',
 };
 
 // Visual Story / Gallery (section id: "gallery"). Placeholder entries tied
@@ -325,7 +333,7 @@ export const gallerySection = {
 // from 6 to 10+ entries needs no component change; a new entry with no
 // `aspect`/`wide` still renders correctly (component provides defaults).
 export const gallery = [
-  { id: 'leo-portrait', src: '/images/gallery-leo-portrait.jpg', captionKo: 'LEO 포트레이트', captionEn: 'LEO Portrait', aspect: '4 / 5' },
+  { id: 'leo-portrait', src: '/images/gallery-leo-portrait.jpg', captionKo: '리오 포트레이트', captionEn: 'LEO Portrait', aspect: '4 / 5' },
   { id: 'samsonite-korea', src: '/images/gallery-samsonite-korea.jpg', captionKo: 'Samsonite Korea', captionEn: 'Samsonite Korea', aspect: '4 / 3' },
   { id: 'samsonite-red', src: '/images/gallery-samsonite-red.jpg', captionKo: 'Samsonite RED', captionEn: 'Samsonite RED', aspect: '3 / 4' },
   { id: 'traveldepot', src: '/images/gallery-traveldepot.jpg', captionKo: 'TravelDepot', captionEn: 'TravelDepot', aspect: '16 / 9', wide: true },

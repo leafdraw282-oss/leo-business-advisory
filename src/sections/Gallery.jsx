@@ -16,11 +16,11 @@ function Gallery() {
   const { t } = useLanguage();
 
   return (
-    <section id="gallery" className="gallery" aria-label="Visual Story">
+    <section id="gallery" className="gallery" aria-label={t(gallerySection.titleKo, gallerySection.titleEn)}>
       <div className="container">
         <SectionTitle eyebrow={t(gallerySection.eyebrowKo, gallerySection.eyebrowEn)} title={t(gallerySection.titleKo, gallerySection.titleEn)} />
         {gallery.length === 0 ? (
-          <p>{t('갤러리 사진은 추후 업데이트될 예정입니다.', 'Gallery photos will be added in a future phase.')}</p>
+          <p>{t(gallerySection.emptyKo, gallerySection.emptyEn)}</p>
         ) : (
           <ul className="gallery__grid">
             {gallery.map((item) => (

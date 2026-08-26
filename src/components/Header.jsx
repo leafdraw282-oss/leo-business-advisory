@@ -68,7 +68,7 @@ function Header() {
           {site.name}
         </a>
 
-        <nav className="header__nav" aria-label="Primary">
+        <nav className="header__nav" aria-label={t('주 메뉴', 'Primary')}>
           <ul>
             {navigation.map((item) => (
               <li key={item.id}>

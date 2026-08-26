@@ -11,9 +11,10 @@ function Hero() {
   const { language, t } = useLanguage();
   const name = language === 'ko' ? person.nameKoFormatted : person.nameEnDisplay;
   const headlineLines = t(hero.headlineKo, hero.headlineEn);
+  const portraitLabel = t(person.portraitLabelKo, person.portraitLabelEn);
 
   return (
-    <section id="top" className="hero" aria-label={person.nameEnDisplay}>
+    <section id="top" className="hero" aria-label={name}>
       <div className="container hero__grid">
         <div className="hero__content">
           <p className="hero__name">{name}</p>
@@ -34,12 +35,7 @@ function Hero() {
           </div>
         </div>
         <div className="hero__media">
-          <ImagePlaceholder
-            src={images.hero}
-            alt={`${person.nameEnDisplay} portrait`}
-            label="LEO Portrait"
-            aspectRatio="4 / 5"
-          />
+          <ImagePlaceholder src={images.hero} alt={portraitLabel} label={portraitLabel} aspectRatio="4 / 5" />
         </div>
       </div>
     </section>

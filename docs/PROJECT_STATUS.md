@@ -1,5 +1,121 @@
 # Project Status
 
+## Phase 1-F — Site-Wide QA & Consistency Pass
+
+**Status: complete.**
+
+Scope was audit and polish only — no new sections, no new features, no
+redesign. Target: full KR/EN coverage, responsive integrity at 1440/1024/
+768/390px, visual consistency (container width, section spacing, heading
+scale, body width, line-height, bronze-accent usage, image treatment,
+button style, dividers, background transitions), and a regression check
+of every interaction built in Phases 1-B through 1-E.
+
+### What was found and fixed
+
+**KR/EN gaps** (text that didn't switch with the language toggle):
+- Hero and About portrait `ImagePlaceholder` `alt`/`label` were hardcoded
+  English ("LEO Portrait") — now `t(person.portraitLabelKo, person.portraitLabelEn)`
+  ("리오 포트레이트" / "LEO Portrait"), new field on `profile.js` `person`.
+- Case Study project-image `alt`/`label` always read `${item.titleEn}
+  Project Image` regardless of language — now built from the resolved,
+  language-aware title ("SAMSONITE KOREA 프로젝트 이미지" in KR).
+- Every section's `aria-label` (`Impact`, `Advisory Focus`, `Executive
+  Career`, `Visual Story`, `Contact`, `About`, `Selected Impact`, and
+  Hero's) was a static English string — now all resolve through `t()`,
+  matching the visible heading/nav text in the current language.
+- Header's desktop-nav `aria-label="Primary"` and `LanguageToggle`'s
+  `aria-label="Language"` were English-only even though the mobile nav's
+  equivalent label was already localized — now both use `t()`, matching
+  the pattern already established elsewhere in the same files.
+- Gallery's "no photos yet" empty-state message and the Case Studies
+  section's eyebrow text were hardcoded inline in the component instead
+  of `profile.js` — moved to `gallerySection.emptyKo/emptyEn` and
+  `caseStudiesSection.eyebrowKo/eyebrowEn` respectively, matching how
+  every other section's eyebrow/empty copy is already structured.
+- Minor: the Gallery's "LEO Portrait" entry used `captionKo: 'LEO
+  포트레이트'` (mixed English/Korean) while the new portrait label uses
+  the fully-transliterated `'리오 포트레이트'` — aligned to the latter for
+  consistency between the two "LEO portrait" placeholder labels on the page.
+
+All of the above were verified end-to-end with Playwright: default
+language, KR→EN, reload (localStorage persistence), and EN→KR, checking
+every section's heading, aria-label, image-placeholder label, footer
+tagline/nav/copyright, contact form labels/dropdown options/disclosure
+note, and the constructed `mailto:` body — nothing left over in the wrong
+language after a toggle, in either direction.
+
+**Visual consistency:**
+- `.contact__headline` used a larger `font-size` clamp than every other
+  section's heading (`SectionTitle`'s `.section-title__heading`), even
+  though Contact doesn't use the `SectionTitle` component (it needs a
+  custom composition — headline + CTA button together, no eyebrow).
+  Aligned its clamp to match `.section-title__heading` exactly
+  (`clamp(1.75rem, 1.4vw + 1.4rem, 2.75rem)`) so heading scale is now
+  uniform across every section on the page.
+- Audited container width, spacing scale, bronze-accent usage, image
+  radius/treatment, button style, divider style, and background
+  transitions across every section's CSS (grepped for hardcoded hex/rgb
+  colors and box-shadows outside `variables.css` — found none besides one
+  intentional, already-existing shadow on the mobile nav panel). No other
+  changes were needed: every section already shares the same `.container`,
+  the same `--space-*` spacing scale, the same `ImagePlaceholder`
+  radius/treatment, the same `.btn`/`.btn--primary`/`.btn--secondary`
+  styles, and bronze is used only for small kickers/accents (index
+  numbers, dots, eyebrows) — never as a large fill — consistent with
+  CLAUDE.md's design system section.
+
+**Interaction regression** (no new interactions added — verified existing
+ones still work correctly):
+- Smooth scroll, sticky header (background/border after 8px scroll),
+  mobile menu (open, close via Escape/outside-click/nav-link-click, body
+  scroll lock), language toggle, Hero CTAs, Contact's Final CTA (focuses
+  the form), Contact/Footer `mailto:`/`tel:` links, and both "logo → top"
+  and the dedicated "Back to top" footer link — all confirmed working via
+  Playwright. (Two checks initially read as failures because the
+  page is long and CSS smooth-scroll takes noticeably longer than a
+  typical `waitForTimeout`; re-checked with a longer wait and both the
+  mobile nav-link scroll and the logo-to-top scroll land correctly —
+  not a real regression.)
+- Active-nav-on-scroll (highlighting the current section in the header as
+  you scroll) was intentionally **not** added — this phase's instructions
+  explicitly exclude new features, and highlighting-on-scroll doesn't
+  exist yet in this codebase, so adding it now would be new, not "polish."
+
+### Deliberately NOT built yet (by scope, not oversight)
+
+- Active-nav-on-scroll highlighting, scroll-reveal animation.
+- Real photography (all 14 image slots still render via `ImagePlaceholder`).
+- GitHub Pages deployment config, SEO OpenGraph/JSON-LD.
+- `ContactForm.jsx` backend swap (still `mailto:`, as designed).
+
+### Test results
+
+```
+npm run lint  → passes, 0 warnings/errors
+npm run build → succeeds, no errors
+```
+
+Verified with a scripted Playwright pass (Chromium) against the production
+build (`npm run preview`):
+- No console errors/warnings, no page errors, at any point in the audit.
+- KR/EN: default `ko`, every section heading + aria-label + image-placeholder
+  label + footer chrome + contact form (labels, 9 dropdown options,
+  disclosure note) switches to `en` on toggle and back to `ko` correctly;
+  `<html lang>` follows; reload after switching to `en` preserves it
+  (localStorage persistence confirmed); scanned full page text for stray
+  Hangul while `en` is active — none found outside intentional Latin-script
+  brand names.
+- Responsive: 1440/1024/768/390px all show zero horizontal overflow and
+  zero DOM elements extending past the viewport edge (scripted full-DOM
+  bounding-box scan, not just a visual spot check). Impact metric values'
+  `scrollWidth === clientWidth` at every breakpoint (no numeral clipping).
+  Hero headline never exceeds its container width at any breakpoint.
+  Career timeline renders all 7 entries at every breakpoint. Nav/hamburger
+  correctly swap at the 768px breakpoint. Footer grid: 3 columns down to
+  1024px, 1 column at 768px and 390px.
+- Full interaction re-test (see above) — all pass.
+
 ## Phase 1-E — Gallery / Final CTA / Contact / Footer
 
 **Status: complete.**
@@ -467,15 +583,16 @@ npm run build
 ```
 Result: succeeded, no errors. (Re-run and update this note if the result changes.)
 
-### Phase 1-C, 1-D and 1-E are documented above (all complete).
+### Phase 1-C, 1-D, 1-E and 1-F are documented above (all complete).
 
-### Next: Phase 1-F (not started — do not begin without explicit instruction)
+### Next: Phase 1-G (not started — do not begin without explicit instruction)
 
-Every section in the Master Specification now has a full visual design.
-Remaining scope is polish/behavior rather than new sections:
+Every section now has a full visual design and has been through one
+site-wide consistency pass. Remaining scope is new behavior/deployment:
 
 1. Active-nav-on-scroll (IntersectionObserver) highlighting the current
-   section in the header nav as the visitor scrolls.
+   section in the header nav as the visitor scrolls — explicitly deferred
+   out of Phase 1-F since it would have been a new feature, not polish.
 2. Subtle scroll-reveal animation (opacity/translateY on scroll into
    view), content visible by default if JS fails.
 3. GitHub Pages deployment config (`vite.config.js` `base`, asset paths)

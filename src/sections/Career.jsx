@@ -15,7 +15,7 @@ function Career() {
   const { t } = useLanguage();
 
   return (
-    <section id="career" className="career" aria-label="Executive Career">
+    <section id="career" className="career" aria-label={t('경력', 'Career')}>
       <div className="container">
         <SectionTitle eyebrow={t(careerSection.eyebrowKo, careerSection.eyebrowEn)} title={t(careerSection.titleKo, careerSection.titleEn)} />
         <ol className="career__timeline">

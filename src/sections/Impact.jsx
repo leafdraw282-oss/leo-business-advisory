@@ -13,7 +13,7 @@ function Impact() {
   const { t } = useLanguage();
 
   return (
-    <section id="impact" className="impact" aria-label="Impact">
+    <section id="impact" className="impact" aria-label={t('성과', 'Impact')}>
       <div className="container">
         <SectionTitle eyebrow={t(impactSection.eyebrowKo, impactSection.eyebrowEn)} title={t(impactSection.titleKo, impactSection.titleEn)} />
         <div className="impact__grid">
