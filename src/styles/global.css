@@ -1,0 +1,118 @@
+/**
+ * Base reset + global element defaults. Section/component-specific visual
+ * design is intentionally NOT built out yet (Phase 1-A covers structure
+ * only) — this file establishes the shared foundation everything else will
+ * sit on top of in later phases.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  line-height: var(--line-height-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Prevents Phase-1 rules like "no horizontal overflow on mobile" from
+     being silently broken by a single oversized child element. */
+  overflow-x: hidden;
+}
+
+img,
+picture,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading);
+  line-height: var(--line-height-heading);
+  margin: 0;
+  font-weight: 600;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Keyboard focus must always be visible — required by the accessibility
+   rules in the project spec (no invisible-focus interactive elements). */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* Shared page container. Every section must use this class instead of
+   inventing its own left/right padding, per the CSS system rule. */
+.container {
+  max-width: var(--container-max-width);
+  margin-inline: auto;
+  padding-inline: var(--container-padding-inline);
+}
+
+/* Every <section> gets an id that matches src/data/navigation.js and needs
+   scroll-margin-top so the sticky header never covers the section title
+   after an anchor jump. */
+section {
+  scroll-margin-top: var(--header-height);
+}
+
+.long-copy {
+  max-width: var(--text-body-max-width);
+  line-height: 1.8;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

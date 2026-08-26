@@ -1,0 +1,26 @@
+/**
+ * Shared responsive rules. Breakpoints verified against 1440 / 1024 / 768 /
+ * 390px per the project spec. Component-level responsive layout (Hero,
+ * Career timeline, Gallery grid, etc.) is added alongside each component in
+ * later phases — this file only carries the container/base rules that
+ * apply everywhere.
+ */
+
+@media (max-width: 1024px) {
+  :root {
+    --container-padding-inline: var(--space-md);
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --header-height: 64px;
+    --container-padding-inline: var(--space-sm);
+  }
+}
+
+@media (max-width: 390px) {
+  :root {
+    --container-padding-inline: var(--space-sm);
+  }
+}

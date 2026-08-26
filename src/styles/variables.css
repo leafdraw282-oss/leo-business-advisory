@@ -1,0 +1,49 @@
+/**
+ * Design tokens. Every color, spacing and layout constant used across the
+ * site must be defined here — components should reference var(--token),
+ * never a hardcoded hex/px value, so the whole site can be restyled from
+ * this one file.
+ */
+:root {
+  /* Color system */
+  --color-navy: #0b1625;
+  --color-ivory: #f4f1ea;
+  --color-charcoal: #222222;
+  --color-gray: #8b8984;
+  --color-bronze: #a4865c;
+  --color-white: #ffffff;
+
+  --color-bg: var(--color-ivory);
+  --color-surface: var(--color-white);
+  --color-text: var(--color-charcoal);
+  --color-text-muted: var(--color-gray);
+  --color-accent: var(--color-bronze);
+  --color-inverse-bg: var(--color-navy);
+  --color-inverse-text: var(--color-ivory);
+  --color-border: rgba(34, 34, 34, 0.12);
+  --color-border-inverse: rgba(244, 241, 234, 0.18);
+
+  /* Typography */
+  --font-kr: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Fraunces', 'Noto Serif KR', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter', var(--font-kr), sans-serif;
+
+  --text-body-max-width: 720px;
+  --line-height-body: 1.75;
+  --line-height-heading: 1.2;
+
+  /* Spacing scale */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.5rem;
+  --space-xl: 4rem;
+  --space-2xl: 6rem;
+
+  /* Layout */
+  --container-max-width: 1280px;
+  --container-padding-inline: var(--space-md);
+  --header-height: 80px;
+  --radius-sm: 2px;
+  --transition-base: 0.25s ease;
+}
