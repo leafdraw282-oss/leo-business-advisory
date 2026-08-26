@@ -215,24 +215,31 @@ export const caseStudiesSection = {
   titleEn: 'SELECTED CAREER IMPACT',
 };
 
-// Advisory Focus section (id: "advisory").
+// Advisory Focus section (id: "advisory"). Title + items are verbatim
+// from the source document's own "핵심 자문 영역" / "ADVISORY FOCUS" list.
 export const advisory = {
+  eyebrowKo: '자문 영역',
+  eyebrowEn: 'HOW I CAN HELP',
   titleKo: '핵심 자문 영역',
   titleEn: 'ADVISORY FOCUS',
   items: [
-    { ko: '브랜드·포트폴리오 전략', en: 'Brand & portfolio strategy' },
-    { ko: '성장전략 및 턴어라운드', en: 'Growth strategy & turnaround' },
-    { ko: '신사업 및 시장진입', en: 'New ventures & market entry' },
-    { ko: '상품/가격/채널 전략', en: 'Product / pricing / channel strategy' },
-    { ko: 'DTC/이커머스/리테일', en: 'DTC / e-commerce / retail' },
-    { ko: '라이선싱 및 전략적 파트너십', en: 'Licensing & strategic partnerships' },
-    { ko: 'P&L/조직/운영체계', en: 'P&L / organization / operating model' },
-    { ko: '창업자·경영진 자문', en: 'Founder & executive advisory' },
+    { id: 'brand-portfolio', ko: '브랜드·포트폴리오 전략', en: 'Brand & portfolio strategy' },
+    { id: 'growth-turnaround', ko: '성장전략 및 턴어라운드', en: 'Growth and turnaround' },
+    { id: 'new-ventures', ko: '신사업 및 시장진입', en: 'New ventures and market entry' },
+    { id: 'product-pricing-channel', ko: '상품/가격/채널', en: 'Product/pricing/channel' },
+    { id: 'dtc-ecommerce-retail', ko: 'DTC/이커머스/리테일', en: 'DTC/e-commerce/retail' },
+    { id: 'licensing-partnerships', ko: '라이선싱 및 파트너십', en: 'Licensing and strategic partnerships' },
+    { id: 'pnl-organization', ko: 'P&L/조직/운영체계', en: 'P&L/organization/operating model' },
+    { id: 'founder-advisory', ko: '창업자·경영진 자문', en: 'Founder and executive advisory' },
   ],
 };
 
-// Heading copy for the Career section, taken from the source document.
+// Heading copy for the Career section. Title is taken verbatim from the
+// source document; the eyebrow is short non-factual UI copy (the
+// document has no separate kicker line for this section).
 export const careerSection = {
+  eyebrowKo: '경력 타임라인',
+  eyebrowEn: 'CAREER TIMELINE',
   titleKo: '주요 경력',
   titleEn: 'EXECUTIVE CAREER',
 };

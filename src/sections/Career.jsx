@@ -1,23 +1,34 @@
 import { career, careerSection } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
+import SectionTitle from '../components/SectionTitle';
+import './Career.css';
 
 /**
- * Structural shell — Career timeline section (id: "career", matches
- * src/data/navigation.js). Visual timeline treatment is a later phase.
+ * Career section (id: "career", matches src/data/navigation.js). A
+ * vertical timeline (spine + marker per entry) rather than a plain
+ * résumé list — generous spacing on desktop, the same clear single-line
+ * structure carries straight through to mobile. Entries come from
+ * profile.js `career`, cross-checked against the Founder Profile source
+ * document (years, roles, companies match exactly).
  */
 function Career() {
   const { t } = useLanguage();
 
   return (
-    <section id="career" aria-label="Executive Career">
+    <section id="career" className="career" aria-label="Executive Career">
       <div className="container">
-        <h2>{t(careerSection.titleKo, careerSection.titleEn)}</h2>
-        <ol>
+        <SectionTitle eyebrow={t(careerSection.eyebrowKo, careerSection.eyebrowEn)} title={t(careerSection.titleKo, careerSection.titleEn)} />
+        <ol className="career__timeline">
           {career.map((entry) => (
-            <li key={entry.period}>
-              <span>{entry.period}</span>
-              <strong>{t(entry.roleKo, entry.roleEn)}</strong>
-              <span>{t(entry.companyKo, entry.companyEn)}</span>
+            <li className="career__entry" key={entry.period}>
+              <div className="career__marker" aria-hidden="true">
+                <span className="career__dot" />
+              </div>
+              <div className="career__detail">
+                <p className="career__period">{entry.period}</p>
+                <h3 className="career__role">{t(entry.roleKo, entry.roleEn)}</h3>
+                <p className="career__company">{t(entry.companyKo, entry.companyEn)}</p>
+              </div>
             </li>
           ))}
         </ol>

@@ -1,5 +1,98 @@
 # Project Status
 
+## Phase 1-D — Advisory / Career
+
+**Status: complete.**
+
+Scope was the full visual design of the Advisory section and the Career
+timeline. Gallery, Contact, and Footer remain out of scope (still
+structural shells, or not yet built).
+
+### What was built
+
+- `src/sections/Advisory.jsx` redesigned (+ `Advisory.css`) — an
+  editorial numbered index (01–08) instead of a card grid: two columns on
+  desktop/tablet, one column on mobile, each row separated by a hairline
+  rule. Fully data-driven from `profile.js` `advisory.items` — a 9th item
+  (or a future description/case-reference field on an item) needs no
+  layout change. Reuses the `SectionTitle` component from Phase 1-C for
+  heading consistency.
+- `src/sections/Career.jsx` redesigned (+ `Career.css`) — a vertical
+  timeline: a continuous spine line with a bronze marker dot per entry,
+  period as a small kicker above a serif role heading and the company
+  name below. One consistent structure serves both breakpoints (no
+  DOM reshuffling between desktop/mobile) — desktop gets generous
+  `--space-lg`/`--space-2xl` vertical rhythm, mobile keeps the same clear
+  single-line spine at tighter spacing. Chosen deliberately over a
+  résumé-style plain list so scale/seniority reads through typography
+  (large serif role titles) rather than a dense text block.
+- `src/data/profile.js`:
+  - **Corrected `advisory.items` EN wording to match the source document
+    exactly** — found during this phase's required re-verification.
+    Previous text had added words not in the document ("Growth **strategy**
+    & turnaround" → "Growth and turnaround"; "New ventures **&**..." → "New
+    ventures **and**..."; "Product / pricing / channel **strategy**" →
+    "Product/pricing/channel"; "Licensing **&**..." → "Licensing **and**...";
+    "P&L / organization..." spacing → "P&L/organization..." (no spaces, per
+    doc); "Founder **&**..." → "Founder **and**..."). The Korean item that
+    read "라이선싱 및 **전략적** 파트너십" had an inserted word not in the
+    source document's own KR list ("라이선싱 및 파트너십") — corrected.
+    Added a stable `id` to each item (was keying off the English string).
+  - `advisory.eyebrowKo` / `advisory.eyebrowEn` (new): "자문 영역" /
+    "HOW I CAN HELP" — satisfies this phase's request for a "HOW I CAN
+    HELP"-equivalent title while keeping the document's own heading
+    ("핵심 자문 영역" / "ADVISORY FOCUS") as the actual `<h2>`.
+  - `careerSection.eyebrowKo` / `careerSection.eyebrowEn` (new): "경력
+    타임라인" / "CAREER TIMELINE" — short non-factual UI copy.
+  - `career` array itself: unchanged — re-verified word-for-word against
+    the source document (see below) and already correct.
+
+### Facts re-verification (per this phase's explicit instruction)
+
+Re-extracted `word/document.xml` from the original
+`Leo_Business_Advisory_Founder_Profile_KR_EN.docx` and diffed against
+`src/data/profile.js`:
+
+- **Career**: all 7 entries' years, roles, and company names match the
+  document's "EXECUTIVE CAREER" / "주요 경력" list exactly, including the
+  "concurrent Korea leadership" / "한국 대표 겸임" note on the 2013–2015
+  entry. No changes needed.
+- **Advisory**: title matches the document exactly. Item wording had
+  drifted from the document in 6 of 8 English items and 1 of 8 Korean
+  items (see above) — corrected to match verbatim; the underlying menu of
+  8 advisory areas itself was already correct and unchanged.
+
+### Deliberately NOT built yet (by scope, not oversight)
+
+- Gallery, Contact, Footer visual design.
+- `ContactForm.jsx`.
+- Active-nav-on-scroll highlighting, scroll-reveal animation.
+- Real photography (all 8 image slots still render via `ImagePlaceholder`
+  — Advisory/Career have no image slots by design, matching the source
+  document, which has none for these sections either).
+
+### Test results
+
+```
+npm run lint  → passes, 0 warnings/errors
+npm run build → succeeds, no errors
+```
+
+Verified with a scripted Playwright pass (Chromium) against the production
+build (`npm run preview`):
+- No console errors/warnings, no page errors, at any point below.
+- Advisory renders all 8 items with the corrected text, numbered 01–08.
+- Career renders all 7 entries in order with correct period/role/company.
+- Regression check: Header nav hrefs, Hero CTA hrefs, Impact metric
+  values, and Case Study tag count all still correct — nothing in Phase
+  1-B/1-C broke.
+- No horizontal overflow at 1440 / 1024 / 768 / 390px.
+- Mobile hamburger menu still opens and closes (via nav-link click) correctly.
+- KR/EN toggle switches Advisory heading + first item, and Career heading
+  + first role, simultaneously with the rest of the page; toggling back to
+  KR restores both correctly — no partial switch introduced by the new
+  sections.
+
 ## Phase 1-C — Impact / Profile / Selected Impact
 
 **Status: complete.**
@@ -270,27 +363,23 @@ npm run build
 ```
 Result: succeeded, no errors. (Re-run and update this note if the result changes.)
 
-### Phase 1-C is documented above (now complete).
+### Phase 1-C and 1-D are documented above (both complete).
 
-### Next: Phase 1-D (not started — do not begin without explicit instruction)
+### Next: Phase 1-E (not started — do not begin without explicit instruction)
 
 Expected scope, per the Master Specification:
 
-1. Full visual design pass for Advisory, Career, Gallery, Contact, and
-   `Footer.jsx` — per the design system in `CLAUDE.md`. Text/data already
-   exists in `profile.js` for all of these; this is layout/CSS work.
-   `SectionTitle.jsx` (built in Phase 1-C) should be reused for their
-   headings rather than re-implemented.
-2. `CareerTimeline.jsx` extracted as a reusable component as the Career
-   section is designed.
-3. `ContactForm.jsx` — real fields per `profile.js` `inquiryTypes`, with a
+1. Full visual design pass for Gallery, Contact, and `Footer.jsx` — per
+   the design system in `CLAUDE.md`. `SectionTitle.jsx` should be reused
+   for their headings rather than re-implemented.
+2. `ContactForm.jsx` — real fields per `profile.js` `inquiryTypes`, with a
    working `mailto:` (or clearly-labeled backend-not-configured) submission
    path — never a fake "sent" confirmation.
-4. Active-nav-on-scroll (IntersectionObserver) highlighting the current
+3. Active-nav-on-scroll (IntersectionObserver) highlighting the current
    section in the header.
-5. Subtle scroll-reveal animation (opacity/translateY), content visible by default.
-6. Responsive QA at 1440 / 1024 / 768 / 390px for the newly designed sections.
-7. `npm run build` re-verified clean.
+4. Subtle scroll-reveal animation (opacity/translateY), content visible by default.
+5. Responsive QA at 1440 / 1024 / 768 / 390px for the newly designed sections.
+6. `npm run build` re-verified clean.
 
 Content editing locations for the next phase (no code changes needed):
 text → `src/data/profile.js`, nav/menu → `src/data/navigation.js`, photos →
