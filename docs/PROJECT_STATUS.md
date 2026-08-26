@@ -1,5 +1,109 @@
 # Project Status
 
+## Phase 1-E — Gallery / Final CTA / Contact / Footer
+
+**Status: complete.**
+
+Scope was the Gallery/Visual Story section, the Contact section's Final
+CTA + full inquiry form, and the site Footer. This completes the visual
+design of every Phase 1 section in the Master Specification — the full
+page now flows Header → Hero → Impact → About → Case Studies → Advisory →
+Career → Gallery → Contact → Footer.
+
+### What was built
+
+- `src/sections/Gallery.jsx` redesigned (+ `Gallery.css`) — an editorial
+  grid (4 columns desktop, 2 tablet, 1 mobile) with per-item aspect ratio
+  and an optional 2-column `wide` span, so tile size/shape varies instead
+  of a uniform photo grid. Fully driven by `profile.js` `gallery` — going
+  from the current 6 entries to 10+ needs no component change, and an
+  entry with no `aspect`/`wide` still renders correctly (defaults apply).
+  All 6 entries currently render through `ImagePlaceholder` (no real
+  photography yet).
+- `src/components/ContactForm.jsx` (+ css) — Name / Company / Email /
+  Type of Inquiry / Message fields (inquiry options from `profile.js`
+  `inquiryTypes`, unchanged from earlier phases). No backend exists, so
+  submitting builds a `mailto:` link from the field values (subject +
+  body, localized labels) and hands off to the visitor's email app —
+  there is no "message sent" confirmation anywhere, and a visible note
+  under the submit button states plainly that sending still happens in
+  the visitor's own email app. Verified end-to-end with Playwright: the
+  constructed `mailto:` URL carries all 5 fields correctly, and no
+  success-style text appears on the page after submitting.
+- `src/sections/Contact.jsx` rewritten (+ `Contact.css`) — a Final CTA
+  block (headline + "Start a Conversation" / "대화 시작하기" button, both
+  already existed in `profile.js` `contactCta` from Phase 1-A) whose
+  button click focuses the form's first field (verified: the `name` input
+  receives focus on click); contact info (working `mailto:`/`tel:` links,
+  unchanged) alongside the new `ContactForm`.
+- `src/components/Footer.jsx` (+ css) — dark navy band (matches the
+  mobile-menu panel treatment already established in Header) with:
+  `LEO BUSINESS ADVISORY` brand + tagline linking to `#top`, Navigation
+  (reads `navigation.js`, the same single source of truth as the header),
+  Contact info (live `mailto:`/`tel:` links), a dynamic-year copyright
+  line, and a dedicated "Back to top" / "맨 위로" link in addition to the
+  logo (both go to `#top`, matching the spec's explicit "Top 이동 기능"
+  item). Mounted in `App.jsx` after `<main>`.
+- `src/data/profile.js` — additive only:
+  - `gallery` populated with 6 placeholder entries (`aspect`, `wide`)
+    named after already-documented ventures (Samsonite Korea, Samsonite
+    RED, TravelDepot, RCC · Rawrow · Nautica, LEOHOLDINGS · Just Craft,
+    plus a "LEO Portrait" slot) — no new facts, just reusing entity names
+    already verified against the source document in earlier phases.
+  - `gallerySection` gained `eyebrowKo`/`eyebrowEn` (moved the old
+    "비주얼 스토리"/"VISUAL STORY" text here) and new `titleKo`/`titleEn`
+    ("기록으로 남은 순간들" / "Moments Along the Way") — the source
+    document has no gallery section, so this is placeholder UI copy as
+    before, just split into eyebrow + heading like every other section.
+  - `contact.infoLabelKo`/`infoLabelEn` (new): "연락처" / "Contact Details".
+  - `contactForm` (new): field labels, inquiry-type placeholder, submit
+    button text, and the mailto-disclosure note — all bilingual.
+  - `footer` (new): copyright phrase and "back to top" link text.
+  - No existing fact (career years, case-study figures, advisory items,
+    contact email/phone) was touched.
+
+### Deliberately NOT built yet (by scope, not oversight)
+
+- Active-nav-on-scroll highlighting in the header.
+- Scroll-reveal animation (opacity/translateY on scroll).
+- Real photography (all 14 image slots — Hero, Profile portrait, 6 case
+  studies, 6 gallery items — still render via `ImagePlaceholder`).
+- GitHub Pages `base` path / custom domain deployment config.
+- SEO OpenGraph/JSON-LD.
+
+### Test results
+
+```
+npm run lint  → passes, 0 warnings/errors
+npm run build → succeeds, no errors
+```
+
+Verified with a scripted Playwright pass (Chromium) against the production
+build (`npm run preview`):
+- No console errors/warnings, no page errors, at any point below.
+- Gallery renders all 6 items with correct captions.
+- Final CTA button click moves focus to the Contact form's `name` field.
+- Email (`mailto:leosuh00@gmail.com`) and phone (`tel:+821090332237`)
+  links confirmed on both the Contact section and the Footer.
+- Contact form: filled every field, submitted, and captured the resulting
+  `mailto:` request — subject and body contain all 5 field values with
+  localized labels; confirmed no "sent"/"submitted successfully"-style
+  text appears anywhere on the page after submitting (regex-checked the
+  full page text in both languages).
+- Footer: nav hrefs match `navigation.js` exactly, logo and the dedicated
+  "Back to top" link both go to `#top`, copyright renders with the live
+  year.
+- Full-page regression: Header nav hrefs, Hero CTA hrefs, Impact metric
+  values, About heading, Case Study tag count (6), Advisory item count
+  (8), and Career entry count (7) all unchanged from Phase 1-D.
+- All 14 image slots across the whole page fall back to `ImagePlaceholder`
+  correctly after scrolling into view — 0 visibly broken `<img>` icons.
+- No horizontal overflow at 1440 / 1024 / 768 / 390px.
+- Mobile hamburger menu still opens and closes (ESC) correctly.
+- KR/EN toggle switches Gallery heading/captions, Contact headline/CTA/
+  form labels/disclosure note, and Footer tagline/nav/copyright/back-to-top
+  simultaneously with the rest of the page — no partial switch.
+
 ## Phase 1-D — Advisory / Career
 
 **Status: complete.**
@@ -363,23 +467,28 @@ npm run build
 ```
 Result: succeeded, no errors. (Re-run and update this note if the result changes.)
 
-### Phase 1-C and 1-D are documented above (both complete).
+### Phase 1-C, 1-D and 1-E are documented above (all complete).
 
-### Next: Phase 1-E (not started — do not begin without explicit instruction)
+### Next: Phase 1-F (not started — do not begin without explicit instruction)
 
-Expected scope, per the Master Specification:
+Every section in the Master Specification now has a full visual design.
+Remaining scope is polish/behavior rather than new sections:
 
-1. Full visual design pass for Gallery, Contact, and `Footer.jsx` — per
-   the design system in `CLAUDE.md`. `SectionTitle.jsx` should be reused
-   for their headings rather than re-implemented.
-2. `ContactForm.jsx` — real fields per `profile.js` `inquiryTypes`, with a
-   working `mailto:` (or clearly-labeled backend-not-configured) submission
-   path — never a fake "sent" confirmation.
-3. Active-nav-on-scroll (IntersectionObserver) highlighting the current
-   section in the header.
-4. Subtle scroll-reveal animation (opacity/translateY), content visible by default.
-5. Responsive QA at 1440 / 1024 / 768 / 390px for the newly designed sections.
+1. Active-nav-on-scroll (IntersectionObserver) highlighting the current
+   section in the header nav as the visitor scrolls.
+2. Subtle scroll-reveal animation (opacity/translateY on scroll into
+   view), content visible by default if JS fails.
+3. GitHub Pages deployment config (`vite.config.js` `base`, asset paths)
+   and the README sections on GitHub upload / Pages / custom domain /
+   swapping the contact form to Formspree — all currently deferred per
+   `CLAUDE.md`.
+4. Basic SEO: OpenGraph metadata, JSON-LD (Person or ProfessionalService).
+5. Responsive QA at 1440 / 1024 / 768 / 390px for any new behavior added.
 6. `npm run build` re-verified clean.
+
+Real photography and final copywriting polish remain owner-driven inputs
+(drop files into `public/images/` and update `src/data/profile.js`) and
+are not a "phase" to schedule — they can happen at any time.
 
 Content editing locations for the next phase (no code changes needed):
 text → `src/data/profile.js`, nav/menu → `src/data/navigation.js`, photos →

@@ -38,6 +38,8 @@ export const contact = {
   emailHref: 'mailto:leosuh00@gmail.com',
   phoneDisplay: '+82 10-9033-2237',
   phoneHref: 'tel:+821090332237',
+  infoLabelKo: '연락처',
+  infoLabelEn: 'Contact Details',
 };
 
 // Hero copy. Facts (name/title/positioning) come from the source document;
@@ -309,14 +311,27 @@ export const education = {
 // Heading copy for the Gallery / Visual Story section. Not present in the
 // source document (it has no gallery); this is placeholder section copy.
 export const gallerySection = {
-  titleKo: '비주얼 스토리',
-  titleEn: 'VISUAL STORY',
+  eyebrowKo: '비주얼 스토리',
+  eyebrowEn: 'VISUAL STORY',
+  titleKo: '기록으로 남은 순간들',
+  titleEn: 'Moments Along the Way',
 };
 
-// Visual Story / Gallery (id within Gallery section). Empty for Phase 1 —
-// populate as photos become available:
-// { id: 'unique-id', src: '/images/example.jpg', captionKo: '...', captionEn: '...' }
-export const gallery = [];
+// Visual Story / Gallery (section id: "gallery"). Placeholder entries tied
+// to real, already-documented ventures (same entities used in
+// `caseStudies`) so the editorial rhythm can be previewed before real
+// photography exists. `aspect` is a CSS aspect-ratio value and `wide`
+// spans 2 grid columns — both are purely layout hints. Growing this list
+// from 6 to 10+ entries needs no component change; a new entry with no
+// `aspect`/`wide` still renders correctly (component provides defaults).
+export const gallery = [
+  { id: 'leo-portrait', src: '/images/gallery-leo-portrait.jpg', captionKo: 'LEO 포트레이트', captionEn: 'LEO Portrait', aspect: '4 / 5' },
+  { id: 'samsonite-korea', src: '/images/gallery-samsonite-korea.jpg', captionKo: 'Samsonite Korea', captionEn: 'Samsonite Korea', aspect: '4 / 3' },
+  { id: 'samsonite-red', src: '/images/gallery-samsonite-red.jpg', captionKo: 'Samsonite RED', captionEn: 'Samsonite RED', aspect: '3 / 4' },
+  { id: 'traveldepot', src: '/images/gallery-traveldepot.jpg', captionKo: 'TravelDepot', captionEn: 'TravelDepot', aspect: '16 / 9', wide: true },
+  { id: 'rcc-rawrow-nautica', src: '/images/gallery-rcc.jpg', captionKo: 'RCC · Rawrow · Nautica', captionEn: 'RCC · Rawrow · Nautica', aspect: '1 / 1' },
+  { id: 'leoholdings-just-craft', src: '/images/gallery-leoholdings.jpg', captionKo: 'LEOHOLDINGS · Just Craft', captionEn: 'LEOHOLDINGS · Just Craft', aspect: '4 / 3' },
+];
 
 // Final CTA (Contact section, id: "contact").
 export const contactCta = {
@@ -336,6 +351,35 @@ export const inquiryTypes = [
   { ko: '경영진 자문', en: 'Executive Advisory' },
   { ko: '기타', en: 'Other' },
 ];
+
+// Contact form copy (id: "contact"). No backend exists yet — submitting
+// this form opens the visitor's email app with the message pre-filled
+// (mailto:), per CLAUDE.md's Contact form rule. `noteKo`/`noteEn` must
+// stay visible near the submit button so nobody mistakes this for a
+// direct server submission.
+export const contactForm = {
+  labels: {
+    name: { ko: '이름', en: 'Name' },
+    company: { ko: '회사', en: 'Company' },
+    email: { ko: '이메일', en: 'Email' },
+    inquiryType: { ko: '문의 유형', en: 'Type of Inquiry' },
+    message: { ko: '메시지', en: 'Message' },
+  },
+  inquiryPlaceholderKo: '유형을 선택해주세요',
+  inquiryPlaceholderEn: 'Select an inquiry type',
+  submitKo: '이메일 앱으로 보내기',
+  submitEn: 'Send via Email',
+  noteKo: '제출하시면 작성하신 내용으로 기본 이메일 앱이 열립니다. 앱에서 발송을 완료해야 실제로 전달됩니다.',
+  noteEn: "Submitting opens your default email app with this message pre-filled — you'll need to hit send there for it to actually reach Leo.",
+};
+
+// Footer copy (id: none — persistent site-wide chrome, not a nav section).
+export const footer = {
+  copyrightKo: '모든 권리 보유.',
+  copyrightEn: 'All rights reserved.',
+  backToTopKo: '맨 위로',
+  backToTopEn: 'Back to top',
+};
 
 // Image registry — components must resolve images through this map, never
 // hardcode a path inline. Files are expected under public/images/ and are
@@ -369,6 +413,8 @@ export const profile = {
   gallerySection,
   contactCta,
   inquiryTypes,
+  contactForm,
+  footer,
   images,
 };
 
