@@ -1,0 +1,46 @@
+.profile {
+  padding-block: var(--space-2xl);
+}
+
+.profile__grid {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: var(--space-xl);
+  align-items: center;
+}
+
+/* Desktop reading order is Text + Image (spec), but the image sits first
+   in the DOM so it naturally leads on mobile — see the override below. */
+.profile__media {
+  order: 2;
+}
+
+.profile__body {
+  order: 1;
+}
+
+.profile__bio {
+  margin-top: var(--space-md);
+}
+
+@media (max-width: 1024px) {
+  .profile__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile__media {
+    order: initial;
+    max-width: 26rem;
+    margin-inline: auto;
+  }
+
+  .profile__body {
+    order: initial;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile {
+    padding-block: var(--space-xl);
+  }
+}

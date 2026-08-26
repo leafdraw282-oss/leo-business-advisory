@@ -1,0 +1,26 @@
+.section-title {
+  margin-bottom: var(--space-xl);
+}
+
+.section-title--center {
+  text-align: center;
+}
+
+.section-title__eyebrow {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: var(--space-sm);
+}
+
+.section-title__heading {
+  font-size: clamp(1.75rem, 1.4vw + 1.4rem, 2.75rem);
+  line-height: 1.15;
+  max-width: 40rem;
+}
+
+.section-title--center .section-title__heading {
+  max-width: none;
+  margin-inline: auto;
+}

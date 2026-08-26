@@ -1,41 +1,46 @@
 import { caseStudies, caseStudiesSection, images } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
-import ImagePlaceholder from '../components/ImagePlaceholder';
+import SectionTitle from '../components/SectionTitle';
+import CaseStudy from '../components/CaseStudy';
+import './CaseStudies.css';
 
 /**
- * Structural shell — editorial Case Study list, rendered from
- * src/data/profile.js `caseStudies` (data-driven per project spec).
- * Distinct per-case editorial layout/rhythm is a later phase.
+ * Editorial case-study list (id: "case-studies", part of the Impact flow).
+ * Fully data-driven from src/data/profile.js `caseStudies` — adding a
+ * 7th case needs no layout change. Media/text sides alternate per case
+ * and the first (flagship) case gets extra visual weight, so the section
+ * reads as an editorial spread rather than a repeating grid of cards.
  */
 function CaseStudies() {
   const { t } = useLanguage();
 
   return (
-    <section id="case-studies" aria-label="Selected Impact">
+    <section id="case-studies" className="case-studies" aria-label="Selected Impact">
       <div className="container">
-        <h2>{t(caseStudiesSection.titleKo, caseStudiesSection.titleEn)}</h2>
-        {caseStudies.map((item) => (
-          <article key={item.id}>
-            <p>{item.tag}</p>
-            <h3>{t(item.titleKo, item.titleEn)}</h3>
-            <ImagePlaceholder
-              src={images[item.image]}
-              alt={`${item.titleEn} project image`}
-              label={`${item.titleEn} Project Image`}
-              aspectRatio="16 / 9"
+        <SectionTitle
+          eyebrow={t('선택된 성과', 'SELECTED IMPACT')}
+          title={t(caseStudiesSection.titleKo, caseStudiesSection.titleEn)}
+        />
+        <div className="case-studies__list">
+          {caseStudies.map((item, index) => (
+            <CaseStudy
+              key={item.id}
+              tag={item.tag}
+              title={t(item.titleKo, item.titleEn)}
+              summary={t(item.summaryKo, item.summaryEn)}
+              metrics={item.metrics.map((metric) => ({
+                value: t(metric.valueKo, metric.valueEn),
+                label: t(metric.labelKo, metric.labelEn),
+              }))}
+              highlights={(item.highlights ?? []).map((h) => t(h.ko, h.en))}
+              image={images[item.image]}
+              imageAlt={`${item.titleEn} project image`}
+              imageLabel={`${item.titleEn} Project Image`}
+              reverse={index % 2 === 1}
+              emphasis={index === 0}
             />
-            <p className="long-copy">{t(item.summaryKo, item.summaryEn)}</p>
-            {item.metrics.length > 0 && (
-              <ul>
-                {item.metrics.map((metric) => (
-                  <li key={metric.labelEn}>
-                    <strong>{t(metric.valueKo, metric.valueEn)}</strong> <span>{t(metric.labelKo, metric.labelEn)}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </article>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

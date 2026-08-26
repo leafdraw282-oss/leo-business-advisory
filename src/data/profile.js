@@ -58,6 +58,16 @@ export const hero = {
   ctaSecondaryTarget: 'contact',
 };
 
+// Heading copy for the Impact section. Not a verbatim doc heading (the
+// source document has no section title of its own for these four
+// figures) — short, non-factual UI copy only.
+export const impactSection = {
+  eyebrowKo: '경영 성과',
+  eyebrowEn: 'TRACK RECORD',
+  titleKo: '숫자로 보는 임팩트',
+  titleEn: 'Impact at a Glance',
+};
+
 // Headline impact metrics (Impact section, id: "impact").
 export const impact = [
   {
@@ -88,6 +98,8 @@ export const impact = [
 
 // Profile / About section (id: "about").
 export const about = {
+  eyebrowKo: '이그제큐티브 프로필',
+  eyebrowEn: 'EXECUTIVE PROFILE',
   headlineKo: '30년 이상, 브랜드를 만들고 성장시켜온 글로벌 경영자',
   headlineEn: '30+ Years of Building, Scaling and Transforming Brands.',
   bioKo:
@@ -125,6 +137,14 @@ export const caseStudies = [
     summaryEn:
       'Originated the Samsonite RED opportunity and built the concept, product, pricing, distribution and marketing platform into a KRW 100B+ Asian brand.',
     metrics: [{ valueKo: 'KRW 100B+', valueEn: 'KRW 100B+', labelKo: '브랜드 매출', labelEn: 'Brand sales' }],
+    // The functions built out, per the source document's own summary.
+    highlights: [
+      { ko: '콘셉트', en: 'Concept' },
+      { ko: '상품', en: 'Product' },
+      { ko: '가격', en: 'Pricing' },
+      { ko: '유통', en: 'Distribution' },
+      { ko: '마케팅', en: 'Marketing' },
+    ],
     image: 'samsoniteRed',
   },
   {
@@ -329,6 +349,7 @@ export const profile = {
   person,
   contact,
   hero,
+  impactSection,
   impact,
   about,
   caseStudies,

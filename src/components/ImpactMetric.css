@@ -1,0 +1,18 @@
+.impact-metric {
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.impact-metric__value {
+  font-family: var(--font-heading);
+  font-size: clamp(2.25rem, 2.4vw + 1.6rem, 3.5rem);
+  line-height: 1.05;
+  color: var(--color-navy);
+  margin-bottom: var(--space-xs);
+}
+
+.impact-metric__label {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  max-width: 16rem;
+}

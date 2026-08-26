@@ -1,0 +1,29 @@
+.impact {
+  padding-block: var(--space-2xl);
+}
+
+.impact__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+}
+
+@media (max-width: 1024px) {
+  .impact__grid {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: var(--space-xl);
+  }
+}
+
+@media (max-width: 768px) {
+  .impact {
+    padding-block: var(--space-xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .impact__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md) var(--space-sm);
+  }
+}

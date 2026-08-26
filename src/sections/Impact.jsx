@@ -1,25 +1,26 @@
-import { impact } from '../data/profile';
+import { impact, impactSection } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
+import SectionTitle from '../components/SectionTitle';
+import ImpactMetric from '../components/ImpactMetric';
+import './Impact.css';
 
 /**
- * Structural shell — Impact section (id must match src/data/navigation.js
- * "impact" entry). Full metric-tile layout is a later phase.
+ * Impact section (id: "impact", matches src/data/navigation.js). Four
+ * headline figures, data-driven from profile.js `impact` — adding a
+ * fifth metric later needs no layout change.
  */
 function Impact() {
   const { t } = useLanguage();
 
   return (
-    <section id="impact" aria-label="Impact">
+    <section id="impact" className="impact" aria-label="Impact">
       <div className="container">
-        <h2>{t('성과', 'Impact')}</h2>
-        <ul>
+        <SectionTitle eyebrow={t(impactSection.eyebrowKo, impactSection.eyebrowEn)} title={t(impactSection.titleKo, impactSection.titleEn)} />
+        <div className="impact__grid">
           {impact.map((metric) => (
-            <li key={metric.labelEn}>
-              <strong>{t(metric.valueKo, metric.valueEn)}</strong>
-              <span>{t(metric.labelKo, metric.labelEn)}</span>
-            </li>
+            <ImpactMetric key={metric.labelEn} value={t(metric.valueKo, metric.valueEn)} label={t(metric.labelKo, metric.labelEn)} />
           ))}
-        </ul>
+        </div>
       </div>
     </section>
   );

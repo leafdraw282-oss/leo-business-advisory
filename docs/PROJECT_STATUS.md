@@ -1,5 +1,121 @@
 # Project Status
 
+## Phase 1-C — Impact / Profile / Selected Impact
+
+**Status: complete.**
+
+Scope was the full visual design of the Impact section, the Profile/About
+section, and the Selected Impact case-study list — the three sections
+covering the "Results" and "Credibility" part of the site flow. Advisory,
+Career, Gallery, Contact and Footer remain out of scope (still structural
+shells, or not yet built).
+
+### What was built
+
+- `src/components/SectionTitle.jsx` (+ css) — shared eyebrow + heading
+  pattern (small bronze uppercase kicker over a large serif heading),
+  matching the treatment Hero already established in Phase 1-B. Used by
+  Impact, Profile, and CaseStudies so heading typography stays consistent
+  without each section re-implementing it.
+- `src/components/ImpactMetric.jsx` (+ css) — one headline figure: a
+  hairline rule, a large `clamp()`-sized number, and a label. Deliberately
+  not a bordered/shadowed card.
+- `src/sections/Impact.jsx` redesigned (+ `Impact.css`) — 4-column grid on
+  desktop, 2-column from 1024px down (spec's "Tablet: 2 Column" and
+  "Mobile: 1~2 Column" — 2 columns reads better than 1 for four short
+  figures and was verified not to overflow or crowd at 390px). Renders the
+  same four `profile.js` `impact` entries as before (8× Samsonite Korea
+  growth, KRW 100B+ Samsonite RED sales, USD 1B APAC & ME P&L, 20+ markets)
+  — no data changed, only the layout.
+- `src/sections/Profile.jsx` redesigned (+ `Profile.css`) — Executive
+  Introduction layout: portrait + eyebrow + headline + bio, text/image
+  side-by-side on desktop (image right, per spec's "Desktop: Text + Image"
+  reading order), image stacked above text from 1024px down (spec's
+  "Mobile: Image → Text"). Long-form bio keeps the existing `.long-copy`
+  max-width/line-height treatment from the global stylesheet.
+- `src/components/CaseStudy.jsx` (+ css) — the editorial case-study unit.
+  Media and text sides alternate per case (`reverse` prop, odd-indexed
+  cases flip), the flagship case (Samsonite Korea, index 0) gets a larger
+  title via an `emphasis` modifier, and a case with no metrics (LEOHOLDINGS)
+  automatically renders its summary as a larger serif pull-statement
+  instead of an empty metrics row (`case-study--statement`) — verified by
+  computed style (25.6px serif vs. 16px sans-serif for the metric cases).
+  Cases are separated by a hairline rule, not card borders/shadows.
+- `src/sections/CaseStudies.jsx` rewritten to map `profile.js`
+  `caseStudies` through `CaseStudy`, resolving KR/EN text before handing
+  it down (the component itself has no language logic).
+- `src/data/profile.js` — additive only, no existing fact/value changed:
+  - `impactSection` (new: short non-factual eyebrow/heading copy for the
+    Impact section — the source document has no heading of its own here).
+  - `about.eyebrowKo` / `about.eyebrowEn` (new keys on the existing `about`
+    object): "이그제큐티브 프로필" / "EXECUTIVE PROFILE".
+  - `caseStudies[1].highlights` (Samsonite RED only): Concept / Product /
+    Pricing / Distribution / Marketing, in both languages — taken directly
+    from that case's own summary sentence in the source document, not
+    invented.
+  - All existing `caseStudies` facts (case numbers, KRW/USD/market figures,
+    dates, entity names) were re-checked word-for-word against the source
+    document before writing any component and are unchanged — see the
+    facts note below.
+
+### Facts re-verification (per this phase's explicit instruction)
+
+Re-extracted `word/document.xml` from the original
+`Leo_Business_Advisory_Founder_Profile_KR_EN.docx` and diffed every case's
+numbers/wording against `src/data/profile.js`:
+
+- Case 01 Samsonite Korea (KRW 30B → KRW 240B, 8× growth, 2018 EBITDA
+  KRW 53B / 22% margin) — matches document exactly.
+- Case 02 Samsonite RED (opportunity → KRW 100B+ Asian brand,
+  concept/product/pricing/distribution/marketing) — matches.
+- Case 03 Asia Pacific & Middle East (USD 1B P&L, 20+ markets, 38% growth
+  2013–2015) — matches.
+- Case 05 RCC · Rawrow · Nautica (-2% → +19% within 4 months) — matches.
+- Case 06 TravelDepot (8,000㎡, 88 brands, 2,300+ SKUs, 4 months) — matches.
+- **LEOHOLDINGS was kept as Case 04.** This phase's instructions re-listed
+  the Master Specification's original 5-case example (which predates the
+  source document and omits LEOHOLDINGS); the source document itself lists
+  LEOHOLDINGS as one of its six "Selected Career Impact" / "주요 경영 성과"
+  entries. Per CLAUDE.md ("Founder Profile document wins" on any conflict,
+  and "never invent or estimate — or drop verified facts") this real,
+  documented entry was kept rather than removed to match the older
+  5-case example. This was already the Phase 1-A decision; Phase 1-C only
+  re-confirmed it against the document rather than changing it.
+
+### Deliberately NOT built yet (by scope, not oversight)
+
+- Advisory, Career, Gallery, Contact, Footer visual design.
+- `CareerTimeline.jsx`, `ContactForm.jsx`.
+- Active-nav-on-scroll highlighting, scroll-reveal animation.
+- Real photography (all 8 image slots — Hero, Profile portrait, and 6 case
+  studies — still render via `ImagePlaceholder`).
+
+### Test results
+
+```
+npm run lint  → passes, 0 warnings/errors
+npm run build → succeeds, no errors
+```
+
+Verified with a scripted Playwright pass (Chromium) against the production
+build (`npm run preview`):
+- No console errors/warnings, no page errors, at any point below.
+- Impact renders all 4 metrics with correct values (`8×`, `KRW 100B+`,
+  `USD 1B`, `20+개국`).
+- About (`#about`) heading and Hero/nav both still resolve correctly —
+  Header/Hero/Navigation from Phase 1-B unaffected.
+- CaseStudies renders exactly 6 cases with tags `CASE 01`–`CASE 06` and the
+  correct titles, in order.
+- All 8 image slots (Hero, Profile portrait, 6 case studies) fall back to
+  `ImagePlaceholder` correctly after scrolling them into view (lazy-loaded)
+  — 0 visibly broken `<img>` icons.
+- No horizontal overflow at 1440 / 1024 / 768 / 390px.
+- Mobile hamburger menu still opens/closes (incl. ESC) correctly.
+- KR/EN toggle switches Impact heading, About heading, and case-study
+  title/summary text simultaneously with the rest of the page (e.g. "Impact
+  at a Glance" / "30+ Years of Building, Scaling and Transforming Brands."
+  in EN) — no partial switch introduced by the new sections.
+
 ## Phase 1-B — Header / Hero / Navigation
 
 **Status: complete.**
@@ -154,26 +270,27 @@ npm run build
 ```
 Result: succeeded, no errors. (Re-run and update this note if the result changes.)
 
-### Next: Phase 1-C (not started — do not begin without explicit instruction)
+### Phase 1-C is documented above (now complete).
+
+### Next: Phase 1-D (not started — do not begin without explicit instruction)
 
 Expected scope, per the Master Specification:
 
-1. `Footer.jsx`.
-2. Full visual design pass for Impact, Profile, CaseStudies, Advisory,
-   Career, Gallery, Contact — per the design system in `CLAUDE.md`
-   (colors, spacing, typography, container rules). Text/data already
+1. Full visual design pass for Advisory, Career, Gallery, Contact, and
+   `Footer.jsx` — per the design system in `CLAUDE.md`. Text/data already
    exists in `profile.js` for all of these; this is layout/CSS work.
-3. `SectionTitle.jsx`, `ImpactMetric.jsx`, `CaseStudy.jsx`,
-   `CareerTimeline.jsx` extracted as reusable components as the sections
-   are designed.
-4. `ContactForm.jsx` — real fields per `profile.js` `inquiryTypes`, with a
+   `SectionTitle.jsx` (built in Phase 1-C) should be reused for their
+   headings rather than re-implemented.
+2. `CareerTimeline.jsx` extracted as a reusable component as the Career
+   section is designed.
+3. `ContactForm.jsx` — real fields per `profile.js` `inquiryTypes`, with a
    working `mailto:` (or clearly-labeled backend-not-configured) submission
    path — never a fake "sent" confirmation.
-5. Active-nav-on-scroll (IntersectionObserver) highlighting the current
+4. Active-nav-on-scroll (IntersectionObserver) highlighting the current
    section in the header.
-6. Subtle scroll-reveal animation (opacity/translateY), content visible by default.
-7. Responsive QA at 1440 / 1024 / 768 / 390px for the newly designed sections.
-8. `npm run build` re-verified clean.
+5. Subtle scroll-reveal animation (opacity/translateY), content visible by default.
+6. Responsive QA at 1440 / 1024 / 768 / 390px for the newly designed sections.
+7. `npm run build` re-verified clean.
 
 Content editing locations for the next phase (no code changes needed):
 text → `src/data/profile.js`, nav/menu → `src/data/navigation.js`, photos →
