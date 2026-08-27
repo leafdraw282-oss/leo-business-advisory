@@ -56,7 +56,7 @@ function FooterSection() {
 
   return (
     <section className="admin-section-form">
-      <h2>Footer</h2>
+      <h2>Footer (하단 영역)</h2>
       <SectionStatus
         status={status}
         loadError={loadError}
@@ -69,14 +69,14 @@ function FooterSection() {
       {values && (
         <>
           <BilingualField
-            label="Copyright line"
+            label="Footer 저작권 문구"
             ko={values.copyrightKo}
             en={values.copyrightEn}
             onKoChange={(v) => update({ copyrightKo: v })}
             onEnChange={(v) => update({ copyrightEn: v })}
           />
           <BilingualField
-            label="Back to top label"
+            label="맨 위로 버튼 문구"
             ko={values.backToTopKo}
             en={values.backToTopEn}
             onKoChange={(v) => update({ backToTopKo: v })}

@@ -92,7 +92,7 @@ function ImpactSection() {
 
   return (
     <section className="admin-section-form">
-      <h2>Impact</h2>
+      <h2>Impact (숫자로 보는 성과)</h2>
       <SectionStatus
         status={status}
         loadError={loadError}
@@ -104,35 +104,35 @@ function ImpactSection() {
       />
       {values && (
         <>
-          <h3>Section heading</h3>
+          <h3>섹션 제목 영역</h3>
           <BilingualField
-            label="Eyebrow"
+            label="Impact 섹션 소제목"
             ko={values.heading.eyebrowKo}
             en={values.heading.eyebrowEn}
             onKoChange={(v) => updateHeading({ eyebrowKo: v })}
             onEnChange={(v) => updateHeading({ eyebrowEn: v })}
           />
           <BilingualField
-            label="Title"
+            label="Impact 섹션 제목"
             ko={values.heading.titleKo}
             en={values.heading.titleEn}
             onKoChange={(v) => updateHeading({ titleKo: v })}
             onEnChange={(v) => updateHeading({ titleEn: v })}
           />
 
-          <h3>Metrics</h3>
+          <h3>성과 지표 (숫자 4가지)</h3>
           {values.metrics.map((metric, index) => (
             <div className="admin-list-row" key={metric.id ?? `new-${index}`}>
-              <p className="admin-list-row-title">Metric {index + 1}</p>
+              <p className="admin-list-row-title">성과 지표 {index + 1}</p>
               <BilingualField
-                label="Value"
+                label="지표 숫자 (예: 8×, KRW 100B+)"
                 ko={metric.valueKo}
                 en={metric.valueEn}
                 onKoChange={(v) => updateMetric(index, { valueKo: v })}
                 onEnChange={(v) => updateMetric(index, { valueEn: v })}
               />
               <BilingualField
-                label="Label"
+                label="지표 설명"
                 ko={metric.labelKo}
                 en={metric.labelEn}
                 onKoChange={(v) => updateMetric(index, { labelKo: v })}

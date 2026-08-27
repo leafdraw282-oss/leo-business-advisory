@@ -199,7 +199,7 @@ function ContactSection() {
 
   return (
     <section className="admin-section-form">
-      <h2>Contact</h2>
+      <h2>Contact (연락처 및 문의 폼)</h2>
       <SectionStatus
         status={status}
         loadError={loadError}
@@ -211,92 +211,92 @@ function ContactSection() {
       />
       {values && (
         <>
-          <h3>Contact info</h3>
+          <h3>연락처 정보</h3>
           <BilingualField
-            label="Location"
+            label="근무 지역"
             ko={values.info.locationKo}
             en={values.info.locationEn}
             onKoChange={(v) => updateInfo({ locationKo: v })}
             onEnChange={(v) => updateInfo({ locationEn: v })}
           />
-          <PlainField label="Email" type="email" value={values.info.email} onChange={(v) => updateInfo({ email: v })} />
-          <PlainField label="Phone (display)" value={values.info.phoneDisplay} onChange={(v) => updateInfo({ phoneDisplay: v })} />
+          <PlainField label="이메일 주소" type="email" value={values.info.email} onChange={(v) => updateInfo({ email: v })} />
+          <PlainField label="전화번호 (표시 형식)" value={values.info.phoneDisplay} onChange={(v) => updateInfo({ phoneDisplay: v })} />
           <BilingualField
-            label="Contact info label"
+            label="연락처 영역 소제목"
             ko={values.info.infoLabelKo}
             en={values.info.infoLabelEn}
             onKoChange={(v) => updateInfo({ infoLabelKo: v })}
             onEnChange={(v) => updateInfo({ infoLabelEn: v })}
           />
 
-          <h3>Final CTA</h3>
+          <h3>하단 문의 유도 문구</h3>
           <BilingualField
-            label="Headline"
+            label="Contact 섹션 제목"
             ko={values.cta.headlineKo}
             en={values.cta.headlineEn}
             onKoChange={(v) => updateCta({ headlineKo: v })}
             onEnChange={(v) => updateCta({ headlineEn: v })}
           />
           <BilingualField
-            label="Button"
+            label="Contact 버튼 문구"
             ko={values.cta.buttonKo}
             en={values.cta.buttonEn}
             onKoChange={(v) => updateCta({ buttonKo: v })}
             onEnChange={(v) => updateCta({ buttonEn: v })}
           />
 
-          <h3>Form copy</h3>
+          <h3>문의 폼 문구</h3>
           <BilingualField
-            label="Field label: Name"
+            label="문의 폼 - 이름 필드 라벨"
             ko={values.form.labelNameKo}
             en={values.form.labelNameEn}
             onKoChange={(v) => updateForm({ labelNameKo: v })}
             onEnChange={(v) => updateForm({ labelNameEn: v })}
           />
           <BilingualField
-            label="Field label: Company"
+            label="문의 폼 - 회사 필드 라벨"
             ko={values.form.labelCompanyKo}
             en={values.form.labelCompanyEn}
             onKoChange={(v) => updateForm({ labelCompanyKo: v })}
             onEnChange={(v) => updateForm({ labelCompanyEn: v })}
           />
           <BilingualField
-            label="Field label: Email"
+            label="문의 폼 - 이메일 필드 라벨"
             ko={values.form.labelEmailKo}
             en={values.form.labelEmailEn}
             onKoChange={(v) => updateForm({ labelEmailKo: v })}
             onEnChange={(v) => updateForm({ labelEmailEn: v })}
           />
           <BilingualField
-            label="Field label: Inquiry type"
+            label="문의 폼 - 문의 유형 필드 라벨"
             ko={values.form.labelInquiryTypeKo}
             en={values.form.labelInquiryTypeEn}
             onKoChange={(v) => updateForm({ labelInquiryTypeKo: v })}
             onEnChange={(v) => updateForm({ labelInquiryTypeEn: v })}
           />
           <BilingualField
-            label="Field label: Message"
+            label="문의 폼 - 메시지 필드 라벨"
             ko={values.form.labelMessageKo}
             en={values.form.labelMessageEn}
             onKoChange={(v) => updateForm({ labelMessageKo: v })}
             onEnChange={(v) => updateForm({ labelMessageEn: v })}
           />
           <BilingualField
-            label="Inquiry-type placeholder"
+            label="문의 유형 선택 안내 문구"
             ko={values.form.inquiryPlaceholderKo}
             en={values.form.inquiryPlaceholderEn}
             onKoChange={(v) => updateForm({ inquiryPlaceholderKo: v })}
             onEnChange={(v) => updateForm({ inquiryPlaceholderEn: v })}
           />
           <BilingualField
-            label="Submit button"
+            label="문의 폼 제출 버튼 문구"
             ko={values.form.submitKo}
             en={values.form.submitEn}
             onKoChange={(v) => updateForm({ submitKo: v })}
             onEnChange={(v) => updateForm({ submitEn: v })}
           />
           <BilingualField
-            label="Note (below submit)"
+            label="제출 버튼 아래 안내 문구"
             ko={values.form.noteKo}
             en={values.form.noteEn}
             onKoChange={(v) => updateForm({ noteKo: v })}
@@ -304,11 +304,11 @@ function ContactSection() {
             multiline
           />
 
-          <h3>Inquiry types</h3>
+          <h3>문의 유형 목록</h3>
           {values.inquiryTypes.map((type, index) => (
             <div className="admin-list-row" key={type.id ?? `new-${index}`}>
               <BilingualField
-                label={`Inquiry type ${index + 1}`}
+                label={`문의 유형 ${index + 1}`}
                 ko={type.labelKo}
                 en={type.labelEn}
                 onKoChange={(v) => updateInquiryType(index, { labelKo: v })}

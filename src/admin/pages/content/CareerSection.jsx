@@ -108,7 +108,7 @@ function CareerSection() {
 
   return (
     <section className="admin-section-form">
-      <h2>Career</h2>
+      <h2>Career (경력 타임라인)</h2>
       <SectionStatus
         status={status}
         loadError={loadError}
@@ -120,35 +120,35 @@ function CareerSection() {
       />
       {values && (
         <>
-          <h3>Section heading</h3>
+          <h3>섹션 제목 영역</h3>
           <BilingualField
-            label="Eyebrow"
+            label="Career 섹션 소제목"
             ko={values.heading.eyebrowKo}
             en={values.heading.eyebrowEn}
             onKoChange={(v) => updateHeading({ eyebrowKo: v })}
             onEnChange={(v) => updateHeading({ eyebrowEn: v })}
           />
           <BilingualField
-            label="Title"
+            label="Career 섹션 제목"
             ko={values.heading.titleKo}
             en={values.heading.titleEn}
             onKoChange={(v) => updateHeading({ titleKo: v })}
             onEnChange={(v) => updateHeading({ titleEn: v })}
           />
 
-          <h3>Career entries</h3>
+          <h3>경력 항목</h3>
           {values.entries.map((entry, index) => (
             <div className="admin-list-row" key={entry.id ?? `new-${index}`}>
-              <PlainField label="Period" value={entry.period} onChange={(v) => updateEntry(index, { period: v })} />
+              <PlainField label="재직 기간 (예: 2013–2015)" value={entry.period} onChange={(v) => updateEntry(index, { period: v })} />
               <BilingualField
-                label="Role"
+                label="직책"
                 ko={entry.roleKo}
                 en={entry.roleEn}
                 onKoChange={(v) => updateEntry(index, { roleKo: v })}
                 onEnChange={(v) => updateEntry(index, { roleEn: v })}
               />
               <BilingualField
-                label="Company"
+                label="회사명"
                 ko={entry.companyKo}
                 en={entry.companyEn}
                 onKoChange={(v) => updateEntry(index, { companyKo: v })}

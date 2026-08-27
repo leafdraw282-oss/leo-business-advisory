@@ -57,7 +57,7 @@ function EducationSection() {
 
   return (
     <section className="admin-section-form">
-      <h2>Education</h2>
+      <h2>Education (학력 및 어학)</h2>
       <SectionStatus
         status={status}
         loadError={loadError}
@@ -71,9 +71,9 @@ function EducationSection() {
         <>
           {values.entries.map((entry, index) => (
             <div className="admin-list-row" key={entry.id ?? `new-${index}`}>
-              <p className="admin-list-row-title">Entry {index + 1}</p>
+              <p className="admin-list-row-title">학력/어학 항목 {index + 1}</p>
               <BilingualField
-                label="Text"
+                label="내용"
                 ko={entry.textKo}
                 en={entry.textEn}
                 onKoChange={(v) => updateEntry(index, { textKo: v })}

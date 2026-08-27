@@ -1,5 +1,54 @@
 # Project Status
 
+## Phase 3-A — Content-Readiness & Admin Label Pass
+
+**Status: complete.** No public site design change, no database field
+change, no Founder Profile fact change — verified below. Scope was
+checking and labeling, not new features.
+
+**Content structure check:** confirmed (by grep, no fixes needed) that
+every image renders through `ImagePlaceholder` with a fixed CSS
+`aspect-ratio` container + `object-fit: cover` on the `<img>` — already
+true site-wide since Phase 1, so any real photo of any dimensions will
+always crop to the designed ratio, never distort or blow out layout.
+Confirmed no text container anywhere uses `-webkit-line-clamp`, a fixed
+`height`, or `white-space: nowrap` on admin-editable content (the one
+`nowrap` that exists, `.header__logo`, is the fixed brand name — not
+CMS-editable). Stress-tested by injecting far-longer-than-current KR and
+EN sentences into Hero headline/subhead, About bio, a Case Study
+summary, an Advisory item, a Career role/company, a Gallery caption, and
+the Contact form note, across Desktop/Tablet/Mobile: zero horizontal
+overflow at any width: text simply wraps and the section grows taller,
+which is the correct, expected behavior for a page with no fixed-height
+sections.
+
+**Image slot check:** every image area on the public site already has a
+1:1 admin counterpart from Phase 2-D (Hero, About/Profile, 6 Case
+Studies, Gallery) — confirmed, not newly built. Retitled the admin's
+image slots for recognizability: Hero → "Hero Portrait (첫 화면 인물
+사진)", About → "Founder Profile (소개 섹션 프로필 사진)", and the
+LEOHOLDINGS case slot now reads "CASE 04 — LEOHOLDINGS (Just Craft)" —
+"Just Craft" is the sub-brand name already used in that case's own
+fact-checked summary text and in the Gallery's own caption for the same
+entity, so this is a recognition aid pulled from existing verified
+content, not a new fact.
+
+**Admin label pass:** every field label in all 9 Content admin sections
+(Hero, Impact, About, Case Studies, Advisory, Career, Education,
+Contact, Footer) was rewritten from generic/developer-flavored English
+("Eyebrow", "Label", "Value", a raw slug like `brand-portfolio` as a row
+heading) to a plain, context-grounded Korean description of what the
+field actually controls on the public site (e.g. "Hero 메인 문구 (줄바꿈으로
+줄 구분)", "사례 요약 문구", "문의 폼 - 이메일 필드 라벨"). Section headings
+gained a Korean gloss too (e.g. "Case Studies (경영 성과 사례)"). Only the
+JSX `label=` prop strings changed — no Supabase column name, table, or
+migration file was touched anywhere.
+
+**Source of truth:** `git diff` of `src/data/profile.js` against every
+prior commit this phase is empty — no Founder Profile fact (name, title,
+career, company, years, revenue, growth rate, EBITDA, P&L, market
+counts) was touched, directly or indirectly, by this phase's work.
+
 ## PHASE 2 COMPLETE
 
 All Phase 2 scope (Admin CMS: Phases 2-A through 2-H) is built, wired to

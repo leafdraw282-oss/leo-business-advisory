@@ -1,4 +1,14 @@
 import { caseStudies } from '../../../data/profile.js';
+
+// Admin-facing recognition aid only (never written to the database or
+// shown on the public site) — LEOHOLDINGS' own case-study text already
+// refers to it by its consumer-facing sub-brand "Just Craft" (see its
+// summary in profile.js and the matching Gallery caption), so the image
+// slot label surfaces that name too, since "LEOHOLDINGS" alone isn't how
+// a non-developer would recognize this case.
+const RECOGNITION_HINT = {
+  leoholdings: 'Just Craft',
+};
 import { isSupabaseConfigured } from '../../../lib/supabase.js';
 import { fetchList, upsertByNaturalKey, fetchRowById } from '../../content/supabaseTable.js';
 import { caseStudyRowDefaults } from '../../content/rowDefaults.js';
@@ -30,7 +40,10 @@ function CaseStudySlot({ caseStudy }) {
     applyParent,
   });
 
-  return <ImageSlotEditor title={`${caseStudy.tag} — ${caseStudy.titleEn}`} aspectRatio="16 / 10" slot={slot} />;
+  const hint = RECOGNITION_HINT[caseStudy.id];
+  const title = `${caseStudy.tag} — ${caseStudy.titleEn}${hint ? ` (${hint})` : ''}`;
+
+  return <ImageSlotEditor title={title} aspectRatio="16 / 10" slot={slot} />;
 }
 
 function CaseStudyImages() {

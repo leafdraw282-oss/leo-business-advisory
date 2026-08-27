@@ -89,7 +89,7 @@ function HeroSection() {
 
   return (
     <section className="admin-section-form">
-      <h2>Hero</h2>
+      <h2>Hero (첫 화면)</h2>
       <SectionStatus
         status={status}
         loadError={loadError}
@@ -102,14 +102,14 @@ function HeroSection() {
       {values && (
         <>
           <BilingualField
-            label="Eyebrow"
+            label="Hero 상단 소개 문구"
             ko={values.eyebrowKo}
             en={values.eyebrowEn}
             onKoChange={(v) => update({ eyebrowKo: v })}
             onEnChange={(v) => update({ eyebrowEn: v })}
           />
           <BilingualField
-            label="Headline (one line per row)"
+            label="Hero 메인 문구 (줄바꿈으로 줄 구분)"
             ko={values.headlineKo}
             en={values.headlineEn}
             onKoChange={(v) => update({ headlineKo: v })}
@@ -117,21 +117,21 @@ function HeroSection() {
             multiline
           />
           <BilingualField
-            label="Subhead"
+            label="Hero 부제목"
             ko={values.subheadKo}
             en={values.subheadEn}
             onKoChange={(v) => update({ subheadKo: v })}
             onEnChange={(v) => update({ subheadEn: v })}
           />
           <BilingualField
-            label="Primary CTA label"
+            label="Hero 주요 버튼 문구"
             ko={values.ctaPrimaryKo}
             en={values.ctaPrimaryEn}
             onKoChange={(v) => update({ ctaPrimaryKo: v })}
             onEnChange={(v) => update({ ctaPrimaryEn: v })}
           />
           <BilingualField
-            label="Secondary CTA label"
+            label="Hero 보조 버튼 문구"
             ko={values.ctaSecondaryKo}
             en={values.ctaSecondaryEn}
             onKoChange={(v) => update({ ctaSecondaryKo: v })}

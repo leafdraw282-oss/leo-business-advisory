@@ -25,7 +25,7 @@ function AboutImage() {
     applyParent,
   });
 
-  return <ImageSlotEditor title="About / Profile" aspectRatio="4 / 5" slot={slot} />;
+  return <ImageSlotEditor title="Founder Profile (소개 섹션 프로필 사진)" aspectRatio="4 / 5" slot={slot} />;
 }
 
 export default AboutImage;

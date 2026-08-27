@@ -90,7 +90,7 @@ function AdvisorySection() {
 
   return (
     <section className="admin-section-form">
-      <h2>Advisory</h2>
+      <h2>Advisory (자문 영역)</h2>
       <SectionStatus
         status={status}
         loadError={loadError}
@@ -102,28 +102,28 @@ function AdvisorySection() {
       />
       {values && (
         <>
-          <h3>Section heading</h3>
+          <h3>섹션 제목 영역</h3>
           <BilingualField
-            label="Eyebrow"
+            label="Advisory 섹션 소제목"
             ko={values.heading.eyebrowKo}
             en={values.heading.eyebrowEn}
             onKoChange={(v) => updateHeading({ eyebrowKo: v })}
             onEnChange={(v) => updateHeading({ eyebrowEn: v })}
           />
           <BilingualField
-            label="Title"
+            label="Advisory 섹션 제목"
             ko={values.heading.titleKo}
             en={values.heading.titleEn}
             onKoChange={(v) => updateHeading({ titleKo: v })}
             onEnChange={(v) => updateHeading({ titleEn: v })}
           />
 
-          <h3>Advisory items</h3>
+          <h3>자문 영역 목록</h3>
           {values.items.map((item, index) => (
             <div className="admin-list-row" key={item.itemKey}>
-              <p className="admin-list-row-title">{item.itemKey}</p>
+              <p className="admin-list-row-title">자문 항목 {index + 1}</p>
               <BilingualField
-                label="Label"
+                label="자문 항목명"
                 ko={item.labelKo}
                 en={item.labelEn}
                 onKoChange={(v) => updateItem(index, { labelKo: v })}

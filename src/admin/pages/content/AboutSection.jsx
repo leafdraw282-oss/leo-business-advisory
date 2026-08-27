@@ -63,7 +63,7 @@ function AboutSection() {
 
   return (
     <section className="admin-section-form">
-      <h2>About</h2>
+      <h2>About (소개)</h2>
       <SectionStatus
         status={status}
         loadError={loadError}
@@ -76,21 +76,21 @@ function AboutSection() {
       {values && (
         <>
           <BilingualField
-            label="Eyebrow"
+            label="About 섹션 소제목"
             ko={values.eyebrowKo}
             en={values.eyebrowEn}
             onKoChange={(v) => update({ eyebrowKo: v })}
             onEnChange={(v) => update({ eyebrowEn: v })}
           />
           <BilingualField
-            label="Headline"
+            label="About 섹션 제목"
             ko={values.headlineKo}
             en={values.headlineEn}
             onKoChange={(v) => update({ headlineKo: v })}
             onEnChange={(v) => update({ headlineEn: v })}
           />
           <BilingualField
-            label="Bio"
+            label="소개 본문"
             ko={values.bioKo}
             en={values.bioEn}
             onKoChange={(v) => update({ bioKo: v })}

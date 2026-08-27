@@ -193,7 +193,7 @@ function CaseStudiesSection() {
 
   return (
     <section className="admin-section-form">
-      <h2>Case Studies</h2>
+      <h2>Case Studies (경영 성과 사례)</h2>
       <SectionStatus
         status={status}
         loadError={loadError}
@@ -205,16 +205,16 @@ function CaseStudiesSection() {
       />
       {values && (
         <>
-          <h3>Section heading</h3>
+          <h3>섹션 제목 영역</h3>
           <BilingualField
-            label="Eyebrow"
+            label="Case Studies 섹션 소제목"
             ko={values.heading.eyebrowKo}
             en={values.heading.eyebrowEn}
             onKoChange={(v) => updateHeading({ eyebrowKo: v })}
             onEnChange={(v) => updateHeading({ eyebrowEn: v })}
           />
           <BilingualField
-            label="Title"
+            label="Case Studies 섹션 제목"
             ko={values.heading.titleKo}
             en={values.heading.titleEn}
             onKoChange={(v) => updateHeading({ titleKo: v })}
@@ -223,17 +223,17 @@ function CaseStudiesSection() {
 
           {values.cases.map((c, caseIndex) => (
             <div className="admin-case-study" key={c.caseKey}>
-              <h3>{c.caseKey}</h3>
-              <PlainField label="Tag" value={c.tag} onChange={(v) => updateCase(caseIndex, { tag: v })} />
+              <h3>{c.tag} — {c.titleKo || c.titleEn}</h3>
+              <PlainField label="사례 번호 (예: CASE 01)" value={c.tag} onChange={(v) => updateCase(caseIndex, { tag: v })} />
               <BilingualField
-                label="Title"
+                label="사례 제목"
                 ko={c.titleKo}
                 en={c.titleEn}
                 onKoChange={(v) => updateCase(caseIndex, { titleKo: v })}
                 onEnChange={(v) => updateCase(caseIndex, { titleEn: v })}
               />
               <BilingualField
-                label="Summary"
+                label="사례 요약 문구"
                 ko={c.summaryKo}
                 en={c.summaryEn}
                 onKoChange={(v) => updateCase(caseIndex, { summaryKo: v })}
@@ -243,18 +243,18 @@ function CaseStudiesSection() {
 
               {c.metrics.length > 0 && (
                 <>
-                  <p className="admin-list-row-title">Metrics</p>
+                  <p className="admin-list-row-title">성과 수치</p>
                   {c.metrics.map((metric, metricIndex) => (
                     <div className="admin-list-row" key={metric.id ?? `new-metric-${metricIndex}`}>
                       <BilingualField
-                        label="Value"
+                        label="수치 (예: KRW 30B → 240B)"
                         ko={metric.valueKo}
                         en={metric.valueEn}
                         onKoChange={(v) => updateMetric(caseIndex, metricIndex, { valueKo: v })}
                         onEnChange={(v) => updateMetric(caseIndex, metricIndex, { valueEn: v })}
                       />
                       <BilingualField
-                        label="Label"
+                        label="수치 설명"
                         ko={metric.labelKo}
                         en={metric.labelEn}
                         onKoChange={(v) => updateMetric(caseIndex, metricIndex, { labelKo: v })}
@@ -267,11 +267,11 @@ function CaseStudiesSection() {
 
               {c.highlights.length > 0 && (
                 <>
-                  <p className="admin-list-row-title">Highlights</p>
+                  <p className="admin-list-row-title">핵심 키워드</p>
                   {c.highlights.map((highlight, highlightIndex) => (
                     <div className="admin-list-row" key={highlight.id ?? `new-highlight-${highlightIndex}`}>
                       <BilingualField
-                        label="Label"
+                        label="키워드"
                         ko={highlight.labelKo}
                         en={highlight.labelEn}
                         onKoChange={(v) => updateHighlight(caseIndex, highlightIndex, { labelKo: v })}
