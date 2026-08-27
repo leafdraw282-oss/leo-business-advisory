@@ -157,6 +157,15 @@
   --motion-distance: 0.75rem;
   --motion-easing: ease;
 
+  /* Phase 4-F — scroll-reveal magnitude. These two defaults are the
+     "Subtle" behavior, matching site_design_settings' own DB default
+     ('standard') and site_design_settings.js's designSettingsFallback()
+     — see global.css's [data-motion-level] rules for how the admin's
+     Minimal/Standard/Expressive picks scale these up or force them off
+     entirely, and useReveal.js for the observer that applies .reveal. */
+  --reveal-distance: 16px;
+  --reveal-duration: 500ms;
+
   /* --transition-base now composes the motion tokens above instead of a
      standalone literal — every existing `transition: X var(--transition-base)`
      declaration keeps resolving to the exact same "0.25s ease" and now
@@ -178,5 +187,7 @@
     --motion-duration-normal: 0.01ms;
     --motion-duration-slow: 0.01ms;
     --motion-distance: 0px;
+    --reveal-distance: 0px;
+    --reveal-duration: 0.01ms;
   }
 }

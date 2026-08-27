@@ -158,3 +158,100 @@ section {
   white-space: nowrap;
   border: 0;
 }
+
+/* ============================================================================
+ * Phase 4-F — Motion System (Section Reveal + Image Motion Style)
+ *
+ * Wires the site_design_settings.motion_level / .image_motion_style values
+ * (already admin-editable since Phase 4-C, previously inert) to real visual
+ * behavior. useReveal.js (src/hooks/useReveal.js) is the only thing that
+ * ever adds/removes the .reveal / .reveal--visible classes below, on each
+ * major section's own <section> element and, opt-in, inside
+ * ImagePlaceholder (its `revealMotion` prop) — and it only ever does so
+ * once it has confirmed IntersectionObserver exists and the visitor hasn't
+ * requested reduced motion, so content is never hidden without JS actively
+ * (and successfully) choosing to hide it first. Everything here is
+ * opacity/transform only — never a property that affects layout — so
+ * reveal can never itself cause a layout shift.
+ *
+ * The MAGNITUDE and on/off switch for each admin preset is decided purely
+ * by CSS reading the data-motion-level / data-image-motion attributes
+ * applyDesignSettings() sets on <html> (src/lib/content/designSettings.js)
+ * — .reveal's own JS-side logic never needs to know the current value.
+ * ============================================================================ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance));
+  transition:
+    opacity var(--reveal-duration) var(--motion-easing),
+    transform var(--reveal-duration) var(--motion-easing);
+}
+
+.reveal--visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Motion Level presets (site_design_settings.motion_level — existing DB
+   enum, unchanged: 'minimal' | 'standard' | 'expressive'). 'standard' is
+   the DB default and needs no override — variables.css's own
+   --reveal-distance/--reveal-duration already ARE that default ("Subtle"
+   per the spec: 16px / 500ms). */
+html[data-motion-level='expressive'] {
+  --reveal-distance: 24px;
+  --reveal-duration: 650ms;
+}
+
+html[data-motion-level='minimal'] {
+  --reveal-distance: 0px;
+  --reveal-duration: 0.01ms;
+}
+
+/* motion_level "minimal" (spec: "None" — every decorative reveal off) and
+   image_motion_style "none" each force full visibility UNCONDITIONALLY,
+   regardless of whatever .reveal/.reveal--visible state useReveal.js's
+   observer has (or hasn't yet) applied — this is a plain CSS override, not
+   a JS branch, so it also correctly covers the brief window between a
+   section mounting and the async site_design_settings fetch actually
+   resolving to a non-default value. */
+html[data-motion-level='minimal'] .reveal {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+html[data-image-motion='none'] .image-placeholder.reveal {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+/* Image Motion Style (site_design_settings.image_motion_style — existing
+   DB enum, unchanged: 'none' | 'fade' | 'zoom' | 'parallax'). Only ever
+   applies inside ImagePlaceholder's own opt-in reveal wrapper (its
+   `revealMotion` prop — never used by Hero, protecting its own separate
+   load-triggered fade-in). 'fade' needs no extra rule: plain .reveal
+   opacity+translateY already reads as "opacity-centric" at this scale.
+   'zoom' and 'parallax' both render as one very small, one-time scale-in
+   (never a true continuously-scrolling parallax translate) — this site is
+   a business-advisory portfolio, not a marketing microsite, so both map to
+   the same restrained "Soft Zoom" the spec asks for rather than adding a
+   second, flashier effect. */
+html[data-image-motion='zoom'] .image-placeholder.reveal,
+html[data-image-motion='parallax'] .image-placeholder.reveal {
+  transform: scale(1.04);
+}
+
+html[data-image-motion='zoom'] .image-placeholder.reveal.reveal--visible,
+html[data-image-motion='parallax'] .image-placeholder.reveal.reveal--visible {
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

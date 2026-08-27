@@ -1,5 +1,6 @@
 import { useLanguage } from '../context/languageContext';
 import { useSectionContent } from '../hooks/useSectionContent';
+import { useReveal } from '../hooks/useReveal';
 import { fetchImpact, impactFallback } from '../lib/content/impact';
 import SectionTitle from '../components/SectionTitle';
 import ImpactMetric from '../components/ImpactMetric';
@@ -13,9 +14,10 @@ import './Impact.css';
 function Impact() {
   const { t } = useLanguage();
   const content = useSectionContent(fetchImpact, impactFallback());
+  const { ref, className: revealClassName } = useReveal();
 
   return (
-    <section id="impact" className="impact" aria-label={t('성과', 'Impact')}>
+    <section id="impact" ref={ref} className={`impact ${revealClassName}`.trim()} aria-label={t('성과', 'Impact')}>
       <div className="container">
         <SectionTitle
           eyebrow={t(content.section.eyebrowKo, content.section.eyebrowEn)}

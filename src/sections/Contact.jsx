@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useLanguage } from '../context/languageContext';
 import { useSectionContent } from '../hooks/useSectionContent';
+import { useReveal } from '../hooks/useReveal';
 import { fetchContactInfo, contactInfoFallback } from '../lib/content/contactInfo';
 import { trackEvent } from '../lib/analytics';
 import ContactForm from '../components/ContactForm';
@@ -17,6 +18,16 @@ function Contact() {
   const contact = useSectionContent(fetchContactInfo, contactInfoFallback());
   const formWrapperRef = useRef(null);
   const sectionRef = useRef(null);
+  const { ref: revealRef, className: revealClassName } = useReveal();
+
+  // This section already tracks its own first-view analytics event via
+  // sectionRef (below) — Phase 4-F's reveal needs a ref on the exact same
+  // <section> node, so this small callback ref assigns both existing
+  // mutable refs to it instead of only ever supporting one ref prop.
+  function setSectionRefs(node) {
+    sectionRef.current = node;
+    revealRef.current = node;
+  }
 
   function focusForm() {
     formWrapperRef.current?.querySelector('input[name="name"]')?.focus();
@@ -44,7 +55,12 @@ function Contact() {
   }, []);
 
   return (
-    <section id="contact" className="contact" aria-label={t('문의', 'Contact')} ref={sectionRef}>
+    <section
+      id="contact"
+      className={`contact ${revealClassName}`.trim()}
+      aria-label={t('문의', 'Contact')}
+      ref={setSectionRefs}
+    >
       <div className="container">
         <div className="contact__cta">
           <h2 className="contact__headline">{t(contact.ctaHeadlineKo, contact.ctaHeadlineEn)}</h2>

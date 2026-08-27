@@ -1,6 +1,7 @@
 import { gallerySection } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
 import { useSectionContent } from '../hooks/useSectionContent';
+import { useReveal } from '../hooks/useReveal';
 import { fetchGallery, galleryFallback } from '../lib/content/gallery';
 import SectionTitle from '../components/SectionTitle';
 import ImagePlaceholder from '../components/ImagePlaceholder';
@@ -18,9 +19,15 @@ import './Gallery.css';
 function Gallery() {
   const { t } = useLanguage();
   const gallery = useSectionContent(fetchGallery, galleryFallback());
+  const { ref, className: revealClassName } = useReveal();
 
   return (
-    <section id="gallery" className="gallery" aria-label={t(gallerySection.titleKo, gallerySection.titleEn)}>
+    <section
+      id="gallery"
+      ref={ref}
+      className={`gallery ${revealClassName}`.trim()}
+      aria-label={t(gallerySection.titleKo, gallerySection.titleEn)}
+    >
       <div className="container">
         <SectionTitle eyebrow={t(gallerySection.eyebrowKo, gallerySection.eyebrowEn)} title={t(gallerySection.titleKo, gallerySection.titleEn)} />
         {gallery.length === 0 ? (
@@ -34,6 +41,7 @@ function Gallery() {
                   alt={t(item.captionKo, item.captionEn)}
                   label={t(item.captionKo, item.captionEn)}
                   aspectRatio={item.aspect || '4 / 3'}
+                  revealMotion
                 />
                 <p className="gallery__caption">{t(item.captionKo, item.captionEn)}</p>
               </li>

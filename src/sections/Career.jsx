@@ -1,5 +1,6 @@
 import { useLanguage } from '../context/languageContext';
 import { useSectionContent } from '../hooks/useSectionContent';
+import { useReveal } from '../hooks/useReveal';
 import { fetchCareer, careerFallback } from '../lib/content/career';
 import SectionTitle from '../components/SectionTitle';
 import './Career.css';
@@ -14,9 +15,10 @@ import './Career.css';
 function Career() {
   const { t } = useLanguage();
   const content = useSectionContent(fetchCareer, careerFallback());
+  const { ref, className: revealClassName } = useReveal();
 
   return (
-    <section id="career" className="career" aria-label={t('경력', 'Career')}>
+    <section id="career" ref={ref} className={`career ${revealClassName}`.trim()} aria-label={t('경력', 'Career')}>
       <div className="container">
         <SectionTitle eyebrow={t(content.eyebrowKo, content.eyebrowEn)} title={t(content.titleKo, content.titleEn)} />
         <ol className="career__timeline">

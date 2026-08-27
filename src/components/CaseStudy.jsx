@@ -28,7 +28,13 @@ function CaseStudy({ tag, title, summary, metrics = [], highlights = [], image, 
         .join(' ')}
     >
       <div className="case-study__media">
-        <ImagePlaceholder src={image} alt={imageAlt} label={imageLabel} aspectRatio={emphasis ? '4 / 3' : '16 / 10'} />
+        <ImagePlaceholder
+          src={image}
+          alt={imageAlt}
+          label={imageLabel}
+          aspectRatio={emphasis ? '4 / 3' : '16 / 10'}
+          revealMotion
+        />
       </div>
       <div className="case-study__body">
         <p className="case-study__tag">{tag}</p>

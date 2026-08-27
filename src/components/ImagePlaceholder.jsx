@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useReveal } from '../hooks/useReveal';
 import './ImagePlaceholder.css';
 
 /**
@@ -20,6 +21,11 @@ import './ImagePlaceholder.css';
  *   real image has actually finished loading (see .image-placeholder__img--fade-in
  *   in ImagePlaceholder.css) — off by default so every existing caller's
  *   appearance is unchanged; pass true only where this specific polish is wanted.
+ * @param {boolean} [revealMotion] - Phase 4-F opt-in scroll-reveal (see
+ *   useReveal.js), styled per the admin's image_motion_style setting via
+ *   global.css's [data-image-motion] rules. Never passed by Hero, which
+ *   keeps its own separate, load-triggered fadeInOnLoad untouched — the two
+ *   are mutually exclusive by caller, never combined on one instance.
  */
 function ImagePlaceholder({
   src,
@@ -30,6 +36,7 @@ function ImagePlaceholder({
   loading = 'lazy',
   fetchPriority,
   fadeInOnLoad = false,
+  revealMotion = false,
 }) {
   // Tracks WHICH src last failed, not just whether "something" failed —
   // every section starts with a src that's guaranteed (or very likely) to
@@ -47,6 +54,14 @@ function ImagePlaceholder({
   const showPlaceholder = !src || failedSrc === src;
   const loaded = loadedSrc === src;
 
+  // Always called (rules of hooks) but its ref/className are only wired
+  // into the DOM below when revealMotion is actually true — an unused
+  // hook instance never observes anything (its ref stays null) so this
+  // has no effect on the many callers that don't opt in.
+  const reveal = useReveal();
+  const revealRef = revealMotion ? reveal.ref : undefined;
+  const revealClassName = revealMotion ? reveal.className : '';
+
   const imgClassName = [
     'image-placeholder__img',
     fadeInOnLoad && 'image-placeholder__img--fade-in',
@@ -57,7 +72,8 @@ function ImagePlaceholder({
 
   return (
     <div
-      className={`image-placeholder ${className}`.trim()}
+      ref={revealRef}
+      className={['image-placeholder', revealClassName, className].filter(Boolean).join(' ')}
       style={{ aspectRatio }}
       role={showPlaceholder ? 'img' : undefined}
       aria-label={showPlaceholder ? alt : undefined}

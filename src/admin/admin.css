@@ -1177,6 +1177,32 @@ body {
   transition: height 0.2s ease;
 }
 
+/* Phase 4-F — Motion Level / Image Motion Style preview (DesignSettingsPreview.jsx).
+   Sits below the existing static preview card; only ever animates when the
+   admin explicitly clicks its own Play button (see MotionPreview's
+   playPreview()), never automatically or in a loop. */
+.admin-design-preview-motion {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e1d6;
+}
+
+.admin-design-preview-motion-play {
+  margin-top: 0.6rem;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.75rem;
+  border: 1px solid #d8d3c4;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #222222;
+  cursor: pointer;
+}
+
+.admin-design-preview-motion-play:hover {
+  border-color: #a4865c;
+  color: #a4865c;
+}
+
 @media (max-width: 900px) {
   .admin-shell {
     flex-direction: column;

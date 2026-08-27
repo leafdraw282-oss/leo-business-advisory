@@ -1,5 +1,6 @@
 import { useLanguage } from '../context/languageContext';
 import { useSectionContent } from '../hooks/useSectionContent';
+import { useReveal } from '../hooks/useReveal';
 import { fetchCaseStudies, caseStudiesFallback } from '../lib/content/caseStudies';
 import SectionTitle from '../components/SectionTitle';
 import CaseStudy from '../components/CaseStudy';
@@ -16,11 +17,13 @@ import './CaseStudies.css';
 function CaseStudies() {
   const { t } = useLanguage();
   const content = useSectionContent(fetchCaseStudies, caseStudiesFallback());
+  const { ref, className: revealClassName } = useReveal();
 
   return (
     <section
       id="case-studies"
-      className="case-studies"
+      ref={ref}
+      className={`case-studies ${revealClassName}`.trim()}
       aria-label={t(content.section.titleKo, content.section.titleEn)}
     >
       <div className="container">

@@ -140,6 +140,20 @@ function composeFontBody(fontEn, fontKo) {
   return parts.join(', ');
 }
 
+// Phase 4-F — the two Motion columns are behavior switches, not CSS values
+// (unlike every entry in DESIGN_TOKEN_MAP, which is a ready-to-use CSS
+// string/number written straight into a custom property). They're applied
+// as `data-*` attributes on <html> instead, which global.css's
+// [data-motion-level]/[data-image-motion] selectors read — see the "Phase
+// 4-F — Motion System" block there. Validated against the exact same enum
+// the database CHECK constraint enforces (supabase/migrations/
+// 0009_site_design_settings.sql) so a malformed/unexpected value can only
+// ever result in the attribute being left unset (CSS's own unscoped
+// default rules apply, i.e. the "standard"/"none" look), never an invalid
+// attribute value silently doing nothing or throwing.
+const MOTION_LEVELS = new Set(['minimal', 'standard', 'expressive']);
+const IMAGE_MOTION_STYLES = new Set(['none', 'fade', 'zoom', 'parallax']);
+
 /**
  * Applies a settings object to :root as CSS custom properties, via
  * DESIGN_TOKEN_MAP — plus one composed value: --font-body (the token
@@ -161,5 +175,12 @@ export function applyDesignSettings(settings, root = document.documentElement) {
 
   if (isUsableValue('fontEn', settings.fontEn) || isUsableValue('fontKo', settings.fontKo)) {
     root.style.setProperty('--font-body', composeFontBody(settings.fontEn, settings.fontKo));
+  }
+
+  if (MOTION_LEVELS.has(settings.motionLevel)) {
+    root.setAttribute('data-motion-level', settings.motionLevel);
+  }
+  if (IMAGE_MOTION_STYLES.has(settings.imageMotionStyle)) {
+    root.setAttribute('data-image-motion', settings.imageMotionStyle);
   }
 }

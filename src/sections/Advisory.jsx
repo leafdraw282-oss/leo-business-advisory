@@ -1,5 +1,6 @@
 import { useLanguage } from '../context/languageContext';
 import { useSectionContent } from '../hooks/useSectionContent';
+import { useReveal } from '../hooks/useReveal';
 import { fetchAdvisory, advisoryFallback } from '../lib/content/advisory';
 import SectionTitle from '../components/SectionTitle';
 import './Advisory.css';
@@ -12,9 +13,10 @@ import './Advisory.css';
 function Advisory() {
   const { t } = useLanguage();
   const advisory = useSectionContent(fetchAdvisory, advisoryFallback());
+  const { ref, className: revealClassName } = useReveal();
 
   return (
-    <section id="advisory" className="advisory" aria-label={t('자문', 'Advisory')}>
+    <section id="advisory" ref={ref} className={`advisory ${revealClassName}`.trim()} aria-label={t('자문', 'Advisory')}>
       <div className="container">
         <SectionTitle eyebrow={t(advisory.eyebrowKo, advisory.eyebrowEn)} title={t(advisory.titleKo, advisory.titleEn)} />
         <ol className="advisory__list">
