@@ -1,5 +1,86 @@
 # Project Status
 
+## Phase 3-F — Custom Domain Readiness (Audit + Documentation Only)
+
+**Status: complete. Zero production files changed** — no real domain was
+provided this phase, and the phase's own explicit instruction is not to
+change production config without one. This was an audit + documentation
+phase: `git diff` against every file except the new
+`docs/CUSTOM_DOMAIN_SETUP.md` and this entry is empty.
+
+**Full audit — every location that hardcodes the current GitHub Pages
+subpath (`/leo-business-advisory/`) or its full URL
+(`https://leafdraw282-oss.github.io/leo-business-advisory/`), found by
+grepping the entire repo (excluding `dist/`, `node_modules/`):**
+
+- `vite.config.js` — `base: '/leo-business-advisory/'`.
+- `index.html` — **10 occurrences**: `canonical`, `og:url`, `og:image`,
+  `twitter:image`, and 6 more inside the JSON-LD `@graph` block (Person's
+  `@id`/`url`/`worksFor` reference, ProfessionalService's
+  `@id`/`url`/`founder` reference).
+- `public/robots.txt` — the `Sitemap:` line only. `Disallow: /admin/` is
+  already domain-root-relative and needs **no** change — it becomes
+  correct (not more or less correct than today) once serving from `/`.
+- `public/sitemap.xml` — the one `<loc>` entry.
+- `public/404.html` — the favicon `<link>` and the "back to home" `<a>`
+  href. This file is a plain static passthrough (not run through Vite's
+  build pipeline), so unlike everywhere else, these two can't pick up a
+  `base` change automatically — they're hardcoded strings and always will
+  be, whichever domain is active.
+- `public/CNAME` — doesn't exist yet; required to be created (just the
+  domain name) once a domain is chosen.
+
+**Confirmed to need NO change** — already domain-agnostic:
+`.github/workflows/deploy.yml` has no hardcoded path or domain anywhere
+(`actions/configure-pages`/`upload-pages-artifact`/`deploy-pages` all
+work identically regardless of custom domain); `admin/index.html`'s
+favicon reference is already root-relative with no absolute URL;
+`src/admin/pages/Dashboard.jsx`'s two "site link" hrefs already read
+`import.meta.env.BASE_URL`, which follows `vite.config.js`'s `base`
+automatically.
+
+**A real bug found during this audit, not fixed (out of this phase's
+scope — flagged, not touched):** `src/data/profile.js`'s `images` map
+(`hero: '/images/hero.jpg'`, etc., consumed by `src/lib/content/hero.js`,
+`about.js`, `caseStudies.js`) stores root-relative paths with no
+`import.meta.env.BASE_URL` prefix — confirmed by grepping the built
+bundle, the literal unprefixed string `/images/hero.jpg` ships as-is. This
+is currently invisible only because no real photo files exist yet at
+those paths (`ImagePlaceholder`'s error fallback hides a 404 exactly the
+same as "no image configured" — same visual result either way). **Once
+real photos are added while still on the current project-subpath
+deployment, these would 404** (the browser would request
+`.../images/hero.jpg` from the domain root, missing the
+`/leo-business-advisory/` prefix). This bug happens to fix itself
+automatically once migrated to a custom domain serving from `/` — see
+`docs/CUSTOM_DOMAIN_SETUP.md`. Flagged in this phase's report; not fixed
+here, since it's outside this audit-only phase's scope and touches
+`profile.js`/content-layer code, not domain config.
+
+**Also confirmed as a genuine (not cosmetic) benefit of migrating:**
+`public/robots.txt` and `public/sitemap.xml`, served today from
+`https://leafdraw282-oss.github.io/leo-business-advisory/robots.txt`,
+are **not at the standard location** crawlers check (that's
+`https://leafdraw282-oss.github.io/robots.txt` — the true origin root,
+which for a GitHub Pages *project* site belongs to a different site
+entirely, or nothing). This isn't a Phase 3-D mistake — there was no way
+to serve robots.txt/sitemap.xml from the real root under a subpath
+deployment; it's an inherent limitation of project-subpath GitHub Pages
+that only a custom domain (serving from `/`) actually resolves.
+
+**Documentation:** new `docs/CUSTOM_DOMAIN_SETUP.md` — a 10-step
+beginner-oriented guide (domain purchase → GitHub Pages custom domain
+setting → DNS → the repo `CNAME` file → HTTPS → `vite.config.js` →
+`index.html` → sitemap/robots → deploy → verification), plus a quick-
+reference table of exactly what needs editing versus what's already
+domain-agnostic. Every domain reference in the doc uses the placeholder
+`yourdomain.com`, never a real or invented domain.
+
+**Build:** `npm run lint` and `npm run build` both pass with zero errors
+(build was also run mid-phase, before any doc was written, purely to
+confirm the built bundle's actual content for the `images` map finding
+above).
+
 ## Phase 3-E — Visitor Analytics (Minimal, Privacy-Safe)
 
 **Status: complete.** No public-site design changed — this phase only
