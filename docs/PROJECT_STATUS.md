@@ -10,6 +10,123 @@ build with zero console errors/warnings. See Phase 1-G directly below for
 the final QA pass, and each earlier phase's section for how every part
 was built.
 
+## Phase 2-D — Admin Image Manager (Supabase Storage, Admin ↔ Database only)
+
+**Status: complete for the site's actual current image slots (Hero,
+About/Profile, 6 Case Studies, Gallery). No Career image slot exists to
+manage — see "Issues" below. Live upload/delete against real Storage
+still requires a real Supabase project.**
+
+Scope was the admin-side Images tab only: view the current image for
+each slot, upload/replace, preview, save, and reset/delete — backed by
+Supabase Storage's `site-images` bucket and the `media` table, both
+already defined in Phase 2-A's schema (`hero_content.hero_image_id`,
+`about_content.portrait_image_id`, `case_studies.image_id`,
+`gallery_items.image_id` all already existed; no migration changes were
+needed this phase). The public site's own images are untouched — it
+still renders only from `src/data/profile.js`'s `images` map and
+`public/images/`, unchanged; connecting the two is Phase 2-E.
+
+**What was built:**
+
+- **`src/admin/content/supabaseStorage.js`** — `validateImageFile()`
+  (JPEG/PNG/WebP/SVG only, 5 MB max), `uploadImageFile()`,
+  `publicUrlFor()`, `removeStorageFile()`, all against the `site-images`
+  bucket from `supabase/migrations/0003_storage_setup.sql`.
+- **`src/admin/content/rowDefaults.js`** — `heroRowDefaults()` /
+  `aboutRowDefaults()` / `caseStudyRowDefaults()`: since
+  `hero_content`/`about_content`/`case_studies` all have several `NOT
+  NULL` text columns beyond the new image FK, attaching an image before
+  that row's own text has ever been saved via Phase 2-C would otherwise
+  fail on insert. These builders always produce a complete, valid row —
+  the row's current values when one exists, `profile.js`'s own text
+  (unmodified) when it doesn't — so an image can be attached in any
+  order relative to the text.
+- **`src/admin/content/useImageSlot.js`** — the state machine behind
+  every single-image slot (Hero, About, each Case Study): load current
+  image + alt text, stage a new file locally (validated, previewed via
+  `URL.createObjectURL`, not yet uploaded), save (uploads, writes a new
+  `media` row, updates the parent's image FK, then best-effort cleans up
+  the previous image/media row), and reset (clears the FK and deletes the
+  image). Old-image cleanup failures are logged, not surfaced as save
+  failures, since the primary action — the new image going live, or the
+  slot being cleared — already succeeded by that point.
+- **`src/admin/content/useGalleryImages.js`** — the equivalent state
+  machine for Gallery's variable-length list: add/delete/reorder (Move
+  Up/Down, persisted via `sort_order` at save time, same pattern as
+  Phase 2-C's Advisory/Career lists), each row with its own optional
+  pending upload, caption KO/EN required before saving.
+- **`src/admin/components/ImageSlotEditor.jsx`** — shared UI for every
+  single-image slot: renders the **same, unmodified `ImagePlaceholder`
+  component the public site uses** for the preview, so "no image yet" or
+  "image failed to load" looks and behaves exactly like the public site's
+  own fallback (see "Fallback check" below) — file input with client-side
+  validation, alt text fields, and a Remove-image button (only shown once
+  an image actually exists, with a confirm prompt before deleting).
+- **`src/admin/pages/images/HeroImage.jsx`**, **`AboutImage.jsx`**,
+  **`CaseStudyImages.jsx`** (6 slots, one per case study, keyed by
+  `case_key`), **`GalleryImages.jsx`** — one page per slot group, wired
+  into a new **`src/admin/pages/Images.jsx`** sub-nav, replacing
+  Dashboard's previous "Images" placeholder tab.
+- **`src/admin/content/supabaseTable.js`** — two small additions:
+  `fetchRowById()` (used to look up a slot's `media` row from its FK) and
+  `deleteRow()` (used by Reset and Gallery's delete-photo action; no
+  Phase 2-C flow needed row deletion before this).
+
+**Why the public site is unchanged:** no file under `src/components/`
+other than reusing (not modifying) the existing `ImagePlaceholder.jsx`,
+and nothing under `src/sections/`, `src/data/`, or `src/styles/` was
+touched — verified via `git diff --stat` (only `src/admin/*` files
+changed) and a dev-server + Playwright check that `/` still renders its
+full title and Hero text unchanged.
+
+**Testing performed:** with the repo's actual current (unconfigured)
+state, confirmed all 4 Images sub-sections load without error — Hero and
+About show the labeled placeholder (`person.portraitLabelKo/En`, exactly
+matching what the public site would show today, since no images exist
+yet either way), all 6 Case Study slots list correctly by tag/title, and
+Gallery pre-fills its 6 rows with `profile.js`'s exact captions.
+Confirmed upload validation rejects an oversized file (>5 MB) and a
+wrong-type file (`text/plain`) with a clear, specific message *before*
+any network call; confirmed a valid file selection shows a pending-file
+indicator with a working Cancel; confirmed the Remove-image button is
+hidden until an image actually exists (nothing to remove yet); confirmed
+Gallery's Add/Delete/Move-up/Move-down all update the list and dirty
+state correctly, and that a newly-added row with an empty caption blocks
+Save with a specific validation message. Found and fixed one real bug
+during this testing: Gallery's `save()` checked "is Supabase configured"
+*before* running caption validation (the opposite order from every
+Phase 2-C section), so an invalid new row reported "Supabase is not
+configured" instead of the actual validation problem — reordered to
+validate first, matching the established pattern.
+
+**Testing limits (same honest caveat as Phase 2-B/2-C, carried over from
+Phase 2-A's "don't create a real Supabase project" constraint):** an
+actual file upload to Storage, and a save → reload round trip confirming
+a real `media` row and image FK, could not be exercised end-to-end — that
+requires a real project. The Storage/DB calls follow documented
+`@supabase/supabase-js` v2 APIs exactly
+(`storage.from().upload()/.getPublicUrl()/.remove()`, plus the same
+`saveListRow`/`upsertByNaturalKey`/`upsertSingleton` primitives Phase 2-C
+already established and tested via error-path verification), and every
+write re-fetches afterward to confirm persistence once a real project
+exists.
+
+**Fallback check:** `src/components/ImagePlaceholder.jsx` was not
+modified in any way this phase (confirmed via `git diff` — zero changes)
+and is reused as-is for every admin preview, so its "no `src` or failed
+load → labeled placeholder, never a broken-image icon" behavior is
+guaranteed identical between the admin preview and the (still
+disconnected) public site.
+
+**Not built in this phase (by design):** connecting the public site's
+own rendering to Storage/the `media` table (Phase 2-E, explicitly), and
+a Career image slot — the current public site has no image in its Career
+section at all (Career.jsx renders a text-only timeline, confirmed via
+audit — the only four `ImagePlaceholder` usages site-wide are Hero,
+About, CaseStudy, and Gallery), so nothing was built or changed there;
+see Issues.
+
 ## Phase 2-C — Admin Content Editor (text content, Admin ↔ Database only)
 
 **Status: complete for the 9 sections in scope (Hero, Impact, About, Case

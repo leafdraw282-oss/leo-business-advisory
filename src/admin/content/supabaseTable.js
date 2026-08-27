@@ -67,3 +67,17 @@ export async function upsertByNaturalKey(table, conflictColumn, values) {
   if (error) throw error;
   return data;
 }
+
+/** Fetch a single row by its primary key (uuid or int). Returns null if id is falsy or no row matches. */
+export async function fetchRowById(table, id) {
+  if (!id) return null;
+  const { data, error } = await supabase.from(table).select('*').eq('id', id).maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+/** Permanently deletes one row by id (Phase 2-D: media rows, gallery_items rows). */
+export async function deleteRow(table, id) {
+  const { error } = await supabase.from(table).delete().eq('id', id);
+  if (error) throw error;
+}

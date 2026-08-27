@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabase.js';
 import Content from './Content.jsx';
+import Images from './Images.jsx';
 
 const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard' },
@@ -9,8 +10,8 @@ const NAV_ITEMS = [
   { id: 'settings', label: 'Settings' },
 ];
 
-// Content editing (Phase 2-C) is implemented; Images and Settings are
-// still placeholders (Phase 2-D+).
+// Content editing (Phase 2-C) and Images (Phase 2-D) are implemented;
+// Settings is still a placeholder.
 function Dashboard({ session }) {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [signingOut, setSigningOut] = useState(false);
@@ -61,14 +62,13 @@ function Dashboard({ session }) {
           <p>
             Use the Content tab to edit the public site's text (Hero,
             Impact, About, Case Studies, Advisory, Career, Education,
-            Contact, Footer) in Korean and English. Images and Settings
-            are not implemented yet — see docs/PROJECT_STATUS.md.
+            Contact, Footer) in Korean and English, and the Images tab to
+            manage Hero, About, Case Study, and Gallery photos. Settings
+            is not implemented yet — see docs/PROJECT_STATUS.md.
           </p>
         )}
         {activeTab === 'content' && <Content />}
-        {activeTab === 'images' && (
-          <p>Image management is not implemented yet (planned for a later phase).</p>
-        )}
+        {activeTab === 'images' && <Images />}
         {activeTab === 'settings' && (
           <p>Settings are not implemented yet (planned for a later phase).</p>
         )}

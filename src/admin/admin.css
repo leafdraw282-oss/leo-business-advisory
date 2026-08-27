@@ -393,6 +393,158 @@ body {
   margin-top: 0;
 }
 
+/* Image editor (Phase 2-D) */
+
+.admin-image-slot {
+  border-top: 2px solid #e5e1d6;
+  padding-top: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.admin-image-slot:first-child {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.admin-image-slot h3 {
+  margin: 0 0 0.75rem;
+  color: #0b1625;
+}
+
+.admin-image-slot-body {
+  display: grid;
+  grid-template-columns: minmax(160px, 240px) 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.admin-image-slot-body .image-placeholder {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.admin-image-slot-controls input[type='file'] {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+
+.admin-image-hint {
+  font-size: 0.75rem;
+  color: #8b8984;
+  margin: 0 0 0.6rem;
+}
+
+.admin-image-pending {
+  font-size: 0.8rem;
+  margin: 0 0 0.75rem;
+}
+
+.admin-image-pending button {
+  border: none;
+  background: none;
+  color: #a4865c;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-size: 0.8rem;
+}
+
+.admin-image-reset {
+  margin-top: 0.75rem;
+  cursor: pointer;
+  border: 1px solid #b3261e;
+  background: #ffffff;
+  color: #b3261e;
+  border-radius: 4px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.admin-image-reset[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-case-study-images {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-gallery-item {
+  display: grid;
+  grid-template-columns: minmax(140px, 200px) 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  border: 1px solid #e5e1d6;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-gallery-item-preview .image-placeholder {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.admin-gallery-item-fields input[type='file'] {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+
+.admin-gallery-item-fields select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #d8d4c8;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.admin-checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  margin: 0.75rem 0;
+}
+
+.admin-checkbox-field input {
+  margin: 0;
+}
+
+.admin-gallery-item-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.admin-gallery-item-actions button {
+  cursor: pointer;
+  border: 1px solid #d8d4c8;
+  background: #ffffff;
+  border-radius: 4px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+}
+
+.admin-gallery-item-actions button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-section-form > button {
+  cursor: pointer;
+  border: 1px solid #0b1625;
+  background: #0b1625;
+  color: #f4f1ea;
+  border-radius: 4px;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
 @media (max-width: 640px) {
   .admin-shell {
     flex-direction: column;
@@ -422,5 +574,10 @@ body {
 
   .admin-content-panel {
     padding: 1.25rem;
+  }
+
+  .admin-image-slot-body,
+  .admin-gallery-item {
+    grid-template-columns: 1fr;
   }
 }
