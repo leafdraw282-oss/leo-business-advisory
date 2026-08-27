@@ -1,0 +1,205 @@
+/* Admin CMS shell styling — self-contained, loaded only by
+   src/admin/main.jsx (admin/index.html). Never imported by the public
+   site's entry point, so it can never affect the public site's CSS.
+   Colors are hardcoded from the public brand palette (see
+   src/styles/variables.css) rather than importing that file, to keep
+   this bundle fully independent. */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+  background: #f4f1ea;
+  color: #222222;
+}
+
+.admin-status-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+.admin-status-screen code {
+  background: #e5e1d6;
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+}
+
+.admin-login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.admin-login-form {
+  width: 100%;
+  max-width: 360px;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 4px 24px rgba(11, 22, 37, 0.12);
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-login-form h1 {
+  font-size: 1.25rem;
+  margin: 0 0 0.25rem;
+  color: #0b1625;
+}
+
+.admin-login-subtitle {
+  margin: 0 0 1.5rem;
+  color: #8b8984;
+  font-size: 0.9rem;
+}
+
+.admin-login-form label {
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+  color: #222222;
+}
+
+.admin-login-form input {
+  margin-bottom: 1.1rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #d8d4c8;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.admin-login-form input:focus-visible {
+  outline: 2px solid #a4865c;
+  outline-offset: 1px;
+}
+
+.admin-login-error {
+  color: #b3261e;
+  font-size: 0.85rem;
+  margin: -0.5rem 0 1rem;
+}
+
+.admin-login-form button,
+.admin-logout {
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  background: #0b1625;
+  color: #f4f1ea;
+}
+
+.admin-login-form button:disabled,
+.admin-logout:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-shell {
+  min-height: 100vh;
+  display: flex;
+}
+
+.admin-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: #0b1625;
+  color: #f4f1ea;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+}
+
+.admin-sidebar-title {
+  font-weight: 600;
+  margin: 0 0 1.5rem;
+  padding: 0 0.5rem;
+}
+
+.admin-sidebar nav {
+  flex: 1;
+}
+
+.admin-sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.admin-sidebar button {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 0.6rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.admin-sidebar button:hover {
+  background: rgba(244, 241, 234, 0.08);
+}
+
+.admin-sidebar button.active {
+  background: #a4865c;
+  color: #0b1625;
+  font-weight: 600;
+}
+
+.admin-logout {
+  margin-top: 1rem;
+  background: transparent;
+  border: 1px solid rgba(244, 241, 234, 0.35);
+  color: #f4f1ea;
+}
+
+.admin-main {
+  flex: 1;
+  padding: 2.5rem 3rem;
+}
+
+.admin-main-header {
+  margin-bottom: 1.5rem;
+}
+
+.admin-main-header h1 {
+  margin: 0 0 0.25rem;
+  color: #0b1625;
+}
+
+.admin-signed-in-as {
+  margin: 0;
+  color: #8b8984;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 640px) {
+  .admin-shell {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+  }
+
+  .admin-main {
+    padding: 1.5rem;
+  }
+}

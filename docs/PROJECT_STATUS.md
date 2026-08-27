@@ -10,6 +10,82 @@ build with zero console errors/warnings. See Phase 1-G directly below for
 the final QA pass, and each earlier phase's section for how every part
 was built.
 
+## Phase 2-B — Admin Auth & `/admin` Entry Point
+
+**Status: complete (login/dashboard implemented; end-to-end auth flow
+cannot be fully exercised until a real Supabase project exists — see
+"User action required" below).**
+
+Scope was authentication and the `/admin` entry point only — no
+content-edit, image-upload, or settings functionality yet. Built on the
+Phase 2-A architecture (`docs/ADMIN_CMS_ARCHITECTURE.md`,
+`src/lib/supabase.js`, the `admin_users` + RLS design).
+
+**What was built:**
+
+- **`admin/index.html`** + **`src/admin/`** — a second, fully independent
+  Vite entry point (standard Vite multi-page-app pattern), built to
+  `dist/admin/` and served at `/admin/` on GitHub Pages
+  (`https://<owner>.github.io/leo-business-advisory/admin/`). It shares no
+  runtime code with the public site's `App.jsx`/render tree — only the
+  existing `src/lib/supabase.js` client is reused. `admin/index.html`
+  carries `<meta name="robots" content="noindex, nofollow">` so it's never
+  indexed as part of the public site.
+- **`src/admin/AdminApp.jsx`** — the auth gate. On mount it calls
+  `supabase.auth.getSession()` and subscribes to
+  `supabase.auth.onAuthStateChange`, then renders one of four states:
+  "not configured" (no `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` — true
+  for this repo today), "loading", `Login` (no session), or `Dashboard`
+  (session present).
+- **`src/admin/pages/Login.jsx`** — email/password form calling
+  `supabase.auth.signInWithPassword`. **No sign-up form, sign-up link, or
+  self-registration path exists anywhere in the admin bundle** — admin
+  accounts are created out-of-band via the Supabase Dashboard or SQL
+  Editor (see `supabase/README.md`), gated by the `admin_users` allowlist
+  + RLS built in Phase 2-A. A failed sign-in shows Supabase's error
+  message inline; nothing pretends to succeed.
+- **`src/admin/pages/Dashboard.jsx`** — minimal shell only: a sidebar with
+  Dashboard / Content / Images / Settings (client-side tab switching, no
+  router dependency added) and a working Logout button
+  (`supabase.auth.signOut()`, which the auth-state listener turns back
+  into the Login screen). No real content-editing, image-upload, or
+  settings UI — each tab shows a "not implemented yet" placeholder.
+- **`src/admin/admin.css`** — self-contained styling, imported only by the
+  admin entry; never touches the public site's CSS.
+- **`vite.config.js`** — `build.rollupOptions.input` now lists both
+  `index.html` and `admin/index.html` so both are built; `base` is
+  unchanged.
+
+**Why the public site is unchanged:** no file under `src/components/`,
+`src/sections/`, `src/context/`, `src/data/`, or `src/styles/` was
+touched, `src/App.jsx`/`src/main.jsx` are untouched, and the admin bundle
+is a separate Rollup input that produces separate output files
+(`dist/admin/*` vs `dist/index.html`/`dist/assets/main-*`) — verified by
+inspecting the build output.
+
+**Verification performed:** built and ran the dev server; confirmed
+`/admin/` with no Supabase configuration shows the "not configured"
+notice (not a broken page); with a temporary local-only dummy
+configuration (never committed — `.env.local` is gitignored and was
+deleted before finishing), confirmed the Login form renders with no
+sign-up affordance anywhere in the page, and that a login attempt against
+a nonexistent project surfaces a visible error message rather than
+silently failing or appearing to succeed; confirmed the public site
+(`/`) still renders its full title and content unchanged. Full
+login-success, session-persistence-after-refresh, and logout→Login
+transitions need a real Supabase Auth session and could not be exercised
+end-to-end in this phase, since creating a real Supabase project is
+explicitly out of scope (see "User action required"); the code follows
+`@supabase/supabase-js`'s standard session-handling contract
+(`getSession()` on load + `onAuthStateChange` subscription, default
+`persistSession`/`autoRefreshToken` behavior), which is what makes those
+three behaviors work once a real project is connected.
+
+**Not built in this phase (by design):** content-edit UI, image-upload
+UI, settings UI, any write to the Supabase tables from Phase 2-A, and any
+`.github/workflows/deploy.yml` change to inject real Supabase secrets at
+deploy time. These are Phase 2-C, not started.
+
 ## Phase 2-A — Admin CMS Architecture (design + foundation only)
 
 **Status: complete.**
