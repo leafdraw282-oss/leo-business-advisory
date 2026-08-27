@@ -5,6 +5,12 @@ import BilingualField from '../../components/BilingualField.jsx';
 import SectionStatus from '../../components/SectionStatus.jsx';
 import ImagePlaceholder from '../../../components/ImagePlaceholder.jsx';
 
+function formatFileSize(bytes) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
 function GalleryImages() {
   const {
     status,
@@ -19,6 +25,7 @@ function GalleryImages() {
     moveItem,
     selectFileForItem,
     save,
+    reset,
     reload,
   } = useGalleryImages();
 
@@ -27,7 +34,8 @@ function GalleryImages() {
       <h2>Gallery ({items.length}장)</h2>
       <p className="admin-section-help">
         사진을 추가·삭제하거나 순서를 바꿀 수 있습니다. 새 사진을 선택하면 저장 전까지 현재 사진과 나란히
-        미리보기가 표시됩니다.
+        미리보기가 표시됩니다. &quot;비활성&quot;으로 표시하면 삭제하지 않고 사진을 보관할 수 있습니다 (Public
+        Website 반영은 다음 단계 작업입니다).
       </p>
       <SectionStatus
         status={status}
@@ -36,6 +44,7 @@ function GalleryImages() {
         saveState={saveState}
         saveError={saveError}
         onSave={save}
+        onReset={reset}
         onReload={reload}
       />
       {status === 'ready' && (
@@ -45,7 +54,10 @@ function GalleryImages() {
             const label = item.captionEn || item.captionKo || `Photo ${index + 1}`;
 
             return (
-              <div className="admin-gallery-item" key={item.itemKey}>
+              <div
+                className={`admin-gallery-item${item.isActive ? '' : ' admin-gallery-item--inactive'}`}
+                key={item.itemKey}
+              >
                 <div className="admin-gallery-item-preview">
                   <div className="admin-image-compare admin-image-compare--stacked">
                     <div className="admin-image-compare-item">
@@ -61,7 +73,22 @@ function GalleryImages() {
                   </div>
                 </div>
                 <div className="admin-gallery-item-fields">
-                  <p className="admin-gallery-item-number">사진 {index + 1}</p>
+                  <div className="admin-gallery-item-heading">
+                    <p className="admin-gallery-item-number">사진 {index + 1}</p>
+                    <label className="admin-gallery-active-toggle">
+                      <input
+                        type="checkbox"
+                        checked={item.isActive}
+                        onChange={(event) => updateItem(index, { isActive: event.target.checked })}
+                      />
+                      {item.isActive ? '활성 (공개)' : '비활성 (숨김)'}
+                    </label>
+                  </div>
+                  {!item.isActive && (
+                    <p className="admin-gallery-inactive-note">
+                      비활성 상태입니다. 저장해도 삭제되지 않고 그대로 보관됩니다.
+                    </p>
+                  )}
                   <input
                     type="file"
                     accept={ALLOWED_IMAGE_TYPES.join(',')}
@@ -74,6 +101,11 @@ function GalleryImages() {
                   <p className="admin-image-hint">
                     JPEG, PNG, WebP, SVG 파일만 가능 — 최대 {MAX_IMAGE_BYTES / 1024 / 1024}MB.
                   </p>
+                  {item.pendingFile && (
+                    <p className="admin-image-pending">
+                      선택한 파일: {item.pendingFile.name} ({formatFileSize(item.pendingFile.size)})
+                    </p>
+                  )}
                   <BilingualField
                     label="캡션 (Caption)"
                     ko={item.captionKo}

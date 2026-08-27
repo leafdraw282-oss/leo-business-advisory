@@ -92,7 +92,7 @@ async function save(values) {
 }
 
 function CareerSection() {
-  const { status, loadError, values, update, isDirty, saveState, saveError, save: runSave, reload } =
+  const { status, loadError, values, update, isDirty, saveState, saveError, save: runSave, reset, reload } =
     useAdminForm({ load, save });
 
   function updateHeading(patch) {
@@ -116,6 +116,7 @@ function CareerSection() {
         saveState={saveState}
         saveError={saveError}
         onSave={runSave}
+        onReset={reset}
         onReload={reload}
       />
       {values && (

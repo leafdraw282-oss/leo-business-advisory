@@ -144,6 +144,24 @@ export function useImageSlot({ folder, fallbackAlt, loadParent, applyParent }) {
     }
   }
 
+  // Reverts an in-progress edit (a staged file, or an alt-text change)
+  // back to what's currently saved — cancels the pending upload and
+  // restores the last-loaded alt text, with no network call and no effect
+  // on the database. Distinct from `resetSlot` below, which deletes the
+  // saved image itself, and from `reload`, which re-fetches from Supabase.
+  function resetToSaved() {
+    setPreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+    setPendingFile(null);
+    setFileError('');
+    setAltKo(savedAlt.ko);
+    setAltEn(savedAlt.en);
+    setSaveState('idle');
+    setSaveError('');
+  }
+
   async function resetSlot() {
     if (!isSupabaseConfigured) {
       setSaveState('error');
@@ -191,6 +209,7 @@ export function useImageSlot({ folder, fallbackAlt, loadParent, applyParent }) {
     saveState,
     saveError,
     save,
+    reset: resetToSaved,
     resetSlot,
     reload: load,
   };

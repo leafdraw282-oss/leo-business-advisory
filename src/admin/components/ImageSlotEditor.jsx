@@ -5,6 +5,12 @@ import ImagePlaceholder from '../../components/ImagePlaceholder.jsx';
 import BilingualField from './BilingualField.jsx';
 import SectionStatus from './SectionStatus.jsx';
 
+function formatFileSize(bytes) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
 // One image slot's full editor UI: preview (via the same ImagePlaceholder
 // the public site uses, so "no image yet" looks exactly like the public
 // site's own fallback), file picker with validation, alt text, and
@@ -34,6 +40,7 @@ function ImageSlotEditor({ title, aspectRatio = '4 / 3', slot }) {
     saveState,
     saveError,
     save,
+    reset,
     resetSlot,
     reload,
   } = slot;
@@ -63,6 +70,7 @@ function ImageSlotEditor({ title, aspectRatio = '4 / 3', slot }) {
         saveState={saveState}
         saveError={saveError}
         onSave={save}
+        onReset={reset}
         onReload={reload}
       />
       {status === 'ready' && (
@@ -97,7 +105,7 @@ function ImageSlotEditor({ title, aspectRatio = '4 / 3', slot }) {
             )}
             {pendingFile && (
               <p className="admin-image-pending">
-                선택한 파일: {pendingFile.name} —{' '}
+                선택한 파일: {pendingFile.name} ({formatFileSize(pendingFile.size)}) —{' '}
                 <button type="button" onClick={cancelPendingFile}>
                   취소
                 </button>

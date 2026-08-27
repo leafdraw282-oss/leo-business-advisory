@@ -84,6 +84,19 @@ export function useAdminForm({ load, save }) {
     }
   }
 
+  // Reverts in-progress edits back to the last value confirmed from the
+  // database (savedRef.current) — a purely local, no-network undo. This is
+  // NOT a "restore factory defaults" button: if nothing has ever been
+  // saved to the database, savedRef.current is whatever load() returned
+  // (which may itself be the src/data/profile.js fallback), never a
+  // separate hardcoded "original" value applied on top of real DB content.
+  function resetToSaved() {
+    if (savedRef.current === null) return;
+    setValues(savedRef.current);
+    setSaveState('idle');
+    setSaveError('');
+  }
+
   return {
     status,
     loadError,
@@ -93,6 +106,7 @@ export function useAdminForm({ load, save }) {
     saveState,
     saveError,
     save: runSave,
+    reset: resetToSaved,
     reload: runLoad,
   };
 }

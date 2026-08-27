@@ -152,7 +152,7 @@ async function save(values) {
 }
 
 function CaseStudiesSection() {
-  const { status, loadError, values, update, isDirty, saveState, saveError, save: runSave, reload } =
+  const { status, loadError, values, update, isDirty, saveState, saveError, save: runSave, reset, reload } =
     useAdminForm({ load, save });
 
   function updateHeading(patch) {
@@ -201,6 +201,7 @@ function CaseStudiesSection() {
         saveState={saveState}
         saveError={saveError}
         onSave={runSave}
+        onReset={reset}
         onReload={reload}
       />
       {values && (

@@ -217,7 +217,7 @@ body {
 
 .admin-dashboard-cards {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
 }
 
@@ -233,6 +233,11 @@ body {
 
 .admin-dashboard-card:hover {
   border-color: #a4865c;
+}
+
+.admin-dashboard-card--link {
+  display: block;
+  text-decoration: none;
 }
 
 .admin-dashboard-card h2 {
@@ -267,6 +272,24 @@ body {
   margin: 0;
   font-size: 0.95rem;
   color: #0b1625;
+}
+
+.admin-dashboard-status-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.admin-dashboard-status-list li {
+  font-size: 0.95rem;
+  color: #0b1625;
+}
+
+.admin-dashboard-status-list span {
+  color: #8b8984;
 }
 
 .admin-dashboard-note {
@@ -667,11 +690,52 @@ body {
   overflow: hidden;
 }
 
+.admin-gallery-item--inactive {
+  opacity: 0.6;
+  background: #f4f1ea;
+}
+
+.admin-gallery-item-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
 .admin-gallery-item-number {
-  margin: 0 0 0.5rem;
+  margin: 0;
   font-size: 0.8rem;
   font-weight: 700;
   color: #0b1625;
+}
+
+.admin-gallery-active-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1e7a34;
+  cursor: pointer;
+}
+
+.admin-gallery-item--inactive .admin-gallery-active-toggle {
+  color: #8b8984;
+}
+
+.admin-gallery-active-toggle input {
+  margin: 0;
+}
+
+.admin-gallery-inactive-note {
+  font-size: 0.75rem;
+  color: #8a5a00;
+  background: #fbf1e0;
+  border-radius: 4px;
+  padding: 0.3rem 0.5rem;
+  margin: 0 0 0.6rem;
 }
 
 .admin-gallery-item-fields input[type='file'] {

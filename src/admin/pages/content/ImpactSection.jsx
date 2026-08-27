@@ -76,7 +76,7 @@ async function save(values) {
 }
 
 function ImpactSection() {
-  const { status, loadError, values, update, isDirty, saveState, saveError, save: runSave, reload } =
+  const { status, loadError, values, update, isDirty, saveState, saveError, save: runSave, reset, reload } =
     useAdminForm({ load, save });
 
   function updateHeading(patch) {
@@ -100,6 +100,7 @@ function ImpactSection() {
         saveState={saveState}
         saveError={saveError}
         onSave={runSave}
+        onReset={reset}
         onReload={reload}
       />
       {values && (

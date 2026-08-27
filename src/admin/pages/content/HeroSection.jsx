@@ -84,7 +84,7 @@ async function save(values) {
 }
 
 function HeroSection() {
-  const { status, loadError, values, update, isDirty, saveState, saveError, save: runSave, reload } =
+  const { status, loadError, values, update, isDirty, saveState, saveError, save: runSave, reset, reload } =
     useAdminForm({ load, save });
 
   return (
@@ -97,6 +97,7 @@ function HeroSection() {
         saveState={saveState}
         saveError={saveError}
         onSave={runSave}
+        onReset={reset}
         onReload={reload}
       />
       {values && (

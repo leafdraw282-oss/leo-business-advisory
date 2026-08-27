@@ -45,7 +45,7 @@ async function save(values) {
 }
 
 function EducationSection() {
-  const { status, loadError, values, update, isDirty, saveState, saveError, save: runSave, reload } =
+  const { status, loadError, values, update, isDirty, saveState, saveError, save: runSave, reset, reload } =
     useAdminForm({ load, save });
 
   function updateEntry(index, patch) {
@@ -65,6 +65,7 @@ function EducationSection() {
         saveState={saveState}
         saveError={saveError}
         onSave={runSave}
+        onReset={reset}
         onReload={reload}
       />
       {values && (

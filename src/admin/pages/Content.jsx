@@ -27,8 +27,14 @@ const SECTIONS = [
 // Switching sections unmounts the previous one, which would silently
 // discard an in-progress edit — so switching while the active section has
 // unsaved changes asks for confirmation first (see src/admin/content/dirtyTracker.js).
-function Content() {
-  const [activeId, setActiveId] = useState(SECTIONS[0].id);
+//
+// `initialSectionId`: lets a caller (Dashboard's "연락처 관리" shortcut)
+// open directly on a specific sub-section instead of always defaulting to
+// the first one (Hero).
+function Content({ initialSectionId }) {
+  const [activeId, setActiveId] = useState(
+    SECTIONS.some((section) => section.id === initialSectionId) ? initialSectionId : SECTIONS[0].id,
+  );
   const Active = SECTIONS.find((section) => section.id === activeId)?.Component;
 
   function selectSection(id) {

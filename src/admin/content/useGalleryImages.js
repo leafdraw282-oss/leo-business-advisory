@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { gallery } from '../../data/profile.js';
 import { isSupabaseConfigured } from '../../lib/supabase.js';
 import { fetchList, upsertByNaturalKey, fetchRowById, saveListRow, deleteRow } from './supabaseTable.js';
@@ -21,6 +21,9 @@ function fallbackItems() {
     captionEn: g.captionEn,
     aspectRatio: g.aspect ?? '4 / 3',
     isWide: Boolean(g.wide),
+    // src/data/profile.js has no active/inactive concept — every fallback
+    // photo is active until an admin turns one off in the database.
+    isActive: true,
     mediaId: null,
     storagePath: null,
     pendingFile: null,
@@ -32,8 +35,8 @@ function fallbackItems() {
 // excludes pendingFile/previewUrl, which are transient local-only state
 // (a File object isn't a meaningful thing to diff via JSON.stringify).
 function comparable(item) {
-  const { id, itemKey, captionKo, captionEn, aspectRatio, isWide, mediaId } = item;
-  return { id, itemKey, captionKo, captionEn, aspectRatio, isWide, mediaId };
+  const { id, itemKey, captionKo, captionEn, aspectRatio, isWide, isActive, mediaId } = item;
+  return { id, itemKey, captionKo, captionEn, aspectRatio, isWide, isActive, mediaId };
 }
 
 async function load() {
@@ -50,6 +53,10 @@ async function load() {
     captionEn: r.caption_en,
     aspectRatio: r.aspect_ratio,
     isWide: r.is_wide,
+    // is_active defaults true at the database (0004_gallery_active_flag.sql)
+    // for every pre-existing row, so `?? true` only matters when running
+    // against a database that predates that migration.
+    isActive: r.is_active ?? true,
     mediaId: r.image_id,
     storagePath: mediaRows[i]?.storage_path ?? null,
     pendingFile: null,
@@ -73,6 +80,10 @@ export function useGalleryImages() {
   const [pendingDeletions, setPendingDeletions] = useState([]);
   const [saveState, setSaveState] = useState('idle');
   const [saveError, setSaveError] = useState('');
+  // Full last-loaded rows (not just the `comparable()` projection used for
+  // dirty-checking) so `resetToSaved` can restore storagePath etc. locally
+  // without a network round-trip.
+  const savedSnapshotRef = useRef([]);
 
   const runLoad = useCallback(async () => {
     setStatus('loading');
@@ -81,6 +92,7 @@ export function useGalleryImages() {
       const loaded = await load();
       setItems(loaded);
       setSavedItems(loaded.map(comparable));
+      savedSnapshotRef.current = loaded;
       setPendingDeletions([]);
       setStatus('ready');
       setSaveState('idle');
@@ -122,6 +134,7 @@ export function useGalleryImages() {
         captionEn: '',
         aspectRatio: '4 / 3',
         isWide: false,
+        isActive: true,
         mediaId: null,
         storagePath: null,
         pendingFile: null,
@@ -217,6 +230,7 @@ export function useGalleryImages() {
           caption_en: item.captionEn,
           aspect_ratio: item.aspectRatio,
           is_wide: item.isWide,
+          is_active: item.isActive,
           sort_order: index,
           image_id: mediaId,
         });
@@ -242,6 +256,21 @@ export function useGalleryImages() {
     }
   }
 
+  // Reverts every add/remove/reorder/edit/pending-upload back to the last
+  // database-confirmed state (savedSnapshotRef) — a local, no-network undo.
+  // If nothing has ever been saved, that snapshot is whatever load()
+  // returned (possibly the src/data/profile.js fallback list) — this never
+  // pulls in a separate "original" value on top of real DB content.
+  function resetToSaved() {
+    items.forEach((item) => {
+      if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
+    });
+    setItems(savedSnapshotRef.current.map((item) => ({ ...item })));
+    setPendingDeletions([]);
+    setSaveState('idle');
+    setSaveError('');
+  }
+
   return {
     status,
     loadError,
@@ -255,6 +284,7 @@ export function useGalleryImages() {
     moveItem,
     selectFileForItem,
     save,
+    reset: resetToSaved,
     reload: runLoad,
   };
 }

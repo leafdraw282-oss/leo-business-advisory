@@ -1,5 +1,71 @@
 # Project Status
 
+## Phase 3-B — Admin Operational Convenience Pass
+
+**Status: complete. Admin CMS only** — no public-site file
+(`src/data/profile.js`, `src/sections/*`, `src/lib/*`, `src/App.jsx`, or
+any public CSS) was touched; `git diff` on that set is empty.
+
+**Dashboard:** added a fourth Dashboard-home card, **연락처 관리**, as its
+own direct shortcut — Contact was previously reachable only via
+Content → its own sub-nav. Clicking it opens the Content tab straight on
+the Contact sub-section (`Dashboard.jsx`'s `goToContentSection`, passed
+into `Content.jsx` as a new `initialSectionId` prop). Also added a fourth
+card, **사이트 바로가기**, so Dashboard now surfaces all of 콘텐츠 관리 /
+이미지 관리 / 연락처 관리 / 사이트 바로가기 as equal-weight cards (Logout
+stays in the sidebar, always visible). The "최근 저장" panel now shows
+Content and Images as two separate rows instead of one merged
+most-recent-wins line (`lastSaved.js` now stores a `{area: isoTimestamp}`
+map instead of a single record, with the old single-record shape still
+read correctly for anyone with existing localStorage data).
+
+**Content editor UX:** `SectionStatus.jsx`'s status text now names the
+three states the spec asked for explicitly — "✎ 수정 중" (editing) vs.
+"✓ 저장 완료 — 현재 저장된 값입니다" (current saved value) vs. the existing
+"저장되지 않은 변경사항" dirty badge — instead of leaving "editing" implicit.
+Save-success/failure messaging and duplicate-save prevention
+(`disabled={saveState === 'saving' || !isDirty}`) already existed from
+Phase 2-F and needed no change; confirmed still correct everywhere.
+
+**Reset (되돌리기), not a factory-reset:** every editor (`useAdminForm`,
+`useImageSlot`, `useGalleryImages`) gained a `reset()` that reverts
+in-progress edits back to the last value confirmed from the database —
+purely local, no network call, no Founder Profile involvement. If nothing
+has ever been saved to the database, "the saved value" is whatever
+`load()` already returned (which may be the `profile.js` fallback the
+site is already showing) — reset never pulls in a separate "original"
+value on top of that. This is distinct from the existing "다시 불러오기"
+(a real network re-fetch) and, for images, from "이미지 삭제" (which
+actually deletes the saved file). Wired into all 9 Content sections, both
+single-image slots, and Gallery.
+
+**Image management:** `ImageSlotEditor.jsx` and `GalleryImages.jsx` now
+show file size next to file name for a staged upload (e.g. "선택한 파일:
+photo.jpg (240 KB)") — previously only the name was shown. The
+current-photo-never-lost-before-save behavior (current vs. new-preview
+shown side by side, nothing overwritten until Save) was already correct
+from Phase 2-D/2-F and is unchanged.
+
+**Gallery active/inactive:** added `is_active boolean not null default
+true` to `gallery_items` (`supabase/migrations/0004_gallery_active_flag.sql`,
+additive, defaults every existing row to visible) and a per-photo 활성/비활성
+checkbox in the admin Gallery editor, so a photo can be hidden without
+being permanently deleted. Reordering stays the existing ↑/↓ button
+pattern — no drag-and-drop library was added, per the phase's explicit
+constraint. **Deliberately admin-side only in this phase:** the public
+site's gallery query (`src/lib/content/gallery.js`) was not touched, so
+toggling a photo inactive does not yet hide it on the public site — the
+admin UI says this next to the checkbox and in the section's help text, so
+it's disclosed rather than a silent gap. See "Next Phase 3-C" for the
+public-side follow-up.
+
+**Responsive:** re-verified at 390/768/1024/1280px after all of the above
+(new 4-card Dashboard grid, the gallery active-toggle row, the added
+Reset button in every toolbar) — zero horizontal overflow at any width,
+verified via a headless-browser pass, not just CSS review.
+
+**Build:** `npm run lint` and `npm run build` both pass with zero errors.
+
 ## Phase 3-A — Content-Readiness & Admin Label Pass
 
 **Status: complete.** No public site design change, no database field
