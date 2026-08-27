@@ -25,6 +25,13 @@ export function useImageDimensions(url) {
     };
   }, [url]);
 
-  if (loaded?.url !== url) return null;
+  // `url` can be `null` (ImageSlotEditor's "no image yet") or `undefined`
+  // (GalleryImages' "no image yet") — both must resolve to "nothing to
+  // show" the same way. Checking `!loaded` explicitly, before reading
+  // `loaded.url`, is what actually matters: comparing `loaded?.url !== url`
+  // alone breaks when `loaded` is still null and `url` is `undefined`,
+  // since `undefined !== undefined` is false and would fall through to
+  // reading `.width` off `null`.
+  if (!url || !loaded || loaded.url !== url) return null;
   return { width: loaded.width, height: loaded.height };
 }
