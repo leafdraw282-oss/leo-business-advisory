@@ -653,6 +653,47 @@ body {
   font-size: 0.8rem;
 }
 
+/* Recommended size/ratio guidance (Phase 4-B) — shown once per slot,
+   right under its title. */
+.admin-image-guideline {
+  background: #f4f1ea;
+  border-radius: 6px;
+  padding: 0.6rem 0.85rem;
+  margin: 0 0 0.85rem;
+}
+
+.admin-image-guideline-size {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0b1625;
+  margin: 0;
+}
+
+.admin-image-guideline-format {
+  font-size: 0.75rem;
+  color: #8b8984;
+  margin: 0.15rem 0 0;
+}
+
+/* Actual uploaded image's real pixel size + non-blocking ratio-mismatch
+   warning, shown under each individual thumbnail. */
+.admin-image-actual-info {
+  margin-top: 0.2rem;
+}
+
+.admin-image-actual-size {
+  font-size: 0.72rem;
+  color: #8b8984;
+  margin: 0;
+}
+
+.admin-image-guideline-warning {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #8a5a00;
+  margin: 0.2rem 0 0;
+}
+
 .admin-image-reset {
   margin-top: 0.75rem;
   cursor: pointer;

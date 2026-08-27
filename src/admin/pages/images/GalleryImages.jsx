@@ -1,8 +1,11 @@
 import { isSupabaseConfigured } from '../../../lib/supabase.js';
 import { publicUrlFor, ALLOWED_IMAGE_TYPES, MAX_IMAGE_BYTES } from '../../content/supabaseStorage.js';
 import { useGalleryImages } from '../../content/useGalleryImages.js';
+import { recommendedSizeForRatio } from '../../content/imageGuidelines.js';
 import BilingualField from '../../components/BilingualField.jsx';
 import SectionStatus from '../../components/SectionStatus.jsx';
+import ImageGuidelines from '../../components/ImageGuidelines.jsx';
+import ImageActualInfo from '../../components/ImageActualInfo.jsx';
 import ImagePlaceholder from '../../../components/ImagePlaceholder.jsx';
 
 function formatFileSize(bytes) {
@@ -57,6 +60,7 @@ function GalleryImages() {
           {items.map((item, index) => {
             const currentSrc = isSupabaseConfigured && item.storagePath ? publicUrlFor(item.storagePath) : undefined;
             const label = item.captionEn || item.captionKo || `Photo ${index + 1}`;
+            const guideline = recommendedSizeForRatio(item.aspectRatio);
 
             return (
               <div
@@ -68,11 +72,17 @@ function GalleryImages() {
                     <div className="admin-image-compare-item">
                       <span className="admin-image-compare-label">현재 사진</span>
                       <ImagePlaceholder src={currentSrc} alt={label} label={label} aspectRatio={item.aspectRatio} />
+                      <ImageActualInfo url={currentSrc} recommendedWidth={guideline.width} recommendedHeight={guideline.height} />
                     </div>
                     {item.previewUrl && (
                       <div className="admin-image-compare-item admin-image-compare-item--new">
                         <span className="admin-image-compare-label">새 사진 (저장 전 미리보기)</span>
                         <ImagePlaceholder src={item.previewUrl} alt={label} label={label} aspectRatio={item.aspectRatio} />
+                        <ImageActualInfo
+                          url={item.previewUrl}
+                          recommendedWidth={guideline.width}
+                          recommendedHeight={guideline.height}
+                        />
                       </div>
                     )}
                   </div>
@@ -89,6 +99,7 @@ function GalleryImages() {
                       {item.isActive ? '활성 (공개)' : '비활성 (숨김)'}
                     </label>
                   </div>
+                  <ImageGuidelines width={guideline.width} height={guideline.height} ratioLabel={guideline.ratioLabel} />
                   {!item.isActive && (
                     <p className="admin-gallery-inactive-note">
                       비활성 상태입니다. 저장해도 삭제되지 않고 그대로 보관됩니다.

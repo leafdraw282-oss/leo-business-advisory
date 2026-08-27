@@ -4,6 +4,8 @@ import { publicUrlFor, ALLOWED_IMAGE_TYPES, MAX_IMAGE_BYTES } from '../content/s
 import ImagePlaceholder from '../../components/ImagePlaceholder.jsx';
 import BilingualField from './BilingualField.jsx';
 import SectionStatus from './SectionStatus.jsx';
+import ImageGuidelines from './ImageGuidelines.jsx';
+import ImageActualInfo from './ImageActualInfo.jsx';
 
 function formatFileSize(bytes) {
   if (bytes < 1024) return `${bytes} B`;
@@ -20,7 +22,7 @@ function formatFileSize(bytes) {
 // While a new file is staged but not yet saved, the current (live) image
 // and the new one are shown side by side, each clearly labeled — an
 // admin should never have to guess which one is still live.
-function ImageSlotEditor({ title, aspectRatio = '4 / 3', slot }) {
+function ImageSlotEditor({ title, aspectRatio = '4 / 3', guideline, slot }) {
   const fileInputRef = useRef(null);
   const {
     status,
@@ -63,6 +65,7 @@ function ImageSlotEditor({ title, aspectRatio = '4 / 3', slot }) {
   return (
     <div className="admin-image-slot">
       <h3>{title}</h3>
+      {guideline && <ImageGuidelines {...guideline} />}
       <SectionStatus
         status={status}
         loadError={loadError}
@@ -79,11 +82,17 @@ function ImageSlotEditor({ title, aspectRatio = '4 / 3', slot }) {
             <div className="admin-image-compare-item">
               <span className="admin-image-compare-label">현재 이미지</span>
               <ImagePlaceholder src={currentUrl} alt={previewLabel} label={previewLabel} aspectRatio={aspectRatio} />
+              {guideline && (
+                <ImageActualInfo url={currentUrl} recommendedWidth={guideline.width} recommendedHeight={guideline.height} />
+              )}
             </div>
             {previewUrl && (
               <div className="admin-image-compare-item admin-image-compare-item--new">
                 <span className="admin-image-compare-label">새 이미지 (저장 전 미리보기)</span>
                 <ImagePlaceholder src={previewUrl} alt={previewLabel} label={previewLabel} aspectRatio={aspectRatio} />
+                {guideline && (
+                  <ImageActualInfo url={previewUrl} recommendedWidth={guideline.width} recommendedHeight={guideline.height} />
+                )}
               </div>
             )}
           </div>

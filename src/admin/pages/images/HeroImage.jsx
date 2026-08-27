@@ -3,6 +3,7 @@ import { isSupabaseConfigured } from '../../../lib/supabase.js';
 import { fetchSingleton, upsertSingleton, fetchRowById } from '../../content/supabaseTable.js';
 import { heroRowDefaults } from '../../content/rowDefaults.js';
 import { useImageSlot } from '../../content/useImageSlot.js';
+import { HERO_IMAGE_GUIDELINE } from '../../content/imageGuidelines.js';
 import ImageSlotEditor from '../../components/ImageSlotEditor.jsx';
 
 async function loadParent() {
@@ -25,7 +26,14 @@ function HeroImage() {
     applyParent,
   });
 
-  return <ImageSlotEditor title="Hero Portrait (첫 화면 인물 사진)" aspectRatio="4 / 5" slot={slot} />;
+  return (
+    <ImageSlotEditor
+      title="Hero Portrait (첫 화면 인물 사진)"
+      aspectRatio="4 / 5"
+      guideline={HERO_IMAGE_GUIDELINE}
+      slot={slot}
+    />
+  );
 }
 
 export default HeroImage;
