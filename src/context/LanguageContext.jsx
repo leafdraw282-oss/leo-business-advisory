@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LanguageContext } from './languageContext.js';
+import { trackEvent } from '../lib/analytics.js';
 
 const STORAGE_KEY = 'leo-advisory-language';
 
@@ -32,14 +33,29 @@ export function LanguageProvider({ children }) {
     document.documentElement.lang = language;
   }, [language]);
 
+  // Tracks only an actual change (clicking the already-active language is
+  // a no-op, not a "change" event) — compares against `language` from the
+  // closure rather than putting the trackEvent side effect inside a
+  // functional setState updater, since React (in StrictMode dev builds)
+  // can invoke that updater twice, which would double-fire the event.
+  // Watching `language` in a useEffect instead was also ruled out: that
+  // would additionally fire once on mount, which isn't a visitor action.
+  const changeLanguage = useCallback(
+    (next) => {
+      if (next !== language) trackEvent('language_change', { language: next });
+      setLanguage(next);
+    },
+    [language],
+  );
+
   const value = useMemo(
     () => ({
       language,
-      setLanguage,
-      toggleLanguage: () => setLanguage((prev) => (prev === 'ko' ? 'en' : 'ko')),
+      setLanguage: changeLanguage,
+      toggleLanguage: () => changeLanguage(language === 'ko' ? 'en' : 'ko'),
       t: (koValue, enValue) => (language === 'ko' ? koValue : enValue),
     }),
-    [language],
+    [language, changeLanguage],
   );
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;

@@ -2,6 +2,7 @@ import { person } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
 import { useSectionContent } from '../hooks/useSectionContent';
 import { fetchHero, heroFallback } from '../lib/content/hero';
+import { trackEvent } from '../lib/analytics';
 import ImagePlaceholder from '../components/ImagePlaceholder';
 import './Hero.css';
 
@@ -32,10 +33,21 @@ function Hero() {
           </h1>
           <p className="hero__subhead">{t(hero.subheadKo, hero.subheadEn)}</p>
           <div className="hero__cta">
-            <a className="btn btn--primary" href={`#${hero.ctaPrimaryTarget}`}>
+            {/* Tracked by the CTA's fixed role (primary/secondary), not its
+                admin-editable label text, which can change without notice —
+                see src/lib/analytics.js. */}
+            <a
+              className="btn btn--primary"
+              href={`#${hero.ctaPrimaryTarget}`}
+              onClick={() => trackEvent('explore_experience_click')}
+            >
               {t(hero.ctaPrimaryKo, hero.ctaPrimaryEn)}
             </a>
-            <a className="btn btn--secondary" href={`#${hero.ctaSecondaryTarget}`}>
+            <a
+              className="btn btn--secondary"
+              href={`#${hero.ctaSecondaryTarget}`}
+              onClick={() => trackEvent('discuss_project_click')}
+            >
               {t(hero.ctaSecondaryKo, hero.ctaSecondaryEn)}
             </a>
           </div>

@@ -1,5 +1,68 @@
 # Project Status
 
+## Phase 3-E — Visitor Analytics (Minimal, Privacy-Safe)
+
+**Status: complete.** No public-site design changed — this phase only
+added `src/lib/analytics.js` and wired event calls into existing
+interaction handlers.
+
+**Architecture:** `src/lib/analytics.js` mirrors `src/lib/supabase.js`'s
+shape exactly — `isAnalyticsConfigured` derived from
+`VITE_GA_MEASUREMENT_ID` (Google Analytics 4, via `gtag.js`), with every
+other function a safe no-op when unset. No Measurement ID is hardcoded or
+invented anywhere; without a real one, `initAnalytics()` does nothing at
+all — verified live: no script tag, no `googletagmanager.com` network
+request, `window.gtag`/`window.dataLayer` stay `undefined`,
+`trackEvent(...)` calls no-op silently with zero errors.
+
+**Events wired** (all via one `trackEvent(name, params)` call, never
+called directly against `window.gtag`):
+- **Page View** — GA4's own `config` call already sends this by default;
+  this SPA has no client-side router/route changes, so no manual
+  page_view call is needed anywhere.
+- **explore_experience_click** / **discuss_project_click** —
+  `src/sections/Hero.jsx`'s two CTA buttons, tracked by their fixed
+  primary/secondary role, not their (admin-editable) label text.
+- **contact_section_view** — `src/sections/Contact.jsx`, a new
+  `IntersectionObserver` (this codebase's first use of it) fires once,
+  the first time the section is actually scrolled into view; disconnects
+  after firing so it never re-fires.
+- **contact_submit** — `src/components/ContactForm.jsx`, fired only after
+  `submitInquiry()` actually resolves successfully (Phase 3-C's real
+  Supabase insert) — never on a validation failure and never on the
+  honeypot's silent no-op path. Verified live: exactly one event, only
+  after a genuine success.
+- **email_click** / **phone_click** — the `mailto:`/`tel:` links in
+  Contact.jsx's info panel.
+- **language_change** — `LanguageContext.jsx`'s `changeLanguage` fires
+  only on an actual change (clicking the already-active language is a
+  no-op, not tracked).
+
+**Privacy enforcement (not just a comment):** `trackEvent`'s
+`sanitizeParams` drops any param under the keys `name`, `email`, `phone`,
+`message`, or `company` before sending, logging a console warning — this
+is a real runtime guard against ever sending visitor-entered content, not
+just a documented convention. Every wired call site above passes no
+params at all, or only a fixed non-personal value (`language: 'en'|'ko'`).
+Verified both via a standalone logic test and live in the browser.
+
+**Performance:** `initAnalytics()` is called from `main.jsx` via
+`requestIdleCallback` (a short `setTimeout` fallback for browsers without
+it), after the initial render already kicked off — so loading analytics
+never competes with first paint. The injected `gtag.js` script tag itself
+carries `async` (verified in the DOM). When unconfigured, there is no
+script, no request, and no measurable cost at all. Bundle size impact of
+`analytics.js` itself: ~0.4KB gzipped.
+
+**Build:** `npm run lint` and `npm run build` both pass with zero errors.
+One real bug was found and fixed via live testing during this phase: the
+first `language_change` wiring put the `trackEvent` call inside a
+functional `setState` updater, which React's `StrictMode` (development
+only) double-invokes — causing every real language change to fire the
+event twice in `npm run dev`. Fixed by comparing against the current
+`language` from the component's closure instead (via `useCallback`), so
+the side effect runs exactly once per real change; confirmed live.
+
 ## Phase 3-D — SEO, Structured Data & Sharing Metadata
 
 **Status: complete.** No public-site design, layout, or page copy was

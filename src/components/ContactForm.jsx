@@ -3,6 +3,7 @@ import { useLanguage } from '../context/languageContext';
 import { useSectionContent } from '../hooks/useSectionContent';
 import { fetchContactForm, contactFormFallback } from '../lib/content/contactForm';
 import { submitInquiry } from '../lib/inquiries';
+import { trackEvent } from '../lib/analytics';
 import './ContactForm.css';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -72,6 +73,10 @@ function ContactForm() {
     try {
       await submitInquiry({ name, company, email, inquiryType, message });
       setSubmitState('success');
+      // No params — inquiry_type/name/email/etc. are all visitor-entered
+      // or derived from it; only the fact that a submission succeeded is
+      // tracked. See src/lib/analytics.js.
+      trackEvent('contact_submit');
       form.reset();
     } catch (err) {
       // The underlying error (a raw network error name, a Postgres
