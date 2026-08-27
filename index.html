@@ -4,11 +4,23 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b1625" />
     <title>LEO Business Advisory | Boosuk Leo Suh</title>
     <meta
       name="description"
       content="Global executive and business advisor with 30+ years of experience in brand growth, retail strategy, market expansion and business transformation."
     />
+    <!-- Everyone should index this page; nothing on the public site is
+         private. The admin CMS (admin/index.html) carries its own
+         noindex, separately. -->
+    <meta name="robots" content="index, follow" />
+
+    <!-- GitHub Pages project-site URL (see vite.config.js's `base` and
+         README.md's deployment section). If a custom domain is ever
+         configured instead, every absolute URL on this page (canonical,
+         og:url, og:image, twitter:image) needs updating to match — same
+         as the README's existing custom-domain checklist. -->
+    <link rel="canonical" href="https://leafdraw282-oss.github.io/leo-business-advisory/" />
 
     <!-- OpenGraph -->
     <meta property="og:type" content="website" />
@@ -18,31 +30,72 @@
       property="og:description"
       content="Global executive and business advisor with 30+ years of experience in brand growth, retail strategy, market expansion and business transformation."
     />
+    <meta property="og:url" content="https://leafdraw282-oss.github.io/leo-business-advisory/" />
+    <!-- Placeholder share preview (public/og-image.png) — a text/brand-color
+         graphic generated from this same page's own approved copy (name,
+         title, site name), not a photo. Swap this file for real
+         photography once available; the meta tags below don't need to
+         change, only the file itself (keep it at 1200x630). -->
+    <meta property="og:image" content="https://leafdraw282-oss.github.io/leo-business-advisory/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="LEO Business Advisory — Boosuk &quot;Leo&quot; Suh, Founder &amp; President" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:locale:alternate" content="ko_KR" />
 
-    <!-- JSON-LD (schema.org Person) — every field below is sourced from
-         src/data/profile.js; do not add facts here that aren't already
-         verified there against the Founder Profile source document. -->
+    <!-- Twitter/X Card — twitter:image requires a raster format (no SVG),
+         which is why favicon.svg can't double as this; og-image.png above
+         is reused here. -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LEO Business Advisory | Boosuk Leo Suh" />
+    <meta
+      name="twitter:description"
+      content="Global executive and business advisor with 30+ years of experience in brand growth, retail strategy, market expansion and business transformation."
+    />
+    <meta name="twitter:image" content="https://leafdraw282-oss.github.io/leo-business-advisory/og-image.png" />
+
+    <!-- JSON-LD (schema.org Person + ProfessionalService) — every field
+         below is sourced from src/data/profile.js; do not add facts here
+         (awards, reviews, employee counts, founding dates, etc.) that
+         aren't already verified there against the Founder Profile source
+         document. -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Boosuk \"Leo\" Suh",
-        "alternateName": "서부석",
-        "jobTitle": "Founder & President",
-        "email": "mailto:leosuh00@gmail.com",
-        "telephone": "+82-10-9033-2237",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Seoul",
-          "addressCountry": "KR"
-        },
-        "worksFor": {
-          "@type": "Organization",
-          "name": "LEO BUSINESS ADVISORY"
-        },
-        "description": "Global executive and business advisor with 30+ years of experience in brand growth, retail strategy, market expansion and business transformation."
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://leafdraw282-oss.github.io/leo-business-advisory/#person",
+            "name": "Boosuk \"Leo\" Suh",
+            "alternateName": "서부석",
+            "jobTitle": "Founder & President",
+            "url": "https://leafdraw282-oss.github.io/leo-business-advisory/",
+            "email": "mailto:leosuh00@gmail.com",
+            "telephone": "+82-10-9033-2237",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Seoul",
+              "addressCountry": "KR"
+            },
+            "worksFor": { "@id": "https://leafdraw282-oss.github.io/leo-business-advisory/#organization" },
+            "description": "Global executive and business advisor with 30+ years of experience in brand growth, retail strategy, market expansion and business transformation."
+          },
+          {
+            "@type": "ProfessionalService",
+            "@id": "https://leafdraw282-oss.github.io/leo-business-advisory/#organization",
+            "name": "LEO BUSINESS ADVISORY",
+            "url": "https://leafdraw282-oss.github.io/leo-business-advisory/",
+            "email": "mailto:leosuh00@gmail.com",
+            "telephone": "+82-10-9033-2237",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Seoul",
+              "addressCountry": "KR"
+            },
+            "founder": { "@id": "https://leafdraw282-oss.github.io/leo-business-advisory/#person" },
+            "description": "Global executive and business advisor with 30+ years of experience in brand growth, retail strategy, market expansion and business transformation."
+          }
+        ]
       }
     </script>
   </head>

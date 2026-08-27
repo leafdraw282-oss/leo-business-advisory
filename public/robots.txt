@@ -1,0 +1,9 @@
+# LEO BUSINESS ADVISORY — public site
+# Admin CMS is also blocked at the page level via <meta name="robots"
+# content="noindex, nofollow"> in admin/index.html; this Disallow is the
+# crawl-level layer on top of that.
+User-agent: *
+Allow: /
+Disallow: /admin/
+
+Sitemap: https://leafdraw282-oss.github.io/leo-business-advisory/sitemap.xml

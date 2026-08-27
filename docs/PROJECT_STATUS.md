@@ -1,5 +1,78 @@
 # Project Status
 
+## Phase 3-D — SEO, Structured Data & Sharing Metadata
+
+**Status: complete.** No public-site design, layout, or page copy was
+changed — this phase only touched `index.html`'s `<head>` and added new
+`public/` files (robots.txt, sitemap.xml, 404.html, og-image.png).
+
+**SEO tags added to `index.html`** (title/meta description were already
+present and unchanged): `<link rel="canonical">`, `<meta name="robots"
+content="index, follow">`, `<meta name="theme-color" content="#0b1625">`
+(reuses the existing navy brand token, not a new color), `og:url`,
+`og:image` (+ width/height/alt), and a full Twitter/X Card block
+(`summary_large_image`). All new absolute URLs are hardcoded to this
+repo's GitHub Pages project URL (`https://leafdraw282-oss.github.io/leo-business-advisory/`)
+— every one of them needs updating together if a custom domain is ever
+configured, same as the README's existing custom-domain checklist
+(`vite.config.js`'s `base`, image paths).
+
+**Structured data:** the existing Person JSON-LD was verified field-by-field
+against `src/data/profile.js` — already accurate, unchanged. Restructured
+into a `@graph` with a linked **ProfessionalService** entity for "LEO
+BUSINESS ADVISORY" (name, url, email, telephone, address, description,
+`founder` reference back to the Person) — every field is a direct pull
+from `profile.js`'s `site`/`person`/`contact` exports. No award, review,
+rating, employee count, or founding date was added anywhere, since none of
+those are stated facts in the Founder Profile source document.
+
+**robots.txt / sitemap.xml:** new `public/robots.txt` allows everything
+except `/admin/` (which also already carries its own page-level `noindex`
+meta — this is the crawl-level layer on top of that), and points to the
+new sitemap. `public/sitemap.xml` lists a single URL — the site's one page
+— since this is an anchor-navigated SPA with no separate routes; in-page
+anchors (`#hero`, `#about`, etc.) aren't separate crawlable documents and
+don't belong in a sitemap.
+
+**KR/EN duplicate-content check:** confirmed no duplicate-content risk —
+the language toggle is client-side state on one single URL (no `/en/` or
+`/ko/` routes), so there is only ever one canonical document for search
+engines to index; the new `<link rel="canonical">` reinforces that. No
+`hreflang` tags were added, since those describe *separate* URLs serving
+equivalent content, which doesn't apply here — and per this phase's
+explicit instruction, no multi-language routing was added to make it
+apply.
+
+**Sharing preview:** since no real photography exists yet, generated
+`public/og-image.png` (1200×630, exact OG/Twitter-recommended size) — a
+brand-colored graphic (navy/bronze/ivory, the existing design tokens)
+built entirely from already-approved copy (person name, title, site name
+from `profile.js`), in the same spirit as `ImagePlaceholder`'s "never a
+broken/blank state" pattern rather than a decorative fake photo. It's
+referenced by `og:image`/`twitter:image`; swapping in real photography
+later only means replacing this one file (keep it 1200×630) — the meta
+tags don't need to change.
+
+**404 / direct-access check:** verified against a local static-file server
+that mimics GitHub Pages' behavior (project subpath + real 404 for
+unmatched paths, no SPA rewrite). Direct access to `/` and `/admin/`
+returns 200 (both are real built HTML files — Vite's multi-page-app
+setup). Direct access to any other path correctly returns HTTP 404; new
+`public/404.html` gives that a branded page (bilingual, matches the site's
+navy/bronze palette) instead of GitHub's generic default, with a working
+link back home. This is **not** the common "copy index.html to 404.html"
+SPA-rewrite trick — this site has no client-side router (confirmed: no
+`react-router` dependency, `App.jsx` uses anchor navigation only), so
+there's no deep-linkable route for a rewritten index.html to serve; a real
+404 for a genuinely nonexistent path is correct here, not a bug.
+
+**Also fixed in passing:** `README.md`'s Contact Form section and file-tree
+comment still described the pre-Phase-3-C `mailto:`-only behavior — a
+staleness bug left over from that phase, not part of this phase's SEO
+scope, but corrected here since it was found during this pass.
+
+**Build:** `npm run lint` and `npm run build` both pass with zero errors.
+
 ## Phase 3-C — Contact Form → Real Business Inquiry System
 
 **Status: complete.** The Contact Form now saves directly to Supabase

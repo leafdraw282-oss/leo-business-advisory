@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Single-URL sitemap — this site is a one-page SPA with in-page anchor
+  navigation (#hero, #about, etc.), not separate routes, so those anchors
+  aren't listed as separate <url> entries: fragment URLs aren't distinct
+  crawlable documents and search engines don't index them as such. The
+  admin CMS (/admin/) is intentionally excluded — it's noindexed and
+  disallowed in robots.txt, so it has no place in a sitemap of pages meant
+  to be indexed.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://leafdraw282-oss.github.io/leo-business-advisory/</loc>
+    <lastmod>2026-08-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>

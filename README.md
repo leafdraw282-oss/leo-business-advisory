@@ -83,7 +83,7 @@ src/
     SectionTitle.jsx   shared eyebrow + heading pattern
     ImpactMetric.jsx   one Impact-section figure
     CaseStudy.jsx      one editorial case-study entry
-    ContactForm.jsx    the inquiry form (mailto:-based, see below)
+    ContactForm.jsx    the inquiry form (saves to Supabase, see below)
     ImagePlaceholder.jsx  image with graceful fallback
   sections/         one file per page section, each mounted in App.jsx
     Hero.jsx, Impact.jsx, Profile.jsx (About), CaseStudies.jsx,
@@ -99,7 +99,9 @@ src/
   App.jsx            mounts Header, every section, and Footer
   main.jsx           entry point, wraps App in LanguageProvider
 public/images/      static image files
-index.html          title, meta description, OpenGraph, JSON-LD
+public/robots.txt, sitemap.xml, 404.html, og-image.png  SEO/crawling files (Phase 3-D)
+index.html          title, meta description, canonical, robots, OpenGraph,
+                     Twitter/X Card, theme-color, JSON-LD (Person + ProfessionalService)
 CLAUDE.md           permanent project rules and content source-of-truth
 docs/PROJECT_STATUS.md   phase-by-phase build history
 ```
@@ -114,20 +116,19 @@ in a component.
 
 ## Contact form
 
-The contact form does not have a backend yet. Submitting it builds a
-`mailto:` link from the filled-in fields and opens the visitor's own email
-app with the message pre-filled — a note under the submit button says so
-explicitly, so nobody mistakes it for a direct server submission.
-
-To connect a real backend later (e.g. Formspree):
-1. Open `src/components/ContactForm.jsx`.
-2. Replace the body of `handleSubmit` with a `fetch()`/API call to your
-   backend instead of building the `mailto:` URL.
-3. Keep giving the visitor real feedback (a success or error state) —
-   never leave the button just sitting there with no response.
+Submitting the form saves the inquiry directly to Supabase (the
+`inquiries` table — see `supabase/migrations/0005_inquiries.sql` and
+`src/lib/inquiries.js`), with real loading/success/error states — never a
+fake "sent" message. Submissions are only ever visible in the admin
+Inquiries screen (`/admin` → Inquiries), never readable by the public; see
+that migration's Row Level Security policies. The direct `mailto:`/`tel:`
+links in the Contact section's info panel are a separate, secondary
+contact method and don't go through this form at all.
 
 The field markup, labels, and inquiry-type options (from `profile.js`
-`inquiryTypes`) don't need to change.
+`inquiryTypes`) match the `inquiries` table's columns; extending either
+needs matching changes on both sides — see the migration file's comments
+for the schema.
 
 ## Deploying to GitHub Pages / a custom domain
 
