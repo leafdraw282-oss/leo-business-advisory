@@ -1,6 +1,7 @@
 import Header from './components/Header';
 import Footer from './components/Footer';
 import SectionErrorBoundary from './components/SectionErrorBoundary';
+import { useApplyDesignSettings } from './hooks/useApplyDesignSettings';
 import Hero from './sections/Hero';
 import Impact from './sections/Impact';
 import Profile from './sections/Profile';
@@ -15,8 +16,14 @@ import Contact from './sections/Contact';
 // one below except Header) is individually wrapped in
 // SectionErrorBoundary (Phase 2-G): if malformed Supabase data somehow
 // crashes one section's render, the rest of the page keeps working
-// instead of going blank.
+// instead of going blank. useApplyDesignSettings() (Phase 4-C) applies
+// the admin-configurable site_design_settings row to :root once fetched;
+// first paint always uses variables.css's own defaults, and any fetch
+// failure/invalid value falls back the same way, so this can never blank
+// or break the page either.
 function App() {
+  useApplyDesignSettings();
+
   return (
     <>
       <Header />

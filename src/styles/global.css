@@ -97,7 +97,7 @@ select:focus-visible {
 /* Shared page container. Every section must use this class instead of
    inventing its own left/right padding, per the CSS system rule. */
 .container {
-  max-width: var(--container-max-width);
+  max-width: var(--content-max-width);
   margin-inline: auto;
   padding-inline: var(--container-padding-inline);
 }
@@ -124,8 +124,8 @@ section {
 }
 
 .btn--primary {
-  background-color: var(--color-navy);
-  color: var(--color-ivory);
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
 }
 
 .btn--primary:hover {
@@ -133,13 +133,13 @@ section {
 }
 
 .btn--secondary {
-  border-color: var(--color-navy);
-  color: var(--color-navy);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .btn--secondary:hover {
-  background-color: var(--color-navy);
-  color: var(--color-ivory);
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
 }
 
 .long-copy {

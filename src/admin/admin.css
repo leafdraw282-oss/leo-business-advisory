@@ -1029,6 +1029,100 @@ body {
    sidebar + sub-nav + two-column image comparison don't fit side by side
    below ~900px, so everything stacks to one column here instead of only
    below 640px. */
+/* Design Settings (Phase 4-C) */
+
+.admin-settings-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+  gap: 2rem;
+  align-items: start;
+}
+
+.admin-settings-form h3 {
+  margin: 1.75rem 0 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 2px solid #e5e1d6;
+  color: #0b1625;
+  font-size: 1rem;
+}
+
+.admin-settings-form h3:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.admin-field-unit-hint {
+  font-weight: 400;
+  color: #8b8984;
+}
+
+.admin-field-hint {
+  font-size: 0.75rem;
+  color: #8a5a00;
+  margin: 0.3rem 0 0;
+}
+
+.admin-settings-form input[type='number'],
+.admin-settings-form select {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #d8d4c8;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.admin-color-field-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-color-swatch {
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid #d8d4c8;
+  border-radius: 4px;
+  cursor: pointer;
+  background: none;
+}
+
+.admin-color-swatch--preview {
+  cursor: default;
+}
+
+.admin-color-hex-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #d8d4c8;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: monospace;
+}
+
+.admin-settings-preview-column {
+  position: sticky;
+  top: 1rem;
+}
+
+.admin-design-preview {
+  border: 1px solid #e5e1d6;
+  border-radius: 6px;
+}
+
+.admin-design-preview-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #8b8984;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin: 0 0 0.75rem;
+}
+
 @media (max-width: 900px) {
   .admin-shell {
     flex-direction: column;
@@ -1082,5 +1176,13 @@ body {
 
   .admin-dashboard-cards {
     grid-template-columns: 1fr;
+  }
+
+  .admin-settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-settings-preview-column {
+    position: static;
   }
 }

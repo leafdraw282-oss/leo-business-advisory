@@ -2,22 +2,21 @@ import { fetchWithFallback } from './fetchWithFallback.js';
 import { fetchSingletonRow } from './publicTable.js';
 
 /**
- * Phase 4-B — data access layer for `site_design_settings`
- * (supabase/migrations/0009_site_design_settings.sql).
- *
- * This module only reads/shapes data — nothing here is wired into page
- * rendering yet (no component calls fetchDesignSettings() or
- * applyDesignSettings() today). That wiring, and any admin UI to edit
- * these values, is out of scope for Phase 4-B on purpose; see
- * docs/PROJECT_STATUS.md's Phase 4-B entry.
+ * Data access layer for `site_design_settings`
+ * (supabase/migrations/0009_site_design_settings.sql), wired into the
+ * public site's rendering by Phase 4-C — see src/App.jsx's
+ * useApplyDesignSettings() call.
  *
  * `designSettingsFallback()` is the safety net: its values are the exact
  * literals src/styles/variables.css already resolves to (Phase 4-A). A
  * missing Supabase project, a network error, an empty table, or an RLS
  * rejection all resolve the same way through fetchWithFallback — quietly
- * falling back to these, never to a blank/broken design. A future phase
- * that wires applyDesignSettings() into page load inherits this guarantee
- * for free, the same way every other src/lib/content/*.js module does.
+ * falling back to these, never to a blank/broken design. applyDesignSettings()
+ * additionally re-validates every value it's handed (see isUsableValue
+ * below) before writing it to :root, so even a malformed row fetched
+ * successfully from the database can't break rendering — only individual
+ * out-of-range fields are skipped, falling back to whatever variables.css
+ * already defines for that one token.
  */
 
 /** camelCase key -> the CSS custom property it drives (see variables.css). */
@@ -113,17 +112,54 @@ export async function fetchDesignSettings() {
   }, designSettingsFallback());
 }
 
+// The two truly numeric columns (heading_scale, line_height are
+// Postgres `numeric`, checked > 0 at the database) get a real type/range
+// check here too — defense in depth, not trust in the DB constraint
+// alone. Every other column is already a ready-to-use CSS value string;
+// CSS custom properties accept arbitrary text, and an individual
+// malformed one (e.g. "1280xyz" for a length) simply makes the one
+// specific declaration that reads it invalid — the browser falls back to
+// that property's normal cascade instead of crashing or blanking the
+// page, so no further validation is needed for those.
+const NUMERIC_KEYS = new Set(['headingScale', 'lineHeight']);
+
+function isUsableValue(key, value) {
+  if (value === undefined || value === null || value === '') return false;
+  if (NUMERIC_KEYS.has(key)) return typeof value === 'number' && Number.isFinite(value) && value > 0;
+  return true;
+}
+
+// Always appended after whatever font-family value ends up in --font-en/
+// --font-ko, so even a bare/unsafe custom font name (no fallback names
+// of its own) still degrades to this site's proven default stack instead
+// of an unstyled system font or invisible text — see composeFontBody().
+const FONT_SAFETY_FALLBACK = "'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif";
+
+function composeFontBody(fontEn, fontKo) {
+  const parts = [fontEn, fontKo, FONT_SAFETY_FALLBACK].filter((part) => typeof part === 'string' && part.trim());
+  return parts.join(', ');
+}
+
 /**
  * Applies a settings object to :root as CSS custom properties, via
- * DESIGN_TOKEN_MAP. Pure DOM side effect, safe to call with either a
- * fetched row's shape or designSettingsFallback()'s. Not invoked from
- * anywhere yet — kept ready for the phase that wires live design
- * overrides into page load.
+ * DESIGN_TOKEN_MAP — plus one composed value: --font-body (the token
+ * global.css's `body { font-family }` actually reads) is rebuilt from
+ * --font-en/--font-ko so a font change is actually visible, without
+ * needing global.css itself to change. Each value is checked by
+ * isUsableValue() first; anything that fails is skipped, leaving
+ * variables.css's own default for that one token in place — this can
+ * never throw, so it's always safe to call from a page-load effect.
  */
 export function applyDesignSettings(settings, root = document.documentElement) {
+  if (!settings || !root) return;
+
   for (const [key, cssVar] of Object.entries(DESIGN_TOKEN_MAP)) {
-    const value = settings?.[key];
-    if (value === undefined || value === null || value === '') continue;
+    const value = settings[key];
+    if (!isUsableValue(key, value)) continue;
     root.style.setProperty(cssVar, String(value));
+  }
+
+  if (isUsableValue('fontEn', settings.fontEn) || isUsableValue('fontKo', settings.fontKo)) {
+    root.style.setProperty('--font-body', composeFontBody(settings.fontEn, settings.fontKo));
   }
 }

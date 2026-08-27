@@ -6,6 +6,7 @@ import Content from './Content.jsx';
 import Images from './Images.jsx';
 import Inquiries from './Inquiries.jsx';
 import Revisions from './Revisions.jsx';
+import Settings from './Settings.jsx';
 
 const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard' },
@@ -33,8 +34,8 @@ function lastSavedRows() {
   }));
 }
 
-// Content editing (Phase 2-C) and Images (Phase 2-D) are implemented;
-// Settings is still a placeholder. Phase 2-F adds: a Dashboard home view
+// Content editing (Phase 2-C), Images (Phase 2-D), and Settings (Phase
+// 4-C, site-wide Design Settings) are implemented. Phase 2-F adds: a Dashboard home view
 // non-developers can orient from, and a guard against silently losing
 // unsaved edits when navigating away (tab switch, logout, or closing the
 // browser tab) — see src/admin/content/dirtyTracker.js. Phase 3-B adds a
@@ -162,6 +163,10 @@ function Dashboard({ session }) {
                 <h2>변경 기록</h2>
                 <p>콘텐츠를 저장할 때마다 자동으로 남는 이전 값 기록을 확인하고, 필요하면 되돌립니다.</p>
               </button>
+              <button type="button" className="admin-dashboard-card" onClick={() => selectTab('settings')}>
+                <h2>디자인 설정</h2>
+                <p>사이트 전체 색상·폰트·레이아웃·모션 값을 확인하고 수정합니다.</p>
+              </button>
               <a
                 className="admin-dashboard-card admin-dashboard-card--link"
                 href={import.meta.env.BASE_URL}
@@ -188,18 +193,13 @@ function Dashboard({ session }) {
               )}
             </div>
 
-            <p className="admin-dashboard-note">
-              Settings는 아직 준비 중입니다. 위 카드를 눌러 원하는 관리 화면으로 이동하세요.
-            </p>
           </div>
         )}
         {activeTab === 'content' && <Content key={contentKey} initialSectionId={contentInitialSection} />}
         {activeTab === 'images' && <Images />}
         {activeTab === 'inquiries' && <Inquiries />}
         {activeTab === 'revisions' && <Revisions />}
-        {activeTab === 'settings' && (
-          <p>Settings are not implemented yet (planned for a later phase).</p>
-        )}
+        {activeTab === 'settings' && <Settings />}
       </main>
     </div>
   );
