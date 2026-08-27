@@ -19,11 +19,17 @@ alter table admin_users enable row level security;
 -- from the client at all; membership is managed directly in the SQL
 -- editor by whoever has Supabase project access.
 
+-- `set search_path` pins this security-definer function to the `public`
+-- schema (plus pg_temp, needed for temp objects) so a caller can't shadow
+-- `admin_users` by creating a same-named table/function earlier in their
+-- own search_path — the standard hardening for SECURITY DEFINER
+-- functions (Phase 2-G security pass).
 create or replace function is_admin()
 returns boolean
 language sql
 security definer
 stable
+set search_path = public, pg_temp
 as $$
   select exists (select 1 from admin_users where user_id = auth.uid());
 $$;

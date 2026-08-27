@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { isSupabaseConfigured, supabase } from '../lib/supabase.js';
 import Login from './pages/Login.jsx';
 import Dashboard from './pages/Dashboard.jsx';
+import AdminErrorBoundary from './components/AdminErrorBoundary.jsx';
 
 // Auth gate for the whole admin shell. There is no server here to enforce
 // this — the real security boundary is Supabase Row Level Security (see
@@ -59,7 +60,13 @@ function AdminApp() {
     );
   }
 
-  return session ? <Dashboard session={session} /> : <Login />;
+  return session ? (
+    <AdminErrorBoundary>
+      <Dashboard session={session} />
+    </AdminErrorBoundary>
+  ) : (
+    <Login />
+  );
 }
 
 export default AdminApp;

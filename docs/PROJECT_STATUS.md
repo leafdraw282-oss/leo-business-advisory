@@ -10,6 +10,108 @@ build with zero console errors/warnings. See Phase 1-G directly below for
 the final QA pass, and each earlier phase's section for how every part
 was built.
 
+## Phase 2-G — Security, Data Integrity & Operational Safety Review
+
+**Status: complete.** Public site design unchanged — every fix is
+either backend (SQL migrations, not yet applied anywhere) or defensive
+code that only activates on already-abnormal data.
+
+Audited the full Admin CMS + public site (Phase 2-A–2-F) against an
+explicit checklist covering auth, RLS, Storage, secrets, XSS, error
+handling, and fallback behavior. Found and fixed three real gaps;
+everything else was verified correct as already built.
+
+**Fixed:**
+
+1. **Storage bucket had no server-side file-type/size enforcement**
+   (`supabase/migrations/0003_storage_setup.sql`) — the 5 MB/
+   JPEG-PNG-WebP-SVG check only existed in the admin's client-side JS
+   (`validateImageFile`), which a direct API call with a valid admin
+   session could bypass entirely. Added `file_size_limit` (5242880) and
+   `allowed_mime_types` to the bucket definition itself, matching the
+   client check exactly — real defense in depth, not just a UI nicety.
+2. **`is_admin()` didn't pin its `search_path`**
+   (`supabase/migrations/0002_rls_policies.sql`) — a `security definer`
+   function without an explicit `search_path` is vulnerable to a caller
+   shadowing `admin_users` via a same-named object earlier in their own
+   search path (standard Postgres hardening advice). Added
+   `set search_path = public, pg_temp`.
+3. **Two concrete render-crash risks from malformed CMS data**, found by
+   seeding a local mock backend with deliberately broken rows and
+   watching what happened:
+   - `contact_form_content.labels` is one jsonb blob; a partial/malformed
+     edit (e.g. a typo made directly in the Supabase table editor) could
+     leave one key missing, and `ContactForm.jsx` reading
+     `labels.company.ko` off a missing `company` key would throw.
+     `src/lib/content/contactForm.js` now merges the blob key-by-key
+     against the `profile.js` fallback instead of trusting its shape.
+   - `hero_content.headline_ko/en` are jsonb arrays; a non-array value
+     there would crash `Hero.jsx`'s `.map()`. `src/lib/content/hero.js`
+     now checks `Array.isArray()` before using the DB value.
+4. **No general safety net for the class of "malformed data crashes the
+   whole page" that the two fixes above don't individually cover** —
+   added `src/components/SectionErrorBoundary.jsx`, wrapping each
+   CMS-backed public section (Hero, Impact, About, Case Studies,
+   Advisory, Career, Gallery, Contact, Footer) individually in `App.jsx`.
+   Verified by seeding an `advisory_items` row with an object where a
+   string was expected (a case neither fix above touches): Advisory's
+   render threw as expected, the boundary caught it and hid only that
+   one section, and every other section — Hero through Footer — kept
+   rendering normally. Added the equivalent `AdminErrorBoundary.jsx`
+   around the admin Dashboard (visible "새로고침" recovery message,
+   since an admin operator needs to know something broke, unlike a
+   silent public-page boundary).
+
+**Verified, no change needed:**
+
+- **RLS coverage**: all 23 content tables + `admin_users` have RLS
+  enabled; every content table has exactly a public-read + admin-write
+  policy pair (`for all using (is_admin()) with check (is_admin())`) —
+  confirmed by diffing the table list against the policy list.
+  Non-admins cannot write (`auth.uid()` is `null` when signed out, and
+  `user_id = null` never matches in SQL, so `is_admin()` correctly
+  returns false).
+- **No sign-up path**: confirmed (again) that `Login.jsx` only calls
+  `signInWithPassword` — no sign-up form/link anywhere in the admin
+  bundle.
+- **Secrets**: `git log --all` for `.env`/`.env.local` returns nothing
+  (never committed); grepped the full working tree and entire git
+  history for JWT-shaped strings and `*.supabase.co` URLs — no matches;
+  `service_role` appears only once, in a documentation warning not to
+  use it. `.gitignore` correctly excludes `.env`, `.env.local`,
+  `.env.*.local`. **No secret exposure found — see SECRET CHECK.**
+- **XSS**: no `dangerouslySetInnerHTML`, `eval`, `new Function`, or raw
+  `innerHTML` anywhere in `src/` — every admin-editable string renders
+  through React's default (auto-escaping) JSX text interpolation.
+- **Fallback / API / Storage errors**: `fetchWithFallback.js` (public)
+  and `extractErrorMessage` + try/catch (admin) already cover network
+  failures, missing rows, and Storage errors — re-verified, not
+  re-tested from scratch since Phase 2-C/D/E already exercised these
+  paths directly.
+- **KR/EN missing data**: `t(ko, en)` returns whatever it's given —
+  a missing leaf string renders blank (never crashes); the risk was
+  always at the structural level, addressed by fixes 3–4 above.
+- **Admin/public refresh**: session persistence is `@supabase/supabase-js`'s
+  default (`persistSession`/`autoRefreshToken`), unchanged; the new
+  dirty-tracker (Phase 2-F) is module-level state that naturally resets
+  on reload, no stale state risk.
+- **GitHub Pages direct URL access**: confirmed `dist/admin/index.html`
+  is still a real, separate static file with correctly base-prefixed
+  asset URLs (`/leo-business-advisory/assets/...`) — direct navigation
+  to `/admin/` on GitHub Pages resolves normally, no SPA-fallback trick
+  needed (this was the reason for this architecture back in Phase 2-B).
+  `.github/workflows/deploy.yml` uses least-privilege permissions
+  (`contents: read`, `pages: write`, `id-token: write`) and references
+  no secrets yet (Supabase isn't wired into the build).
+
+**Residual, accepted limitation:** file-type validation (both the
+client check and the new bucket-level `allowed_mime_types`) checks the
+declared `Content-Type`, not the file's actual bytes — a determined
+attacker with valid admin credentials could still spoof the header.
+Full content-sniffing would need server-side processing (e.g. an Edge
+Function), which is disproportionate to this phase's scope for a
+single-trusted-operator internal tool; noted for awareness, not fixed.
+
 ## Phase 2-F — Admin Usability Pass (Content/Images UX)
 
 **Status: complete.** Public site untouched — every change is scoped to

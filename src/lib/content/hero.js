@@ -29,11 +29,15 @@ export async function fetchHero() {
 
     const media = await resolveImageUrl(row.hero_image_id);
 
+    // headline_ko/en are jsonb arrays (Hero.jsx maps over each line) — a
+    // hand-edited row in the Supabase table editor could leave one as a
+    // plain string or other non-array value, which would crash
+    // `.map()` in Hero.jsx. Guard the type, not just presence.
     return {
       eyebrowKo: row.eyebrow_ko,
       eyebrowEn: row.eyebrow_en,
-      headlineKo: row.headline_ko ?? hero.headlineKo,
-      headlineEn: row.headline_en ?? hero.headlineEn,
+      headlineKo: Array.isArray(row.headline_ko) ? row.headline_ko : hero.headlineKo,
+      headlineEn: Array.isArray(row.headline_en) ? row.headline_en : hero.headlineEn,
       subheadKo: row.subhead_ko,
       subheadEn: row.subhead_en,
       ctaPrimaryKo: row.cta_primary_ko,

@@ -14,9 +14,22 @@
 --   site-images/gallery/
 -- ============================================================================
 
-insert into storage.buckets (id, name, public)
-values ('site-images', 'site-images', true)
-on conflict (id) do nothing;
+-- file_size_limit / allowed_mime_types enforce the same limits as the
+-- admin's client-side check (src/admin/content/supabaseStorage.js)
+-- server-side too — the client check alone only stops an honest mistake,
+-- not a direct API call with a valid admin session, so both layers exist
+-- (Phase 2-G security pass).
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'site-images',
+  'site-images',
+  true,
+  5242880, -- 5 MB, matches MAX_IMAGE_BYTES
+  array['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'] -- matches ALLOWED_IMAGE_TYPES
+)
+on conflict (id) do update set
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
 
 create policy "site_images_public_read"
   on storage.objects for select

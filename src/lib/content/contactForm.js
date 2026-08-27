@@ -21,6 +21,23 @@ export function contactFormFallback() {
   };
 }
 
+// `labels` is stored as one jsonb blob, so a malformed/partial edit made
+// directly in the Supabase table editor (bypassing the admin form, which
+// always writes all five together) could leave one key missing. Merge
+// field-by-field rather than trusting the blob's shape wholesale — the
+// alternative is a render crash in ContactForm.jsx reading
+// `labels.company.ko` off a missing `company` key (Phase 2-G security pass).
+function mergeLabels(dbLabels, fallbackLabels) {
+  const merged = {};
+  for (const key of Object.keys(fallbackLabels)) {
+    merged[key] = {
+      ko: dbLabels?.[key]?.ko ?? fallbackLabels[key].ko,
+      en: dbLabels?.[key]?.en ?? fallbackLabels[key].en,
+    };
+  }
+  return merged;
+}
+
 export async function fetchContactForm() {
   return fetchWithFallback(async () => {
     const formRow = await fetchSingletonRow('contact_form_content');
@@ -29,7 +46,7 @@ export async function fetchContactForm() {
 
     const fallback = contactFormFallback();
     return {
-      labels: formRow?.labels ?? fallback.labels,
+      labels: mergeLabels(formRow?.labels, fallback.labels),
       inquiryPlaceholderKo: formRow?.inquiry_placeholder_ko ?? fallback.inquiryPlaceholderKo,
       inquiryPlaceholderEn: formRow?.inquiry_placeholder_en ?? fallback.inquiryPlaceholderEn,
       submitKo: formRow?.submit_ko ?? fallback.submitKo,
