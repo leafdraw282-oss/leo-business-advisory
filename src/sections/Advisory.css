@@ -1,5 +1,5 @@
 .advisory {
-  padding-block: var(--space-2xl);
+  padding-block: var(--section-spacing);
 }
 
 .advisory__list {
@@ -36,6 +36,6 @@
 
 @media (max-width: 768px) {
   .advisory {
-    padding-block: var(--space-xl);
+    padding-block: var(--section-spacing-mobile);
   }
 }

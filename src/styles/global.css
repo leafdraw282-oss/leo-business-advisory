@@ -29,10 +29,12 @@ body {
 }
 
 body {
-  background-color: var(--color-bg);
+  background-color: var(--color-background);
   color: var(--color-text);
   font-family: var(--font-body);
+  font-size: var(--font-size-body);
   line-height: var(--line-height-body);
+  letter-spacing: var(--letter-spacing-body);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   /* Prevents Phase-1 rules like "no horizontal overflow on mobile" from
@@ -117,7 +119,7 @@ section {
   font-size: 0.875rem;
   letter-spacing: 0.02em;
   border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  border-radius: var(--card-radius);
   transition: background-color var(--transition-base), color var(--transition-base), border-color var(--transition-base);
 }
 

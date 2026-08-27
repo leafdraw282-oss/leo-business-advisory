@@ -34,7 +34,7 @@
 }
 
 .header__nav a {
-  font-size: 0.875rem;
+  font-size: var(--font-size-small);
   letter-spacing: 0.01em;
 }
 
@@ -82,7 +82,7 @@
   right: 0;
   background-color: var(--color-navy);
   padding: var(--space-lg) var(--container-padding-inline) var(--space-xl);
-  box-shadow: 0 16px 32px rgba(11, 22, 37, 0.25);
+  box-shadow: var(--shadow-elevated);
 }
 
 .header__mobile-panel ul {

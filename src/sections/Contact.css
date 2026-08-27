@@ -1,5 +1,5 @@
 .contact {
-  padding-block: var(--space-2xl);
+  padding-block: var(--section-spacing);
 }
 
 .contact__cta {
@@ -8,7 +8,7 @@
 }
 
 .contact__headline {
-  font-size: clamp(1.75rem, 1.4vw + 1.4rem, 2.75rem);
+  font-size: var(--font-size-h2);
   line-height: 1.15;
   margin-bottom: var(--space-lg);
 }
@@ -58,6 +58,6 @@
 
 @media (max-width: 768px) {
   .contact {
-    padding-block: var(--space-xl);
+    padding-block: var(--section-spacing-mobile);
   }
 }

@@ -1,5 +1,5 @@
 .gallery {
-  padding-block: var(--space-2xl);
+  padding-block: var(--section-spacing);
 }
 
 .gallery__grid {
@@ -27,7 +27,7 @@
 
 @media (max-width: 768px) {
   .gallery {
-    padding-block: var(--space-xl);
+    padding-block: var(--section-spacing-mobile);
   }
 }
 

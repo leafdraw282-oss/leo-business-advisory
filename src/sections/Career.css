@@ -1,5 +1,5 @@
 .career {
-  padding-block: var(--space-2xl);
+  padding-block: var(--section-spacing);
 }
 
 .career__timeline {
@@ -58,7 +58,7 @@
 
 @media (max-width: 768px) {
   .career {
-    padding-block: var(--space-xl);
+    padding-block: var(--section-spacing-mobile);
   }
 
   .career__entry {

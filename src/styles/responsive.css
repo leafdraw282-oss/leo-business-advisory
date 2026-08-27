@@ -4,6 +4,14 @@
  * Career timeline, Gallery grid, etc.) is added alongside each component in
  * later phases — this file only carries the container/base rules that
  * apply everywhere.
+ *
+ * Responsive typography (Phase 4-A): --font-size-h1/h2/h3 in variables.css
+ * are clamp()-based, so headings scale fluidly across every viewport width
+ * between the two ends of their clamp() range without needing separate
+ * Desktop/Tablet/Mobile breakpoint values here. Section vertical rhythm
+ * uses the same two-step model every section already had: --section-spacing
+ * (desktop/tablet default) and --section-spacing-mobile (set per-section at
+ * that section's own existing breakpoint) — see src/sections/*.css.
  */
 
 @media (max-width: 1024px) {

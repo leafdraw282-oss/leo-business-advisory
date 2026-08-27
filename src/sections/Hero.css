@@ -9,7 +9,7 @@
   grid-template-columns: 1.15fr 0.85fr;
   gap: var(--space-xl);
   align-items: center;
-  padding-block: var(--space-2xl);
+  padding-block: var(--section-spacing);
 }
 
 .hero__name {
@@ -29,7 +29,7 @@
 }
 
 .hero__headline {
-  font-size: clamp(2.5rem, 3vw + 1.8rem, 5rem);
+  font-size: var(--font-size-h1);
   line-height: 1.08;
   margin-bottom: var(--space-lg);
 }
@@ -70,6 +70,6 @@
 @media (max-width: 768px) {
   .hero {
     min-height: auto;
-    padding-block: var(--space-xl) 0;
+    padding-block: var(--section-spacing-mobile) 0;
   }
 }

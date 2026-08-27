@@ -3,8 +3,34 @@
  * site must be defined here — components should reference var(--token),
  * never a hardcoded hex/px value, so the whole site can be restyled from
  * this one file.
+ *
+ * ----------------------------------------------------------------------
+ * Phase 4-A note — Design System foundation
+ * ----------------------------------------------------------------------
+ * This file now has two layers:
+ *   1. The original brand tokens (colors, font families, spacing scale,
+ *      layout, --radius-sm, --transition-base) — UNCHANGED in value from
+ *      before Phase 4-A. Every existing component keeps working exactly
+ *      as it did.
+ *   2. A semantic Design Token layer (COLORS / TYPOGRAPHY / LAYOUT /
+ *      MOTION further below) built on top of layer 1, using the naming
+ *      scheme a future admin-configurable "site design settings" screen
+ *      will target. Where a new token is just a renamed pointer to an
+ *      existing value, it's a plain `var(--existing-token)` alias — same
+ *      computed value, zero visual change, single source of truth.
+ *
+ * Because every token here is a plain CSS custom property on :root, a
+ * future Phase (reading a Supabase `site_design_settings` table) can
+ * override any of them at runtime with nothing more than
+ * `document.documentElement.style.setProperty('--color-primary', value)`
+ * — no component code will need to change. That admin UI/table is NOT
+ * built in this phase; this file only keeps the door open for it.
  */
 :root {
+  /* ====================================================================
+   * Layer 1 — original brand tokens (values unchanged since Phase 1)
+   * ==================================================================== */
+
   /* Color system */
   --color-navy: #0b1625;
   --color-ivory: #f4f1ea;
@@ -45,5 +71,99 @@
   --container-padding-inline: var(--space-md);
   --header-height: 80px;
   --radius-sm: 2px;
-  --transition-base: 0.25s ease;
+  --transition-base: 0.25s ease; /* redefined below (Layer 2) to derive from --motion-* tokens; value unchanged */
+
+  /* ====================================================================
+   * Layer 2 — semantic Design Token system (Phase 4-A)
+   * ==================================================================== */
+
+  /* ---- COLORS --------------------------------------------------------
+   * --color-primary is the dominant brand color (navy) already used for
+   * .btn--primary, the mobile nav panel, and inverse sections.
+   * --color-secondary is the second brand-identity tone (ivory) — the
+   * navy/ivory pairing is this site's core visual identity per
+   * CLAUDE.md. Bronze stays --color-accent (already existed) — the spec
+   * explicitly reserves it for sparing accent use, never a base tone.
+   */
+  --color-primary: var(--color-navy);
+  --color-secondary: var(--color-ivory);
+  /* --color-accent already defined above (Layer 1) */
+  --color-background: var(--color-bg);
+  /* --color-surface / --color-text / --color-text-muted / --color-border
+     already defined above (Layer 1) under these exact names. */
+
+  /* Status colors — previously hardcoded hex only inside ContactForm.css */
+  --color-error: #b3261e;
+  --color-error-text: #8a2f27;
+  --color-error-bg: #fcebe9;
+  --color-error-border: #f0aca5;
+
+  /* ---- TYPOGRAPHY ------------------------------------------------------
+   * --font-size-h1/h2/h3 use the same fluid clamp() values already tuned
+   * per heading level (Hero's h1, SectionTitle/Contact's shared h2, and
+   * CaseStudy's h3) — extracting the ones that were already identical
+   * across components into a single token, not changing any size.
+   * clamp() already makes these fluidly responsive across Desktop/
+   * Tablet/Mobile without discrete breakpoints — see responsive.css.
+   */
+  --font-ko: var(--font-kr);
+  --font-en: var(--font-body);
+  --font-size-body: 1rem;
+  --font-size-small: 0.875rem;
+  --font-size-h1: clamp(2.5rem, 3vw + 1.8rem, 5rem);
+  --font-size-h2: clamp(1.75rem, 1.4vw + 1.4rem, 2.75rem);
+  --font-size-h3: clamp(1.5rem, 1.4vw + 1.1rem, 2.25rem);
+  /* --line-height-body already defined above (Layer 1). */
+  /* Reference type-scale ratio for future use (e.g. a calculated scale
+     in a later phase) — h1/h2/h3 above remain individually hand-tuned
+     clamp() values today, not derived from this ratio, so nothing's
+     visual size changes by adding it. */
+  --heading-scale: 1.333;
+  --letter-spacing-body: normal;
+
+  /* ---- LAYOUT ----------------------------------------------------------
+   * --section-spacing/--section-spacing-mobile alias the existing
+   * --space-2xl/--space-xl scale steps, which every section already used
+   * for its vertical padding-block — same values, semantic name.
+   */
+  --content-max-width: var(--container-max-width);
+  --section-spacing: var(--space-2xl);
+  --section-spacing-mobile: var(--space-xl);
+  --card-radius: var(--radius-sm);
+  --image-radius: var(--radius-sm);
+
+  /* Elevation — the one existing box-shadow in the codebase (Header's
+     mobile nav panel), extracted verbatim (rgba(11,22,37,...) is
+     --color-navy at 25% alpha). */
+  --shadow-elevated: 0 16px 32px rgba(11, 22, 37, 0.25);
+
+  /* ---- MOTION ------------------------------------------------------- */
+  --motion-duration-fast: 0.15s;
+  --motion-duration-normal: 0.25s;
+  --motion-duration-slow: 0.4s;
+  --motion-distance: 0.75rem;
+  --motion-easing: ease;
+
+  /* --transition-base now composes the motion tokens above instead of a
+     standalone literal — every existing `transition: X var(--transition-base)`
+     declaration keeps resolving to the exact same "0.25s ease" and now
+     automatically honors prefers-reduced-motion too (see the media query
+     below), with no per-component change required. */
+  --transition-base: var(--motion-duration-normal) var(--motion-easing);
+}
+
+/* prefers-reduced-motion baseline for the whole motion token layer —
+   collapses every duration to effectively-instant and zeroes the
+   distance token, so any current or future component built on these
+   tokens (rather than a hardcoded duration/transform) is automatically
+   accessible with no per-component media query needed. 0.01ms (not 0s)
+   avoids a Safari bug where a 0-duration transition never fires
+   `transitionend`. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-duration-fast: 0.01ms;
+    --motion-duration-normal: 0.01ms;
+    --motion-duration-slow: 0.01ms;
+    --motion-distance: 0px;
+  }
 }

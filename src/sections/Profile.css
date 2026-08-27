@@ -1,5 +1,5 @@
 .profile {
-  padding-block: var(--space-2xl);
+  padding-block: var(--section-spacing);
 }
 
 .profile__grid {
@@ -41,6 +41,6 @@
 
 @media (max-width: 768px) {
   .profile {
-    padding-block: var(--space-xl);
+    padding-block: var(--section-spacing-mobile);
   }
 }
