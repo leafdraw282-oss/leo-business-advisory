@@ -13,6 +13,13 @@ dist-ssr
 *.local
 .claude/settings.local.json
 
+# Environment variables — real Supabase URL/keys go in a local .env file
+# that is NEVER committed. .env.example (checked in) documents the
+# expected variable names with no real values.
+.env
+.env.local
+.env.*.local
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -10,6 +10,57 @@ build with zero console errors/warnings. See Phase 1-G directly below for
 the final QA pass, and each earlier phase's section for how every part
 was built.
 
+## Phase 2-A — Admin CMS Architecture (design + foundation only)
+
+**Status: complete.**
+
+Scope was architecture design and non-invasive foundation only, per
+explicit instruction: the public site's design, layout, responsive
+structure, animation, navigation, KR/EN toggle, SEO, and existing content
+must not change in this phase, and no admin login/edit UI and no real
+Supabase project or credentials were to be created. All of that was
+honored — see `docs/ADMIN_CMS_ARCHITECTURE.md` for the full design.
+
+**What was built:**
+
+- **`src/lib/supabase.js`** — Supabase client, gated by
+  `isSupabaseConfigured` (`false` unless `VITE_SUPABASE_URL` /
+  `VITE_SUPABASE_ANON_KEY` are set at build time — true for this repo
+  today).
+- **`src/lib/content/fetchWithFallback.js`** — the fallback-first fetch
+  wrapper: returns the given `profile.js` value immediately if Supabase
+  isn't configured, or if a configured query fails for any reason. Not
+  imported by any component yet, so it has zero effect on the current
+  build or the rendered site.
+- **`supabase/migrations/0001_init_schema.sql`, `0002_rls_policies.sql`,
+  `0003_storage_setup.sql`** — complete DDL for 23 content tables (mapped
+  field-for-field to `profile.js`), an `admin_users` allowlist + RLS
+  policies (public read, admin-only write), and the `site-images` Storage
+  bucket + policies. Ready to run against a real project later; not
+  applied anywhere — no Supabase project exists yet.
+- **`supabase/README.md`** — step-by-step instructions for the user to
+  apply these migrations and add an admin account, once they choose to.
+- **`.env.example`** — documents `VITE_SUPABASE_URL` /
+  `VITE_SUPABASE_ANON_KEY` with no real values; `.gitignore` updated so
+  `.env`, `.env.local`, `.env.*.local` are never committed.
+- **`docs/ADMIN_CMS_ARCHITECTURE.md`** — the full design document:
+  architecture diagram, database/storage design, KR/EN column-pair
+  rationale, fallback strategy, environment-variable/secret handling
+  rules, and an explicit list of what this phase deliberately did not
+  build.
+- Dependency added: `@supabase/supabase-js` (only new package installed).
+
+**Why the public site is unchanged:** no existing component, section, or
+style file was modified, and nothing imports `fetchWithFallback` or
+`supabase.js` yet — the new code is complete and lint/build-clean but
+structurally unreachable from the current render tree. `src/data/profile.js`
+remains untouched and is still the only thing any page actually renders.
+
+**Not built in this phase (by design):** `/admin` route, login screen,
+content-edit UI, image-upload UI, a real Supabase project or any real
+credentials, a `profile.js` → Supabase seed script, and any change to
+`.github/workflows/deploy.yml`. These are Phase 2-B, not started.
+
 ## Phase 1-G — Final QA
 
 **Status: complete.**
