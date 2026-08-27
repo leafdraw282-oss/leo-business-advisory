@@ -1,7 +1,14 @@
 import { loadDesignSettings, saveDesignSettings } from '../content/designSettings.js';
 import { useAdminForm } from '../content/useAdminForm.js';
+import {
+  CONTENT_WIDTH_PRESETS,
+  SECTION_SPACING_PRESETS,
+  RADIUS_PRESETS,
+  HEADING_SCALE_PRESETS,
+} from '../content/layoutPresets.js';
 import SectionStatus from '../components/SectionStatus.jsx';
 import ColorField from '../components/ColorField.jsx';
+import PresetField from '../components/PresetField.jsx';
 import DesignSettingsPreview from '../components/DesignSettingsPreview.jsx';
 
 // Phase 4-C — the single `site_design_settings` row (id=1), editable
@@ -144,10 +151,10 @@ function Settings() {
               value={values.bodyFontSize}
               onChange={(v) => update({ bodyFontSize: v })}
             />
-            <NumberField
+            <PresetField
               label="Heading Scale"
-              hint="배수 (단위 없음), 예: 1.333"
               value={values.headingScale}
+              presets={HEADING_SCALE_PRESETS}
               onChange={(v) => update({ headingScale: v })}
             />
             <NumberField
@@ -166,28 +173,28 @@ function Settings() {
             />
 
             <h3>Layout</h3>
-            <TextField
-              label="Content Max Width"
-              hint="예: 1280px"
+            <PresetField
+              label="Content Width"
               value={values.contentMaxWidth}
+              presets={CONTENT_WIDTH_PRESETS}
               onChange={(v) => update({ contentMaxWidth: v })}
             />
-            <TextField
+            <PresetField
               label="Section Spacing"
-              hint="예: 6rem"
               value={values.sectionSpacing}
+              presets={SECTION_SPACING_PRESETS}
               onChange={(v) => update({ sectionSpacing: v })}
             />
-            <TextField
-              label="Card Border Radius"
-              hint="예: 2px"
+            <PresetField
+              label="Card Radius"
               value={values.cardRadius}
+              presets={RADIUS_PRESETS}
               onChange={(v) => update({ cardRadius: v })}
             />
-            <TextField
-              label="Image Border Radius"
-              hint="예: 2px"
+            <PresetField
+              label="Image Radius"
               value={values.imageRadius}
+              presets={RADIUS_PRESETS}
               onChange={(v) => update({ imageRadius: v })}
             />
 

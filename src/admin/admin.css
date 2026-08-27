@@ -1123,6 +1123,60 @@ body {
   margin: 0 0 0.75rem;
 }
 
+/* Content Width / Section Spacing schematic bars (Phase 4-E) — scaled
+   representations, not literal pixel copies of the real site. */
+.admin-design-preview-schematic {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-design-preview-bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.admin-design-preview-bar-label {
+  font-size: 0.7rem;
+  color: #8b8984;
+}
+
+.admin-design-preview-bar-track {
+  height: 0.5rem;
+  background: rgba(11, 22, 37, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.admin-design-preview-bar-fill {
+  height: 100%;
+  background: #a4865c;
+  transition: width 0.2s ease;
+}
+
+.admin-design-preview-bar-track--spacing {
+  height: auto;
+  background: none;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.admin-design-preview-spacing-block {
+  height: 0.6rem;
+  background: rgba(11, 22, 37, 0.18);
+  border-radius: 2px;
+  flex: none;
+}
+
+.admin-design-preview-spacing-gap {
+  min-height: 0.4rem;
+  max-height: 3rem;
+  transition: height 0.2s ease;
+}
+
 @media (max-width: 900px) {
   .admin-shell {
     flex-direction: column;

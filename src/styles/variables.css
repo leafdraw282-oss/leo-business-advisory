@@ -110,14 +110,21 @@
   --font-en: var(--font-body);
   --font-size-body: 1rem;
   --font-size-small: 0.875rem;
-  --font-size-h1: clamp(2.5rem, 3vw + 1.8rem, 5rem);
-  --font-size-h2: clamp(1.75rem, 1.4vw + 1.4rem, 2.75rem);
-  --font-size-h3: clamp(1.5rem, 1.4vw + 1.1rem, 2.25rem);
+  /* Phase 4-E: --heading-scale-factor turns the admin-editable
+     --heading-scale ratio into a small, safe multiplier applied to every
+     heading level together (hierarchy preserved — h1/h2/h3 all scale by
+     the same factor). 1.333 is both the original Phase 4-A literal and
+     every already-deployed row's stored value, so it's treated as the
+     neutral point (factor exactly 1 — zero visual change for any
+     existing data); clamp(0.9, …, 1.15) caps the effect at ±15% so no
+     admin-entered value (even a wildly out-of-range one) can break
+     layout. See src/admin/content/layoutPresets.js's HEADING_SCALE
+     presets for the exact admin-facing values this maps from. */
+  --heading-scale-factor: clamp(0.9, calc(1 + (var(--heading-scale) - 1.333) * 0.4), 1.15);
+  --font-size-h1: calc(clamp(2.5rem, 3vw + 1.8rem, 5rem) * var(--heading-scale-factor));
+  --font-size-h2: calc(clamp(1.75rem, 1.4vw + 1.4rem, 2.75rem) * var(--heading-scale-factor));
+  --font-size-h3: calc(clamp(1.5rem, 1.4vw + 1.1rem, 2.25rem) * var(--heading-scale-factor));
   /* --line-height-body already defined above (Layer 1). */
-  /* Reference type-scale ratio for future use (e.g. a calculated scale
-     in a later phase) — h1/h2/h3 above remain individually hand-tuned
-     clamp() values today, not derived from this ratio, so nothing's
-     visual size changes by adding it. */
   --heading-scale: 1.333;
   --letter-spacing-body: normal;
 
@@ -125,10 +132,16 @@
    * --section-spacing/--section-spacing-mobile alias the existing
    * --space-2xl/--space-xl scale steps, which every section already used
    * for its vertical padding-block — same values, semantic name.
+   * --section-spacing-mobile (Phase 4-E) is now computed as 2/3 of
+   * --section-spacing instead of a fixed literal, so admin-selected
+   * spacing presets scale down proportionally on mobile through this
+   * existing responsive token rather than needing a separate
+   * mobile-specific DB column/admin control. 6rem * 2/3 = 4rem — the
+   * exact same default value as before, zero change for existing data.
    */
   --content-max-width: var(--container-max-width);
   --section-spacing: var(--space-2xl);
-  --section-spacing-mobile: var(--space-xl);
+  --section-spacing-mobile: calc(var(--section-spacing) * 2 / 3);
   --card-radius: var(--radius-sm);
   --image-radius: var(--radius-sm);
 
