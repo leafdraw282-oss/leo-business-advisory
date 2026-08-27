@@ -4,11 +4,13 @@ import { isAnyDirty, UNSAVED_CHANGES_MESSAGE } from '../content/dirtyTracker.js'
 import { getAllLastSaved } from '../content/lastSaved.js';
 import Content from './Content.jsx';
 import Images from './Images.jsx';
+import Inquiries from './Inquiries.jsx';
 
 const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'content', label: 'Content' },
   { id: 'images', label: 'Images' },
+  { id: 'inquiries', label: 'Inquiries' },
   { id: 'settings', label: 'Settings' },
 ];
 
@@ -150,6 +152,10 @@ function Dashboard({ session }) {
                 <h2>연락처 관리</h2>
                 <p>근무 지역, 이메일, 전화번호, 문의 폼 문구와 문의 유형 목록을 확인하고 수정합니다.</p>
               </button>
+              <button type="button" className="admin-dashboard-card" onClick={() => selectTab('inquiries')}>
+                <h2>문의 관리</h2>
+                <p>Contact Form으로 접수된 실제 문의 목록을 확인하고 처리 상태를 관리합니다.</p>
+              </button>
               <a
                 className="admin-dashboard-card admin-dashboard-card--link"
                 href={import.meta.env.BASE_URL}
@@ -183,6 +189,7 @@ function Dashboard({ session }) {
         )}
         {activeTab === 'content' && <Content key={contentKey} initialSectionId={contentInitialSection} />}
         {activeTab === 'images' && <Images />}
+        {activeTab === 'inquiries' && <Inquiries />}
         {activeTab === 'settings' && (
           <p>Settings are not implemented yet (planned for a later phase).</p>
         )}

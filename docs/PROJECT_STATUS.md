@@ -1,5 +1,72 @@
 # Project Status
 
+## Phase 3-C — Contact Form → Real Business Inquiry System
+
+**Status: complete.** The Contact Form now saves directly to Supabase
+instead of opening a mailto: link, with a matching admin Inquiries screen.
+Public-site design/layout/copy structure is otherwise unchanged; the field
+set stayed exactly Name/Company/Email/Type of Inquiry/Message, per this
+phase's explicit "don't add fields that increase visitor burden"
+instruction.
+
+**Database:** new `inquiries` table
+(`supabase/migrations/0005_inquiries.sql`): `id, name, company, email,
+phone, inquiry_type, message, status, created_at`. `phone` is nullable and
+not yet collected by the form — the column exists so adding an optional
+Phone field later needs only a form change, not a migration (Country/Region
+would be the same: one nullable column, no architecture change). `status`
+defaults `'new'` with a check constraint limiting it to
+`new`/`in_progress`/`completed`. Basic length/format checks (email regex,
+message ≤ 5000 chars, etc.) are a database-level safety net behind the
+form's own validation.
+
+**RLS (the opposite shape from every other table):** anyone can `INSERT`
+(and only ever as a fresh `'new'` row — the `with check (status = 'new')`
+clause blocks a direct API call from planting an already-`'in_progress'`
+row); nobody but an admin (`is_admin()`, the same `admin_users` mechanism
+as every other table) can `SELECT`, `UPDATE`, or `DELETE` — there is no
+public policy for those at all, so RLS denies them outright. Verified
+against a local mock backend (no real Supabase project exists — none has
+ever been created for this repo): a real form submission works, but the
+mock has no RLS to verify server-side; the policy SQL itself was reviewed
+by hand for correctness (see the migration file's comments) and should be
+re-verified against the real project once one exists.
+
+**Contact Form UX (`src/components/ContactForm.jsx`, rewritten):**
+field-by-field required/format validation with inline Korean/English
+messages; a visually-hidden honeypot field that causes a silent no-op (no
+insert, no success or error shown — a real visitor can never trigger it,
+so no fake-success risk); submit button disabled + relabeled "전송 중…"
+while in flight, with a same-tick `submitState === 'submitting'` guard
+against a duplicate double-click/double-Enter independent of the
+`disabled` attribute (verified live: two rapid clicks produced exactly one
+database row). A success message only ever renders after the database
+insert actually resolves — never optimistically. A failure keeps every
+entered value in place and shows one generic, friendly retry message; the
+real underlying error (found live in testing to sometimes be a raw
+`TypeError: Failed to fetch`) is logged to the console for debugging, never
+shown to the visitor. The mailto:/tel: links in the Contact section's info
+panel are untouched and remain the secondary contact method.
+
+**Admin Inquiries:** a new Dashboard-level "Inquiries" nav item and
+"문의 관리" shortcut card (`src/admin/pages/Inquiries.jsx`,
+`src/admin/content/useInquiries.js`) list every inquiry newest-first;
+clicking one expands full detail (name/company/email/type/message/received
+time) with a status dropdown (신규/진행 중/완료, writing immediately, no
+draft/Save step) and a delete button (confirm-guarded, for removing test
+or spam entries) — kept deliberately simple, no filtering/sorting/CRM
+features added.
+
+**Test result:** a real inquiry was submitted through the live form
+against a local mock Supabase backend, confirmed visible and fully
+manageable in the admin Inquiries screen (status change persisted through
+a reload), then deleted via the admin's own delete action — no test data
+was left behind. This was against the mock only, since (per standing
+project constraint) no real Supabase project has been created; the same
+flow needs re-running against the real project once one exists.
+
+**Build:** `npm run lint` and `npm run build` both pass with zero errors.
+
 ## Phase 3-B — Admin Operational Convenience Pass
 
 **Status: complete. Admin CMS only** — no public-site file

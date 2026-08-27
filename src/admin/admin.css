@@ -796,6 +796,118 @@ body {
   margin-top: 0.5rem;
 }
 
+/* Inquiries (Phase 3-C) */
+
+.admin-inquiry-item {
+  border: 1px solid #e5e1d6;
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+}
+
+.admin-inquiry-summary {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: #ffffff;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.admin-inquiry-summary:hover {
+  background: #f4f1ea;
+}
+
+.admin-inquiry-status {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.admin-inquiry-status--new {
+  background: #fbf1e0;
+  color: #8a5a00;
+}
+
+.admin-inquiry-status--in_progress {
+  background: #e5edfb;
+  color: #1a4f9c;
+}
+
+.admin-inquiry-status--completed {
+  background: #eaf5ec;
+  color: #1e7a34;
+}
+
+.admin-inquiry-name {
+  font-weight: 600;
+  color: #0b1625;
+}
+
+.admin-inquiry-type {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.admin-inquiry-date {
+  font-size: 0.78rem;
+  color: #8b8984;
+  white-space: nowrap;
+}
+
+.admin-inquiry-detail {
+  padding: 1rem;
+  border-top: 1px solid #e5e1d6;
+  background: #fbfaf7;
+}
+
+.admin-inquiry-fields {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.3rem 1rem;
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+}
+
+.admin-inquiry-fields dt {
+  font-weight: 700;
+  color: #8b8984;
+}
+
+.admin-inquiry-fields dd {
+  margin: 0;
+  color: #222222;
+}
+
+.admin-inquiry-message {
+  white-space: pre-wrap;
+  line-height: 1.7;
+  font-size: 0.9rem;
+  background: #ffffff;
+  border: 1px solid #e5e1d6;
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin: 0 0 1rem;
+}
+
+.admin-inquiry-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.admin-inquiry-status-field {
+  margin-bottom: 0;
+}
+
 /* Covers phones and tablet-portrait widths (e.g. iPad at 768px): the
    sidebar + sub-nav + two-column image comparison don't fit side by side
    below ~900px, so everything stacks to one column here instead of only
@@ -833,6 +945,16 @@ body {
 
   .admin-image-slot-body,
   .admin-gallery-item {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-inquiry-summary {
+    grid-template-columns: 1fr;
+    justify-items: start;
+    gap: 0.35rem;
+  }
+
+  .admin-inquiry-fields {
     grid-template-columns: 1fr;
   }
 

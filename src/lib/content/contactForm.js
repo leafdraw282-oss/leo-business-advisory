@@ -17,6 +17,21 @@ export function contactFormFallback() {
     submitEn: contactForm.submitEn,
     noteKo: contactForm.noteKo,
     noteEn: contactForm.noteEn,
+    // Submission-state microcopy (sending/success/error/validation) has no
+    // Supabase-editable counterpart (see fetchContactForm below) — it's
+    // fixed interface text, not admin-managed marketing content, so it
+    // always comes from profile.js regardless of whether Supabase is
+    // configured.
+    sendingKo: contactForm.sendingKo,
+    sendingEn: contactForm.sendingEn,
+    successKo: contactForm.successKo,
+    successEn: contactForm.successEn,
+    errorKo: contactForm.errorKo,
+    errorEn: contactForm.errorEn,
+    requiredKo: contactForm.requiredKo,
+    requiredEn: contactForm.requiredEn,
+    invalidEmailKo: contactForm.invalidEmailKo,
+    invalidEmailEn: contactForm.invalidEmailEn,
     inquiryTypes: inquiryTypes.map((t) => ({ ko: t.ko, en: t.en })),
   };
 }
@@ -53,6 +68,17 @@ export async function fetchContactForm() {
       submitEn: formRow?.submit_en ?? fallback.submitEn,
       noteKo: formRow?.note_ko ?? fallback.noteKo,
       noteEn: formRow?.note_en ?? fallback.noteEn,
+      // Not stored in contact_form_content — always the fixed fallback text.
+      sendingKo: fallback.sendingKo,
+      sendingEn: fallback.sendingEn,
+      successKo: fallback.successKo,
+      successEn: fallback.successEn,
+      errorKo: fallback.errorKo,
+      errorEn: fallback.errorEn,
+      requiredKo: fallback.requiredKo,
+      requiredEn: fallback.requiredEn,
+      invalidEmailKo: fallback.invalidEmailKo,
+      invalidEmailEn: fallback.invalidEmailEn,
       inquiryTypes: typeRows.length > 0 ? typeRows.map((r) => ({ ko: r.label_ko, en: r.label_en })) : fallback.inquiryTypes,
     };
   }, contactFormFallback());

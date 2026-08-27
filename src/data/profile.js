@@ -360,11 +360,11 @@ export const inquiryTypes = [
   { ko: '기타', en: 'Other' },
 ];
 
-// Contact form copy (id: "contact"). No backend exists yet — submitting
-// this form opens the visitor's email app with the message pre-filled
-// (mailto:), per CLAUDE.md's Contact form rule. `noteKo`/`noteEn` must
-// stay visible near the submit button so nobody mistakes this for a
-// direct server submission.
+// Contact form copy (id: "contact"). Phase 3-C: submitting this form saves
+// the inquiry directly to the database (supabase/migrations/0005_inquiries.sql)
+// — see src/lib/inquiries.js and src/components/ContactForm.jsx. The direct
+// mailto:/tel: links in the Contact section's info panel (src/lib/content/contactInfo.js)
+// remain as a secondary contact method, independent of this form.
 export const contactForm = {
   labels: {
     name: { ko: '이름', en: 'Name' },
@@ -375,10 +375,20 @@ export const contactForm = {
   },
   inquiryPlaceholderKo: '유형을 선택해주세요',
   inquiryPlaceholderEn: 'Select an inquiry type',
-  submitKo: '이메일 앱으로 보내기',
-  submitEn: 'Send via Email',
-  noteKo: '제출하시면 작성하신 내용으로 기본 이메일 앱이 열립니다. 앱에서 발송을 완료해야 실제로 전달됩니다.',
-  noteEn: "Submitting opens your default email app with this message pre-filled — you'll need to hit send there for it to actually reach Leo.",
+  submitKo: '문의 보내기',
+  submitEn: 'Send Inquiry',
+  sendingKo: '전송 중…',
+  sendingEn: 'Sending…',
+  successKo: '문의가 정상적으로 접수되었습니다. 빠른 시일 내에 답변드리겠습니다.',
+  successEn: 'Your inquiry has been received. We will get back to you shortly.',
+  errorKo: '전송에 실패했습니다. 잠시 후 다시 시도해주세요.',
+  errorEn: 'Something went wrong. Please try again in a moment.',
+  requiredKo: '필수 입력 항목입니다.',
+  requiredEn: 'This field is required.',
+  invalidEmailKo: '올바른 이메일 주소를 입력해주세요.',
+  invalidEmailEn: 'Please enter a valid email address.',
+  noteKo: '입력하신 정보는 문의 응대 목적으로만 사용됩니다. 자세한 개인정보처리방침은 추후 별도로 안내드릴 예정입니다.',
+  noteEn: 'Your information is used only to respond to this inquiry. A full privacy policy will be provided separately.',
 };
 
 // Footer copy (id: none — persistent site-wide chrome, not a nav section).
