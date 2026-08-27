@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { setDirtyState } from './dirtyTracker.js';
+import { recordSave } from './lastSaved.js';
 
 // Supabase's client throws plain { message, code, ... } objects, not
 // Error instances, so String(err) would otherwise render "[object
@@ -23,6 +25,7 @@ function extractErrorMessage(err) {
  *   what's really in the database after a save, not just what was typed.
  */
 export function useAdminForm({ load, save }) {
+  const instanceId = useId();
   const [status, setStatus] = useState('loading'); // loading | ready | load-error
   const [loadError, setLoadError] = useState('');
   const [values, setValues] = useState(null);
@@ -60,6 +63,11 @@ export function useAdminForm({ load, save }) {
   const isDirty =
     values !== null && savedRef.current !== null && JSON.stringify(values) !== JSON.stringify(savedRef.current);
 
+  useEffect(() => {
+    setDirtyState(instanceId, isDirty);
+    return () => setDirtyState(instanceId, false);
+  }, [instanceId, isDirty]);
+
   async function runSave() {
     setSaveState('saving');
     setSaveError('');
@@ -68,6 +76,7 @@ export function useAdminForm({ load, save }) {
       setValues(confirmed);
       savedRef.current = confirmed;
       setSaveState('success');
+      recordSave('content');
       // eslint-disable-next-line no-unused-vars
     } catch (err) {
       setSaveState('error');

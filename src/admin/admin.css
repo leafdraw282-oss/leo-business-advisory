@@ -163,8 +163,24 @@ body {
   font-weight: 600;
 }
 
-.admin-logout {
+.admin-public-link {
+  display: block;
+  text-align: center;
   margin-top: 1rem;
+  padding: 0.6rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid rgba(164, 134, 92, 0.6);
+  color: #f4f1ea;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.admin-public-link:hover {
+  background: rgba(164, 134, 92, 0.15);
+}
+
+.admin-logout {
+  margin-top: 0.6rem;
   background: transparent;
   border: 1px solid rgba(244, 241, 234, 0.35);
   color: #f4f1ea;
@@ -188,6 +204,74 @@ body {
   margin: 0;
   color: #8b8984;
   font-size: 0.85rem;
+}
+
+/* Dashboard home (Phase 2-F) */
+
+.admin-dashboard-home {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 720px;
+}
+
+.admin-dashboard-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.admin-dashboard-card {
+  text-align: left;
+  cursor: pointer;
+  background: #ffffff;
+  border: 1px solid #e5e1d6;
+  border-radius: 8px;
+  padding: 1.25rem 1.4rem;
+  box-shadow: 0 2px 12px rgba(11, 22, 37, 0.06);
+}
+
+.admin-dashboard-card:hover {
+  border-color: #a4865c;
+}
+
+.admin-dashboard-card h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  color: #0b1625;
+}
+
+.admin-dashboard-card p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+.admin-dashboard-status {
+  background: #ffffff;
+  border: 1px solid #e5e1d6;
+  border-radius: 8px;
+  padding: 1.1rem 1.4rem;
+}
+
+.admin-dashboard-status h2 {
+  margin: 0 0 0.4rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8b8984;
+}
+
+.admin-dashboard-status p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #0b1625;
+}
+
+.admin-dashboard-note {
+  font-size: 0.85rem;
+  color: #8b8984;
 }
 
 /* Content editor (Phase 2-C) */
@@ -215,9 +299,25 @@ body {
   border: none;
   padding: 0.5rem 0.6rem;
   border-radius: 4px;
-  font-size: 0.9rem;
   cursor: pointer;
   color: #222222;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.admin-content-nav-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.admin-content-nav-desc {
+  font-size: 0.75rem;
+  color: #8b8984;
+}
+
+.admin-content-nav button.active .admin-content-nav-desc {
+  color: #d8d4c8;
 }
 
 .admin-content-nav button:hover {
@@ -227,7 +327,6 @@ body {
 .admin-content-nav button.active {
   background: #0b1625;
   color: #f4f1ea;
-  font-weight: 600;
 }
 
 .admin-content-panel {
@@ -267,9 +366,29 @@ body {
   gap: 1rem;
   flex-wrap: wrap;
   background: #f4f1ea;
+  border: 1px solid transparent;
   border-radius: 6px;
   padding: 0.6rem 0.9rem;
   margin-bottom: 1rem;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Background tints the whole bar, not just the text — the "editing vs.
+   saved" distinction should read at a glance, without needing to read
+   English. */
+.admin-section-toolbar--dirty {
+  background: #fbf1e0;
+  border-color: #e8c891;
+}
+
+.admin-section-toolbar--success {
+  background: #eaf5ec;
+  border-color: #a9d9b3;
+}
+
+.admin-section-toolbar--error {
+  background: #fcebe9;
+  border-color: #f0aca5;
 }
 
 .admin-section-toolbar-status {
@@ -278,7 +397,7 @@ body {
 }
 
 .admin-dirty-badge {
-  color: #a4865c;
+  color: #8a5a00;
   font-weight: 600;
 }
 
@@ -290,6 +409,16 @@ body {
 .admin-save-error {
   color: #b3261e;
   font-weight: 600;
+}
+
+.admin-save-neutral {
+  color: #8b8984;
+}
+
+.admin-section-help {
+  font-size: 0.85rem;
+  color: #666;
+  margin: -0.5rem 0 1rem;
 }
 
 .admin-section-toolbar-actions {
@@ -355,8 +484,19 @@ body {
   display: inline-block;
   font-size: 0.7rem;
   font-weight: 700;
-  color: #a4865c;
-  margin-bottom: 0.25rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  margin-bottom: 0.3rem;
+}
+
+.admin-lang-tag--ko {
+  color: #0b1625;
+  background: #e5e1d6;
+}
+
+.admin-lang-tag--en {
+  color: #6b4a26;
+  background: #f1e6d5;
 }
 
 .admin-bilingual-cell input,
@@ -414,7 +554,7 @@ body {
 
 .admin-image-slot-body {
   display: grid;
-  grid-template-columns: minmax(160px, 240px) 1fr;
+  grid-template-columns: minmax(160px, 320px) 1fr;
   gap: 1.5rem;
   align-items: start;
 }
@@ -422,6 +562,45 @@ body {
 .admin-image-slot-body .image-placeholder {
   border-radius: 6px;
   overflow: hidden;
+}
+
+/* Current vs. new-pending-upload comparison, shared by single-image
+   slots (Hero/About/Case Study) and each Gallery row. */
+.admin-image-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.admin-image-compare:has(> .admin-image-compare-item:only-child) {
+  grid-template-columns: 1fr;
+}
+
+.admin-image-compare--stacked {
+  grid-template-columns: 1fr;
+}
+
+.admin-image-compare-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.admin-image-compare-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #8b8984;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.admin-image-compare-item--new .admin-image-compare-label {
+  color: #1e7a34;
+}
+
+.admin-image-compare-item--new .image-placeholder {
+  outline: 2px solid #1e7a34;
+  outline-offset: 2px;
 }
 
 .admin-image-slot-controls input[type='file'] {
@@ -488,6 +667,13 @@ body {
   overflow: hidden;
 }
 
+.admin-gallery-item-number {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0b1625;
+}
+
 .admin-gallery-item-fields input[type='file'] {
   display: block;
   font-size: 0.85rem;
@@ -534,18 +720,23 @@ body {
   cursor: not-allowed;
 }
 
-.admin-section-form > button {
+.admin-gallery-add {
   cursor: pointer;
   border: 1px solid #0b1625;
   background: #0b1625;
   color: #f4f1ea;
   border-radius: 4px;
-  padding: 0.5rem 1.1rem;
-  font-size: 0.85rem;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
   margin-top: 0.5rem;
 }
 
-@media (max-width: 640px) {
+/* Covers phones and tablet-portrait widths (e.g. iPad at 768px): the
+   sidebar + sub-nav + two-column image comparison don't fit side by side
+   below ~900px, so everything stacks to one column here instead of only
+   below 640px. */
+@media (max-width: 900px) {
   .admin-shell {
     flex-direction: column;
   }
@@ -578,6 +769,14 @@ body {
 
   .admin-image-slot-body,
   .admin-gallery-item {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-image-compare {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dashboard-cards {
     grid-template-columns: 1fr;
   }
 }

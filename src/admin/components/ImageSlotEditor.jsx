@@ -10,6 +10,10 @@ import SectionStatus from './SectionStatus.jsx';
 // site's own fallback), file picker with validation, alt text, and
 // save/reset. Used for Hero, About/Profile, and each Case Study — Gallery
 // has its own list-shaped UI (see pages/images/GalleryImages.jsx).
+//
+// While a new file is staged but not yet saved, the current (live) image
+// and the new one are shown side by side, each clearly labeled — an
+// admin should never have to guess which one is still live.
 function ImageSlotEditor({ title, aspectRatio = '4 / 3', slot }) {
   const fileInputRef = useRef(null);
   const {
@@ -35,7 +39,6 @@ function ImageSlotEditor({ title, aspectRatio = '4 / 3', slot }) {
   } = slot;
 
   const currentUrl = isSupabaseConfigured && storagePath ? publicUrlFor(storagePath) : null;
-  const previewSrc = previewUrl ?? currentUrl ?? undefined;
   const previewLabel = altEn || altKo || title;
 
   function handleFileChange(event) {
@@ -45,7 +48,7 @@ function ImageSlotEditor({ title, aspectRatio = '4 / 3', slot }) {
   }
 
   function handleReset() {
-    if (window.confirm(`Remove the current ${title} image? This deletes it from storage.`)) {
+    if (window.confirm(`현재 ${title} 이미지를 삭제할까요? 저장소에서도 삭제되며 되돌릴 수 없습니다.`)) {
       resetSlot();
     }
   }
@@ -64,7 +67,18 @@ function ImageSlotEditor({ title, aspectRatio = '4 / 3', slot }) {
       />
       {status === 'ready' && (
         <div className="admin-image-slot-body">
-          <ImagePlaceholder src={previewSrc} alt={previewLabel} label={previewLabel} aspectRatio={aspectRatio} />
+          <div className="admin-image-compare">
+            <div className="admin-image-compare-item">
+              <span className="admin-image-compare-label">현재 이미지</span>
+              <ImagePlaceholder src={currentUrl} alt={previewLabel} label={previewLabel} aspectRatio={aspectRatio} />
+            </div>
+            {previewUrl && (
+              <div className="admin-image-compare-item admin-image-compare-item--new">
+                <span className="admin-image-compare-label">새 이미지 (저장 전 미리보기)</span>
+                <ImagePlaceholder src={previewUrl} alt={previewLabel} label={previewLabel} aspectRatio={aspectRatio} />
+              </div>
+            )}
+          </div>
 
           <div className="admin-image-slot-controls">
             <input
@@ -74,7 +88,7 @@ function ImageSlotEditor({ title, aspectRatio = '4 / 3', slot }) {
               onChange={handleFileChange}
             />
             <p className="admin-image-hint">
-              JPEG, PNG, WebP, or SVG — max {MAX_IMAGE_BYTES / 1024 / 1024} MB.
+              JPEG, PNG, WebP, SVG 파일만 가능 — 최대 {MAX_IMAGE_BYTES / 1024 / 1024}MB.
             </p>
             {fileError && (
               <p className="admin-status-error" role="alert">
@@ -83,12 +97,15 @@ function ImageSlotEditor({ title, aspectRatio = '4 / 3', slot }) {
             )}
             {pendingFile && (
               <p className="admin-image-pending">
-                Selected: {pendingFile.name} — <button type="button" onClick={cancelPendingFile}>Cancel</button>
+                선택한 파일: {pendingFile.name} —{' '}
+                <button type="button" onClick={cancelPendingFile}>
+                  취소
+                </button>
               </p>
             )}
 
             <BilingualField
-              label="Alt text"
+              label="대체 텍스트 (Alt text)"
               ko={altKo}
               en={altEn}
               onKoChange={setAltKo}
@@ -97,7 +114,7 @@ function ImageSlotEditor({ title, aspectRatio = '4 / 3', slot }) {
 
             {hasImage && (
               <button type="button" className="admin-image-reset" onClick={handleReset} disabled={saveState === 'saving'}>
-                Remove image
+                이미지 삭제
               </button>
             )}
           </div>

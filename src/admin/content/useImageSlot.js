@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 import { isSupabaseConfigured } from '../../lib/supabase.js';
 import { saveListRow, deleteRow } from './supabaseTable.js';
 import { validateImageFile, uploadImageFile, removeStorageFile } from './supabaseStorage.js';
+import { setDirtyState } from './dirtyTracker.js';
+import { recordSave } from './lastSaved.js';
 
 function extractErrorMessage(err) {
   if (err instanceof Error) return err.message;
@@ -20,6 +22,7 @@ function extractErrorMessage(err) {
  * `applyParent`: async (imageIdOrNull) => void — persists the new/cleared image_id onto the parent row.
  */
 export function useImageSlot({ folder, fallbackAlt, loadParent, applyParent }) {
+  const instanceId = useId();
   const [status, setStatus] = useState('loading');
   const [loadError, setLoadError] = useState('');
   const [mediaId, setMediaId] = useState(null);
@@ -93,6 +96,11 @@ export function useImageSlot({ folder, fallbackAlt, loadParent, applyParent }) {
 
   const isDirty = Boolean(pendingFile) || altKo !== savedAlt.ko || altEn !== savedAlt.en;
 
+  useEffect(() => {
+    setDirtyState(instanceId, isDirty);
+    return () => setDirtyState(instanceId, false);
+  }, [instanceId, isDirty]);
+
   async function save() {
     if (!isSupabaseConfigured) {
       setSaveState('error');
@@ -128,6 +136,7 @@ export function useImageSlot({ folder, fallbackAlt, loadParent, applyParent }) {
 
       await load();
       setSaveState('success');
+      recordSave('images');
       // eslint-disable-next-line no-unused-vars
     } catch (err) {
       setSaveState('error');
@@ -156,6 +165,7 @@ export function useImageSlot({ folder, fallbackAlt, loadParent, applyParent }) {
       }
       await load();
       setSaveState('success');
+      recordSave('images');
       // eslint-disable-next-line no-unused-vars
     } catch (err) {
       setSaveState('error');

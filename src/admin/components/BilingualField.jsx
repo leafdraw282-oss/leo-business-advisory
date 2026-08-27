@@ -9,7 +9,7 @@ function BilingualField({ label, ko, en, onKoChange, onEnChange, multiline = fal
       <span className="admin-field-label">{label}</span>
       <div className="admin-bilingual-row">
         <label className="admin-bilingual-cell">
-          <span className="admin-lang-tag">KO</span>
+          <span className="admin-lang-tag admin-lang-tag--ko">한국어</span>
           <Tag
             value={ko}
             onChange={(event) => onKoChange(event.target.value)}
@@ -17,7 +17,7 @@ function BilingualField({ label, ko, en, onKoChange, onEnChange, multiline = fal
           />
         </label>
         <label className="admin-bilingual-cell">
-          <span className="admin-lang-tag">EN</span>
+          <span className="admin-lang-tag admin-lang-tag--en">영어 (EN)</span>
           <Tag
             value={en}
             onChange={(event) => onEnChange(event.target.value)}

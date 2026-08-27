@@ -10,6 +10,71 @@ build with zero console errors/warnings. See Phase 1-G directly below for
 the final QA pass, and each earlier phase's section for how every part
 was built.
 
+## Phase 2-F — Admin Usability Pass (Content/Images UX)
+
+**Status: complete.** Public site untouched — every change is scoped to
+`src/admin/`.
+
+Scope was making the already-working admin CMS (Phase 2-B–2-E) safe and
+clear for a non-developer to operate, not new functionality.
+
+**Dashboard home view:** replaced the single placeholder paragraph with
+two cards ("Content 관리" / "Images 관리", each with a one-line
+description, clicking either jumps to that tab), a "마지막 저장" panel, and
+a "Public Website 바로가기" link (opens the live site in a new tab, using
+`import.meta.env.BASE_URL` so it's correct in both dev and production).
+
+**Never silently lose an edit:** the biggest real risk in the Phase
+2-B–E admin was that switching sections (or tabs, or logging out, or
+closing the tab) unmounted the active form and discarded any unsaved
+edit with no warning. `src/admin/content/dirtyTracker.js` is a small
+module every data hook (`useAdminForm`, `useImageSlot`,
+`useGalleryImages`) now reports its dirty state into; `Content.jsx`,
+`Images.jsx`, and `Dashboard.jsx`'s tab/section switches and Logout all
+check it first and ask for confirmation before discarding anything, and
+a `beforeunload` handler warns before closing/refreshing the tab too.
+
+**Saved vs. editing, unmistakably:** `SectionStatus.jsx`'s toolbar now
+tints its whole background (amber = unsaved changes, green = just
+saved, red = save failed, neutral = matches what's saved) instead of
+only changing a line of text — the distinction reads at a glance without
+needing to read English. Every status message, button label, and
+confirmation dialog was translated to Korean (Content/Images sections'
+own field labels stay as before — this pass targeted the messages where
+a mistake is actually made, not a full UI translation).
+
+**Section navigation now shows what's inside:** both Content's and
+Images' sub-nav list a one-line Korean description under each section
+name (e.g. "Hero — 첫 화면 문구와 버튼"), so a non-developer can find the
+right section without opening each one to check.
+
+**KR/EN clarity:** `BilingualField.jsx`'s tags changed from bare "KO"/
+"EN" to "한국어"/"영어 (EN)", with distinct background colors per
+language, so the two columns read as unmistakably different languages,
+not just different abbreviations.
+
+**Current vs. replacement image, side by side:** `ImageSlotEditor.jsx`
+(Hero/About/Case Study slots) and Gallery's per-photo rows now show
+"현재 이미지" and, once a new file is selected but not yet saved, "새
+이미지 (저장 전 미리보기)" next to it with a green outline — previously the
+new preview silently replaced the current-image view, so there was no
+way to compare them or confirm what was actually still live. Gallery
+also gained an item count in its heading ("Gallery (6장)"), a per-photo
+number label, and a short instructions line.
+
+**Responsive:** re-tested Dashboard, Content, and Images (including
+Gallery) at 390px, 768px, 1024px, and 1280px via a full-page overflow
+sweep. **Found and fixed a real bug**: at 768px (tablet-portrait width),
+the two-column image-slot layout didn't have enough room next to the
+sidebar and sub-nav and caused horizontal overflow — the stacking
+breakpoint was 640px, leaving a gap between "phone" and "desktop" widths
+with nothing designed for it. Widened the breakpoint to 900px; re-swept
+all four widths afterward with zero overflow anywhere.
+
+**Not built in this phase (by design):** any new admin functionality
+(Settings, additional fields, new sections) — this was a UX pass over
+what Phase 2-B–2-E already built, not new scope.
+
 ## Phase 2-E — Public Website Connected to CMS Data
 
 **Status: complete for every section with a public rendering surface

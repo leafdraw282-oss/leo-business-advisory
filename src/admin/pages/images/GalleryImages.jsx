@@ -24,7 +24,11 @@ function GalleryImages() {
 
   return (
     <section className="admin-section-form">
-      <h2>Gallery</h2>
+      <h2>Gallery ({items.length}장)</h2>
+      <p className="admin-section-help">
+        사진을 추가·삭제하거나 순서를 바꿀 수 있습니다. 새 사진을 선택하면 저장 전까지 현재 사진과 나란히
+        미리보기가 표시됩니다.
+      </p>
       <SectionStatus
         status={status}
         loadError={loadError}
@@ -37,16 +41,27 @@ function GalleryImages() {
       {status === 'ready' && (
         <>
           {items.map((item, index) => {
-            const previewSrc =
-              item.previewUrl ?? (isSupabaseConfigured && item.storagePath ? publicUrlFor(item.storagePath) : undefined);
+            const currentSrc = isSupabaseConfigured && item.storagePath ? publicUrlFor(item.storagePath) : undefined;
             const label = item.captionEn || item.captionKo || `Photo ${index + 1}`;
 
             return (
               <div className="admin-gallery-item" key={item.itemKey}>
                 <div className="admin-gallery-item-preview">
-                  <ImagePlaceholder src={previewSrc} alt={label} label={label} aspectRatio={item.aspectRatio} />
+                  <div className="admin-image-compare admin-image-compare--stacked">
+                    <div className="admin-image-compare-item">
+                      <span className="admin-image-compare-label">현재 사진</span>
+                      <ImagePlaceholder src={currentSrc} alt={label} label={label} aspectRatio={item.aspectRatio} />
+                    </div>
+                    {item.previewUrl && (
+                      <div className="admin-image-compare-item admin-image-compare-item--new">
+                        <span className="admin-image-compare-label">새 사진 (저장 전 미리보기)</span>
+                        <ImagePlaceholder src={item.previewUrl} alt={label} label={label} aspectRatio={item.aspectRatio} />
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="admin-gallery-item-fields">
+                  <p className="admin-gallery-item-number">사진 {index + 1}</p>
                   <input
                     type="file"
                     accept={ALLOWED_IMAGE_TYPES.join(',')}
@@ -57,26 +72,26 @@ function GalleryImages() {
                     }}
                   />
                   <p className="admin-image-hint">
-                    JPEG, PNG, WebP, or SVG — max {MAX_IMAGE_BYTES / 1024 / 1024} MB.
+                    JPEG, PNG, WebP, SVG 파일만 가능 — 최대 {MAX_IMAGE_BYTES / 1024 / 1024}MB.
                   </p>
                   <BilingualField
-                    label="Caption"
+                    label="캡션 (Caption)"
                     ko={item.captionKo}
                     en={item.captionEn}
                     onKoChange={(v) => updateItem(index, { captionKo: v })}
                     onEnChange={(v) => updateItem(index, { captionEn: v })}
                   />
                   <label className="admin-field">
-                    <span className="admin-field-label">Aspect ratio</span>
+                    <span className="admin-field-label">가로세로 비율</span>
                     <select
                       value={item.aspectRatio}
                       onChange={(event) => updateItem(index, { aspectRatio: event.target.value })}
                     >
-                      <option value="1 / 1">Square (1 / 1)</option>
-                      <option value="4 / 3">Landscape (4 / 3)</option>
-                      <option value="4 / 5">Portrait (4 / 5)</option>
-                      <option value="3 / 4">Portrait (3 / 4)</option>
-                      <option value="16 / 9">Wide (16 / 9)</option>
+                      <option value="1 / 1">정사각형 (1 / 1)</option>
+                      <option value="4 / 3">가로 (4 / 3)</option>
+                      <option value="4 / 5">세로 (4 / 5)</option>
+                      <option value="3 / 4">세로 (3 / 4)</option>
+                      <option value="16 / 9">와이드 (16 / 9)</option>
                     </select>
                   </label>
                   <label className="admin-checkbox-field">
@@ -85,25 +100,25 @@ function GalleryImages() {
                       checked={item.isWide}
                       onChange={(event) => updateItem(index, { isWide: event.target.checked })}
                     />
-                    Span two grid columns
+                    그리드에서 두 칸 차지 (와이드 타일)
                   </label>
                   <div className="admin-gallery-item-actions">
                     <button type="button" onClick={() => moveItem(index, -1)} disabled={index === 0}>
-                      Move up
+                      ↑ 위로
                     </button>
                     <button type="button" onClick={() => moveItem(index, 1)} disabled={index === items.length - 1}>
-                      Move down
+                      ↓ 아래로
                     </button>
                     <button type="button" className="admin-image-reset" onClick={() => removeItem(index)}>
-                      Delete photo
+                      이 사진 삭제
                     </button>
                   </div>
                 </div>
               </div>
             );
           })}
-          <button type="button" onClick={addItem}>
-            Add photo
+          <button type="button" className="admin-gallery-add" onClick={addItem}>
+            + 사진 추가
           </button>
         </>
       )}

@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 import { gallery } from '../../data/profile.js';
 import { isSupabaseConfigured } from '../../lib/supabase.js';
 import { fetchList, upsertByNaturalKey, fetchRowById, saveListRow, deleteRow } from './supabaseTable.js';
 import { uploadImageFile, removeStorageFile, validateImageFile } from './supabaseStorage.js';
 import { requireFilled } from './validation.js';
+import { setDirtyState } from './dirtyTracker.js';
+import { recordSave } from './lastSaved.js';
 
 function extractErrorMessage(err) {
   if (err instanceof Error) return err.message;
@@ -63,6 +65,7 @@ async function load() {
  * a hook, not directly in the component's own effect body.
  */
 export function useGalleryImages() {
+  const instanceId = useId();
   const [status, setStatus] = useState('loading');
   const [loadError, setLoadError] = useState('');
   const [items, setItems] = useState([]);
@@ -99,6 +102,11 @@ export function useGalleryImages() {
     pendingDeletions.length > 0 ||
     JSON.stringify(items.map(comparable)) !== JSON.stringify(savedItems);
 
+  useEffect(() => {
+    setDirtyState(instanceId, isDirty);
+    return () => setDirtyState(instanceId, false);
+  }, [instanceId, isDirty]);
+
   function updateItem(index, patch) {
     setItems((prev) => prev.map((item, i) => (i === index ? { ...item, ...patch } : item)));
     if (saveState !== 'idle') setSaveState('idle');
@@ -124,7 +132,7 @@ export function useGalleryImages() {
 
   function removeItem(index) {
     const item = items[index];
-    if (!window.confirm('Remove this gallery photo?')) return;
+    if (!window.confirm('이 갤러리 사진을 삭제할까요? 저장해야 실제로 반영됩니다.')) return;
     if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
     if (item.id) {
       setPendingDeletions((prev) => [...prev, { id: item.id, mediaId: item.mediaId, storagePath: item.storagePath }]);
@@ -226,6 +234,7 @@ export function useGalleryImages() {
 
       await runLoad();
       setSaveState('success');
+      recordSave('images');
       // eslint-disable-next-line no-unused-vars
     } catch (err) {
       setSaveState('error');
