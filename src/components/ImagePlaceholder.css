@@ -14,6 +14,20 @@
   object-fit: cover;
 }
 
+/* Opt-in only (ImagePlaceholder's `fadeInOnLoad` prop) — every other
+   caller renders at opacity: 1 immediately, unchanged. --motion-duration-fast
+   is already 0.01ms under prefers-reduced-motion (see variables.css), so
+   this automatically shows the image immediately for those users with no
+   separate media query needed here. */
+.image-placeholder__img--fade-in {
+  opacity: 0;
+  transition: opacity var(--motion-duration-fast) ease;
+}
+
+.image-placeholder__img--fade-in.image-placeholder__img--loaded {
+  opacity: 1;
+}
+
 .image-placeholder__label {
   color: var(--color-ivory);
   opacity: 0.6;

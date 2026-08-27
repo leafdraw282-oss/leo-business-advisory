@@ -12,8 +12,25 @@ import './ImagePlaceholder.css';
  * @param {string} label - short text shown inside the placeholder (e.g. "LEO Portrait")
  * @param {string} [aspectRatio] - CSS aspect-ratio value, e.g. "4 / 5"
  * @param {string} [className]
+ * @param {'lazy'|'eager'} [loading] - defaults to 'lazy'; pass 'eager' for an
+ *   above-the-fold image (e.g. Hero) that should start loading immediately.
+ * @param {'high'|'low'|'auto'} [fetchPriority] - hints the browser's request
+ *   priority; only meaningful paired with loading="eager".
+ * @param {boolean} [fadeInOnLoad] - opt-in short opacity transition once the
+ *   real image has actually finished loading (see .image-placeholder__img--fade-in
+ *   in ImagePlaceholder.css) — off by default so every existing caller's
+ *   appearance is unchanged; pass true only where this specific polish is wanted.
  */
-function ImagePlaceholder({ src, alt, label, aspectRatio = '4 / 3', className = '' }) {
+function ImagePlaceholder({
+  src,
+  alt,
+  label,
+  aspectRatio = '4 / 3',
+  className = '',
+  loading = 'lazy',
+  fetchPriority,
+  fadeInOnLoad = false,
+}) {
   // Tracks WHICH src last failed, not just whether "something" failed —
   // every section starts with a src that's guaranteed (or very likely) to
   // 404 (src/data/profile.js's local fallback path) before an async CMS
@@ -23,7 +40,20 @@ function ImagePlaceholder({ src, alt, label, aspectRatio = '4 / 3', className = 
   // OLD src can never mask a newer, different src — it just stops
   // matching the moment `src` changes, with no separate reset step needed.
   const [failedSrc, setFailedSrc] = useState(null);
+  // Same src-keyed-comparison pattern for "has THIS src finished loading",
+  // used only to drive the optional fade-in above — a src change never
+  // inherits a previous src's loaded state.
+  const [loadedSrc, setLoadedSrc] = useState(null);
   const showPlaceholder = !src || failedSrc === src;
+  const loaded = loadedSrc === src;
+
+  const imgClassName = [
+    'image-placeholder__img',
+    fadeInOnLoad && 'image-placeholder__img--fade-in',
+    fadeInOnLoad && loaded && 'image-placeholder__img--loaded',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div
@@ -51,10 +81,12 @@ function ImagePlaceholder({ src, alt, label, aspectRatio = '4 / 3', className = 
           // failedSrc/src comparison above means it would record against
           // the old src value, not the new one, and still be ignored.
           key={src}
-          className="image-placeholder__img"
+          className={imgClassName}
           src={src}
           alt={alt}
-          loading="lazy"
+          loading={loading}
+          fetchPriority={fetchPriority}
+          onLoad={() => setLoadedSrc(src)}
           onError={() => setFailedSrc(src)}
         />
       )}

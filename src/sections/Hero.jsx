@@ -1,7 +1,7 @@
 import { person } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
 import { useSectionContent } from '../hooks/useSectionContent';
-import { fetchHero, heroFallback } from '../lib/content/hero';
+import { fetchHero, heroInitial } from '../lib/content/hero';
 import { trackEvent } from '../lib/analytics';
 import ImagePlaceholder from '../components/ImagePlaceholder';
 import './Hero.css';
@@ -15,7 +15,7 @@ import './Hero.css';
  */
 function Hero() {
   const { language, t } = useLanguage();
-  const hero = useSectionContent(fetchHero, heroFallback());
+  const hero = useSectionContent(fetchHero, heroInitial());
   const name = language === 'ko' ? person.nameKoFormatted : person.nameEnDisplay;
   const headlineLines = t(hero.headlineKo, hero.headlineEn);
   const portraitLabel = t(hero.imageAltKo, hero.imageAltEn);
@@ -53,7 +53,15 @@ function Hero() {
           </div>
         </div>
         <div className="hero__media">
-          <ImagePlaceholder src={hero.imageUrl} alt={portraitLabel} label={portraitLabel} aspectRatio="4 / 5" />
+          <ImagePlaceholder
+            src={hero.imageUrl}
+            alt={portraitLabel}
+            label={portraitLabel}
+            aspectRatio="4 / 5"
+            loading="eager"
+            fetchPriority="high"
+            fadeInOnLoad
+          />
         </div>
       </div>
     </section>

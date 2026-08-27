@@ -5,6 +5,17 @@
 }
 
 .hero__grid {
+  /* .hero is display:flex (to vertically center this, its only child, via
+     align-items) — without an explicit width, a flex item's width comes
+     from flex-basis:auto, which falls through to its CONTENT's intrinsic
+     size rather than stretching to fill .hero. That size genuinely
+     differs between the placeholder's text label and a loaded <img>, so
+     while the Hero image was loading, this whole grid (both columns, not
+     just the image one) would measurably narrow and then widen again — a
+     real layout shift, not just a visual one. width: 100% makes
+     flex-basis:auto resolve to "fill the parent" instead, independent of
+     whatever .hero__media happens to be showing at any given moment. */
+  width: 100%;
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
   gap: var(--space-xl);
@@ -53,6 +64,14 @@
 
 .hero__media {
   width: 100%;
+  /* Grid items default to min-width: auto, which lets their content's
+     intrinsic minimum size inflate this column's track width. The
+     placeholder label text and the real <img> don't have the same
+     min-content width, so swapping between them (while the CMS image
+     loads) could otherwise nudge this column — and therefore
+     .hero__content's column too — a few pixels wider/narrower, a small
+     layout shift unrelated to the image itself ever actually resizing. */
+  min-width: 0;
 }
 
 @media (max-width: 1024px) {

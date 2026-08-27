@@ -23,6 +23,23 @@ export function heroFallback() {
   };
 }
 
+/**
+ * Same text content as heroFallback(), but with no image src — used only
+ * as useSectionContent()'s first-paint value (see Hero.jsx), before
+ * fetchHero() has resolved either way. heroFallback()'s local fallback
+ * image path is very likely to 404 on a real deployment (no static photo
+ * file exists there once Supabase is the actual source of images) — using
+ * it as the *initial* value meant every page load fired that doomed
+ * request immediately, before there was even a chance to hear back from
+ * Supabase with the real one. That request is only genuinely useful once
+ * fetchHero() has actually concluded there's no CMS image (its own
+ * fetchWithFallback() catch-all still resolves to heroFallback(), local
+ * image path included, for that case) — not before.
+ */
+export function heroInitial() {
+  return { ...heroFallback(), imageUrl: null };
+}
+
 export async function fetchHero() {
   return fetchWithFallback(async () => {
     const row = await fetchSingletonRow('hero_content');
