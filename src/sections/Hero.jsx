@@ -1,17 +1,23 @@
-import { hero, person, images } from '../data/profile';
+import { person } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
+import { useSectionContent } from '../hooks/useSectionContent';
+import { fetchHero, heroFallback } from '../lib/content/hero';
 import ImagePlaceholder from '../components/ImagePlaceholder';
 import './Hero.css';
 
 /**
- * Hero section (id: "top" — also the Logo's scroll target). Full visual
- * design per Phase 1-B; other sections remain structural shells.
+ * Hero section (id: "top" — also the Logo's scroll target). Content comes
+ * from Supabase (Phase 2-E) when configured and saved, falling back to
+ * src/data/profile.js otherwise — see src/lib/content/hero.js. `name` is
+ * not part of the CMS (person identity fields are out of admin scope),
+ * so it stays a direct profile.js read.
  */
 function Hero() {
   const { language, t } = useLanguage();
+  const hero = useSectionContent(fetchHero, heroFallback());
   const name = language === 'ko' ? person.nameKoFormatted : person.nameEnDisplay;
   const headlineLines = t(hero.headlineKo, hero.headlineEn);
-  const portraitLabel = t(person.portraitLabelKo, person.portraitLabelEn);
+  const portraitLabel = t(hero.imageAltKo, hero.imageAltEn);
 
   return (
     <section id="top" className="hero" aria-label={name}>
@@ -35,7 +41,7 @@ function Hero() {
           </div>
         </div>
         <div className="hero__media">
-          <ImagePlaceholder src={images.hero} alt={portraitLabel} label={portraitLabel} aspectRatio="4 / 5" />
+          <ImagePlaceholder src={hero.imageUrl} alt={portraitLabel} label={portraitLabel} aspectRatio="4 / 5" />
         </div>
       </div>
     </section>

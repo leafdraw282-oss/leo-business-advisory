@@ -1,25 +1,26 @@
-import { career, careerSection } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
+import { useSectionContent } from '../hooks/useSectionContent';
+import { fetchCareer, careerFallback } from '../lib/content/career';
 import SectionTitle from '../components/SectionTitle';
 import './Career.css';
 
 /**
  * Career section (id: "career", matches src/data/navigation.js). A
  * vertical timeline (spine + marker per entry) rather than a plain
- * résumé list — generous spacing on desktop, the same clear single-line
- * structure carries straight through to mobile. Entries come from
- * profile.js `career`, cross-checked against the Founder Profile source
- * document (years, roles, companies match exactly).
+ * résumé list. Content comes from Supabase (Phase 2-E) when available,
+ * falling back to src/data/profile.js `career` (cross-checked against the
+ * Founder Profile source document) — see src/lib/content/career.js.
  */
 function Career() {
   const { t } = useLanguage();
+  const content = useSectionContent(fetchCareer, careerFallback());
 
   return (
     <section id="career" className="career" aria-label={t('경력', 'Career')}>
       <div className="container">
-        <SectionTitle eyebrow={t(careerSection.eyebrowKo, careerSection.eyebrowEn)} title={t(careerSection.titleKo, careerSection.titleEn)} />
+        <SectionTitle eyebrow={t(content.eyebrowKo, content.eyebrowEn)} title={t(content.titleKo, content.titleEn)} />
         <ol className="career__timeline">
-          {career.map((entry) => (
+          {content.entries.map((entry) => (
             <li className="career__entry" key={entry.period}>
               <div className="career__marker" aria-hidden="true">
                 <span className="career__dot" />

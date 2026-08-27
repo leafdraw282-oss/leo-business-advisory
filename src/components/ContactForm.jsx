@@ -1,16 +1,21 @@
-import { contact, contactForm, inquiryTypes } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
+import { useSectionContent } from '../hooks/useSectionContent';
+import { fetchContactInfo, contactInfoFallback } from '../lib/content/contactInfo';
+import { fetchContactForm, contactFormFallback } from '../lib/content/contactForm';
 import './ContactForm.css';
 
 /**
  * No backend exists yet, so this form never claims a message was "sent".
  * Submitting builds a mailto: link from the field values and hands off to
  * the visitor's own email app — contactForm.noteKo/En says so explicitly,
- * visible right under the submit button. Swapping in a real backend later
- * only means replacing handleSubmit; the fields/markup stay the same.
+ * visible right under the submit button. Content comes from Supabase
+ * (Phase 2-E) when available, falling back to src/data/profile.js — see
+ * src/lib/content/contactForm.js and contactInfo.js (for emailHref).
  */
 function ContactForm() {
   const { t } = useLanguage();
+  const contact = useSectionContent(fetchContactInfo, contactInfoFallback());
+  const contactForm = useSectionContent(fetchContactForm, contactFormFallback());
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -58,7 +63,7 @@ function ContactForm() {
             <option value="" disabled>
               {t(contactForm.inquiryPlaceholderKo, contactForm.inquiryPlaceholderEn)}
             </option>
-            {inquiryTypes.map((type) => (
+            {contactForm.inquiryTypes.map((type) => (
               <option key={type.en} value={t(type.ko, type.en)}>
                 {t(type.ko, type.en)}
               </option>

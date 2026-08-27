@@ -10,6 +10,72 @@ build with zero console errors/warnings. See Phase 1-G directly below for
 the final QA pass, and each earlier phase's section for how every part
 was built.
 
+## Phase 2-E — Public Website Connected to CMS Data
+
+**Status: complete for every section with a public rendering surface
+(Hero, Impact, About, Case Studies, Advisory, Career, Gallery, Contact,
+Footer). Education has no public UI to connect — see Issues.**
+
+Scope was wiring the public site's existing components to read from
+Supabase (Phase 2-A schema, Phase 2-C/2-D's admin-writable data) with
+`src/data/profile.js` as the fallback at every level, per the exact
+priority order specified: (1) successfully-fetched Supabase data, (2)
+`profile.js` whenever there's no data or the fetch fails. No design,
+layout, animation, or responsive behavior was changed — every section's
+JSX/CSS is untouched; only *where the values come from* changed.
+
+**What was built:**
+
+- **`src/hooks/useSectionContent.js`** — the hook every section now uses.
+  It initializes React state directly with the `profile.js`-derived
+  fallback (so first paint is byte-identical to before this phase — no
+  loading state, no blank page), then swaps in whatever the section's
+  fetch function resolves to once it completes.
+- **`src/lib/content/{hero,impact,about,caseStudies,advisory,career,
+  gallery,contactInfo,contactForm,footer}.js`** — one read module per
+  section, each exporting a `xFallback()` (the instant, `profile.js`-only
+  initial value) and `fetchX()` (tries Supabase via
+  `fetchWithFallback.js` — built in Phase 2-A, wired in for the first
+  time here — returns `xFallback()` untouched on any missing data,
+  network error, or unconfigured backend). Case Studies/Advisory/Career
+  merge Supabase and `profile.js` at the finest available granularity
+  (per case, per advisory item) rather than all-or-nothing, matching the
+  stated priority rule literally. Image-bearing sections resolve their
+  `media` row to a public Storage URL and fall back to the existing
+  static `images` map entry when no image is set.
+- **`src/lib/content/publicTable.js`** — tiny read-only query helpers,
+  intentionally separate from `src/admin/content/supabaseTable.js` so the
+  public bundle's dependency graph never reaches into `src/admin/`
+  (same isolation principle as Phase 2-B's separate entry points).
+- **Section components updated** (content source only, zero markup/CSS
+  changes): `Hero.jsx`, `Impact.jsx`, `Profile.jsx` (About),
+  `CaseStudies.jsx`, `Advisory.jsx`, `Career.jsx`, `Gallery.jsx`,
+  `Contact.jsx`, `ContactForm.jsx`, `Footer.jsx`. Each now calls
+  `useSectionContent(fetchX, xFallback())` instead of importing its
+  content directly from `profile.js`; `person`/`site`/navigation (not
+  part of the Phase 2-C CMS scope) are still direct `profile.js` reads,
+  unchanged.
+
+**Verified with a local mock backend (not a real Supabase project — see
+Issues):** ran the exact test the phase asked for — changed Footer's
+"Back to top" EN label to a non-factual test string
+(`"Back to top (TEST)"`) in the admin Content editor, saved, reloaded the
+public site, confirmed the footer showed the new text in EN while KO
+stayed unchanged (`맨 위로`), then reverted the EN value and saved again,
+reloaded, and confirmed the footer was back to `"Back to top"`. Also
+confirmed: with a configured-but-empty backend, Hero/About/Case Study
+images correctly fall back to the labeled `ImagePlaceholder` (same
+component, unmodified); the full page still renders (never blank); KR/EN
+toggle still updates every section simultaneously; anchor nav, smooth
+scroll, and the mobile menu all still work; the public site with no
+Supabase configuration at all (this repo's actual current state) renders
+byte-identical section counts/content to before this phase.
+
+**Not built in this phase (by design):** an Education section on the
+public site (none exists to connect — see Issues), and
+`.github/workflows/deploy.yml` changes to inject real Supabase secrets at
+deploy time (still no real project to point at).
+
 ## Phase 2-D — Admin Image Manager (Supabase Storage, Admin ↔ Database only)
 
 **Status: complete for the site's actual current image slots (Hero,

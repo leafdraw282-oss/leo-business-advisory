@@ -1,19 +1,23 @@
-import { gallery, gallerySection } from '../data/profile';
+import { gallerySection } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
+import { useSectionContent } from '../hooks/useSectionContent';
+import { fetchGallery, galleryFallback } from '../lib/content/gallery';
 import SectionTitle from '../components/SectionTitle';
 import ImagePlaceholder from '../components/ImagePlaceholder';
 import './Gallery.css';
 
 /**
- * Visual Story / Gallery section (id: "gallery"). Fully data-driven from
- * profile.js `gallery` — going from 6 photos to 10+ needs no layout
- * change, just more array entries. Tile size/aspect varies per entry
- * (`wide` + `aspect`) for an editorial-portfolio rhythm rather than a
- * uniform same-size grid; every tile falls back to ImagePlaceholder until
- * real photography is added.
+ * Visual Story / Gallery section (id: "gallery"). Photos come from
+ * Supabase (Phase 2-D/2-E) when available, falling back to
+ * src/data/profile.js `gallery` — see src/lib/content/gallery.js. The
+ * section heading/empty-state copy (`gallerySection`) has no admin editor
+ * (Phase 2-C's Content sections don't include it — Gallery's admin-
+ * manageable content is its photos/captions), so it stays a direct
+ * profile.js read, same as before.
  */
 function Gallery() {
   const { t } = useLanguage();
+  const gallery = useSectionContent(fetchGallery, galleryFallback());
 
   return (
     <section id="gallery" className="gallery" aria-label={t(gallerySection.titleKo, gallerySection.titleEn)}>

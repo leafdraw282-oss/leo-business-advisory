@@ -1,17 +1,19 @@
 import { useRef } from 'react';
-import { contact, contactCta } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
+import { useSectionContent } from '../hooks/useSectionContent';
+import { fetchContactInfo, contactInfoFallback } from '../lib/content/contactInfo';
 import ContactForm from '../components/ContactForm';
 import './Contact.css';
 
 /**
  * Contact section (id: "contact", matches src/data/navigation.js) — the
- * site's final conversion point. A large closing statement + "Start a
- * Conversation" button that focuses the form below it, then contact
- * details (real mailto:/tel: links) alongside the actual inquiry form.
+ * site's final conversion point. Content comes from Supabase (Phase 2-E)
+ * when available, falling back to src/data/profile.js — see
+ * src/lib/content/contactInfo.js.
  */
 function Contact() {
   const { t } = useLanguage();
+  const contact = useSectionContent(fetchContactInfo, contactInfoFallback());
   const formWrapperRef = useRef(null);
 
   function focusForm() {
@@ -22,9 +24,9 @@ function Contact() {
     <section id="contact" className="contact" aria-label={t('문의', 'Contact')}>
       <div className="container">
         <div className="contact__cta">
-          <h2 className="contact__headline">{t(contactCta.headlineKo, contactCta.headlineEn)}</h2>
+          <h2 className="contact__headline">{t(contact.ctaHeadlineKo, contact.ctaHeadlineEn)}</h2>
           <button type="button" className="btn btn--primary" onClick={focusForm}>
-            {t(contactCta.buttonKo, contactCta.buttonEn)}
+            {t(contact.ctaButtonKo, contact.ctaButtonEn)}
           </button>
         </div>
 

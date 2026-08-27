@@ -1,17 +1,17 @@
-import { advisory } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
+import { useSectionContent } from '../hooks/useSectionContent';
+import { fetchAdvisory, advisoryFallback } from '../lib/content/advisory';
 import SectionTitle from '../components/SectionTitle';
 import './Advisory.css';
 
 /**
  * Advisory section (id: "advisory", matches src/data/navigation.js).
- * An editorial numbered index rather than a card grid — each row is
- * ready to carry a description or case reference in a later phase
- * without any layout change, since it's driven entirely by
- * profile.js `advisory.items`.
+ * Content comes from Supabase (Phase 2-E) when available, falling back
+ * to src/data/profile.js — see src/lib/content/advisory.js.
  */
 function Advisory() {
   const { t } = useLanguage();
+  const advisory = useSectionContent(fetchAdvisory, advisoryFallback());
 
   return (
     <section id="advisory" className="advisory" aria-label={t('자문', 'Advisory')}>
