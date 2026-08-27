@@ -14,8 +14,14 @@ export function advisoryFallback() {
 
 export async function fetchAdvisory() {
   return fetchWithFallback(async () => {
-    const sectionRow = await fetchSingletonRow('advisory_section');
-    const itemRows = await fetchListRows('advisory_items');
+    // Phase 4-H: neither query depends on the other's result, so run them
+    // concurrently instead of one-after-another — same two requests, but
+    // this section's total fetch latency is now bounded by the slower of
+    // the two instead of their sum.
+    const [sectionRow, itemRows] = await Promise.all([
+      fetchSingletonRow('advisory_section'),
+      fetchListRows('advisory_items'),
+    ]);
     if (!sectionRow && itemRows.length === 0) return null;
 
     const fallback = advisoryFallback();

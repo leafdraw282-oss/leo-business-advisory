@@ -102,6 +102,15 @@ function ImagePlaceholder({
           alt={alt}
           loading={loading}
           fetchPriority={fetchPriority}
+          // Phase 4-H — measured: no <img> anywhere on the site set this
+          // before. "async" tells the browser it may decode off the main
+          // thread and doesn't need to block rendering on this specific
+          // image being decode-ready, which is the right default for
+          // every caller here (lazy below-the-fold images shouldn't block
+          // on decode at all; the eager Hero image already gets its own
+          // opacity fade-in via fadeInOnLoad, so a decode that finishes a
+          // frame later costs nothing visible there either).
+          decoding="async"
           onLoad={() => setLoadedSrc(src)}
           onError={() => setFailedSrc(src)}
         />

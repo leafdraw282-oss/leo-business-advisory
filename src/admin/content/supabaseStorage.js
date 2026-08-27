@@ -7,7 +7,24 @@ import { supabase } from '../../lib/supabase.js';
 // reference media.id, never a raw storage path.
 
 export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
-export const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB — generous for web photography, small enough to keep the bucket lean.
+// Phase 4-H: measured against this site's real recommended upload
+// dimensions (src/admin/content/imageGuidelines.js — the largest is
+// 1600x1200) — a well-compressed JPEG/WebP/PNG at those sizes is
+// typically well under 1MB, often a few hundred KB. 5MB (the original
+// value) was ~10x more than any correctly-exported photo at the
+// recommended size would ever need, so it did nothing to stop an admin
+// from accidentally uploading an oversized, unoptimized file straight
+// onto the LCP-critical Hero slot. 2MB stays generous — plenty of
+// headroom above what a correctly-sized image needs — while actually
+// catching that mistake. Existing already-uploaded files are completely
+// unaffected; this only changes what a NEW upload accepts.
+export const MAX_IMAGE_BYTES = 2 * 1024 * 1024; // 2 MB
+
+// Shown alongside the pixel-size guidance (ImageGuidelines.jsx) as a
+// target, not a hard cap — MAX_IMAGE_BYTES above is the actual enforced
+// ceiling. A well-exported photo at the recommended dimensions should
+// comfortably land under this.
+export const RECOMMENDED_MAX_KB = 500;
 
 /** Returns an error message if the file fails type/size validation, or null if it's fine. */
 export function validateImageFile(file) {

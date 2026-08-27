@@ -55,8 +55,12 @@ function mergeLabels(dbLabels, fallbackLabels) {
 
 export async function fetchContactForm() {
   return fetchWithFallback(async () => {
-    const formRow = await fetchSingletonRow('contact_form_content');
-    const typeRows = await fetchListRows('inquiry_types');
+    // Phase 4-H: independent queries, run concurrently — see advisory.js
+    // for the same fix with a fuller explanation.
+    const [formRow, typeRows] = await Promise.all([
+      fetchSingletonRow('contact_form_content'),
+      fetchListRows('inquiry_types'),
+    ]);
     if (!formRow && typeRows.length === 0) return null;
 
     const fallback = contactFormFallback();

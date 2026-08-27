@@ -22,6 +22,19 @@ export default defineConfig({
         main: new URL('index.html', import.meta.url).pathname,
         admin: new URL('admin/index.html', import.meta.url).pathname,
       },
+      // Phase 4-H — measured, then deliberately NOT changed: Rollup's
+      // default chunking already shares react/react-dom/@supabase/
+      // supabase-js as ONE chunk between the main and admin entries (no
+      // duplication) — it just names that chunk after whichever app
+      // module pulls it in ("ImagePlaceholder-*.js" today), which looks
+      // odd but has no effect on bytes shipped. Tried an explicit
+      // manualChunks split (separate named vendor chunks, for better
+      // cache stability across deploys) and measured a real regression
+      // from it: total gzip for that code went from ~70.6KB to ~113.6KB,
+      // because splitting it disabled cross-module tree-shaking Rollup
+      // can only do when the code stays in one chunk. Reverted — a
+      // same-visit transfer-size regression for every visitor is a worse
+      // trade than a cosmetic chunk name / marginal cache-churn benefit.
     },
   },
 })

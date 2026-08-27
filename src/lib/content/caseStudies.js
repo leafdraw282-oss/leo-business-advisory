@@ -31,8 +31,12 @@ function fallbackCase(fc) {
 
 export async function fetchCaseStudies() {
   return fetchWithFallback(async () => {
-    const sectionRow = await fetchSingletonRow('case_studies_section');
-    const caseRows = await fetchListRows('case_studies');
+    // Phase 4-H: sectionRow/caseRows are independent (neither's result
+    // shapes the other's query) — run concurrently.
+    const [sectionRow, caseRows] = await Promise.all([
+      fetchSingletonRow('case_studies_section'),
+      fetchListRows('case_studies'),
+    ]);
     if (!sectionRow && caseRows.length === 0) return null;
 
     const fallback = caseStudiesFallback();
@@ -44,8 +48,13 @@ export async function fetchCaseStudies() {
       return { section, items: fallback.items };
     }
 
-    const allMetrics = await fetchListRows('case_study_metrics');
-    const allHighlights = await fetchListRows('case_study_highlights');
+    // Also independent of each other — still gated behind the caseRows
+    // check above (unchanged: no point fetching either when there are no
+    // case rows to attach them to).
+    const [allMetrics, allHighlights] = await Promise.all([
+      fetchListRows('case_study_metrics'),
+      fetchListRows('case_study_highlights'),
+    ]);
 
     const items = await Promise.all(
       caseStudies.map(async (fc) => {

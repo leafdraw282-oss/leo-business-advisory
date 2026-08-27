@@ -14,8 +14,12 @@ export function careerFallback() {
 
 export async function fetchCareer() {
   return fetchWithFallback(async () => {
-    const sectionRow = await fetchSingletonRow('career_section');
-    const entryRows = await fetchListRows('career_entries');
+    // Phase 4-H: independent queries, run concurrently — see advisory.js
+    // for the same fix with a fuller explanation.
+    const [sectionRow, entryRows] = await Promise.all([
+      fetchSingletonRow('career_section'),
+      fetchListRows('career_entries'),
+    ]);
     if (!sectionRow && entryRows.length === 0) return null;
 
     const fallback = careerFallback();

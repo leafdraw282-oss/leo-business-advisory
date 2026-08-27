@@ -30,10 +30,25 @@ export function contactInfoFallback() {
   };
 }
 
-export async function fetchContactInfo() {
+// Phase 4-H: both Contact.jsx and Footer.jsx call fetchContactInfo() —
+// two independent components each needing the same contact/CTA copy — so
+// a normal page load fired this exact query pair twice. Caching the
+// in-flight/resolved promise here (module-level, reset per page load —
+// there's no need for a TTL or invalidation, a fresh page load starts a
+// fresh cache) means the second caller reuses the first caller's request
+// instead of firing a duplicate one, with no change to either caller.
+let cachedPromise = null;
+
+export function fetchContactInfo() {
+  if (cachedPromise) return cachedPromise;
+  cachedPromise = fetchContactInfoUncached();
+  return cachedPromise;
+}
+
+async function fetchContactInfoUncached() {
   return fetchWithFallback(async () => {
-    const infoRow = await fetchSingletonRow('contact_info');
-    const ctaRow = await fetchSingletonRow('contact_cta');
+    // Independent queries — run concurrently.
+    const [infoRow, ctaRow] = await Promise.all([fetchSingletonRow('contact_info'), fetchSingletonRow('contact_cta')]);
     if (!infoRow && !ctaRow) return null;
 
     const fallback = contactInfoFallback();

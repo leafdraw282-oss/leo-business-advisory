@@ -16,8 +16,12 @@ export function impactFallback() {
 
 export async function fetchImpact() {
   return fetchWithFallback(async () => {
-    const sectionRow = await fetchSingletonRow('impact_section');
-    const metricRows = await fetchListRows('impact_metrics');
+    // Phase 4-H: independent queries, run concurrently — see advisory.js
+    // for the same fix with a fuller explanation.
+    const [sectionRow, metricRows] = await Promise.all([
+      fetchSingletonRow('impact_section'),
+      fetchListRows('impact_metrics'),
+    ]);
     if (!sectionRow && metricRows.length === 0) return null;
 
     const fallback = impactFallback();
