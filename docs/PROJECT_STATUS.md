@@ -1,5 +1,103 @@
 # Project Status
 
+## PHASE 3 COMPLETE — PRODUCTION READY
+
+All of Phase 3 (3-A through 3-H) is built, integration-tested, and
+verified production-stable: Public Website (bilingual, responsive,
+SEO-complete), Admin CMS (content editing, image management, revision
+history), a real Business Inquiry system (Contact Form → Supabase →
+Admin), privacy-safe visitor analytics, and custom-domain readiness
+documentation. See Phase 3-H directly below for the final QA pass that
+confirms this, and each earlier phase's section for how every part was
+built.
+
+## Phase 3-H — Final Production QA
+
+**Status: complete. No new features added** — verification only, plus
+one bug fix found during this pass (see below). Full detail in the
+delivered report; this entry is a summary for the project history.
+
+**Public Website:** swept at 1440/1024/768/390px against the actual
+production build (served locally with the same base path GitHub Pages
+uses) — every section present, zero horizontal overflow, zero console
+errors at any width, KR/EN toggle updates the whole page, all nav
+anchors scroll correctly, Hero CTAs point at their targets, the Contact
+CTA focuses the form, empty-form validation fires, mailto:/tel: links
+are correct, footer back-to-top works.
+
+**Admin CMS:** verified end-to-end with a real login (not a test
+bypass) — session persists across a page reload, Content edit shows the
+dirty badge on a KR+EN change, 되돌리기 (Reset) correctly discards an
+unsaved edit, Save persists and re-confirms, Logout returns to the login
+screen. Image upload/replacement, Gallery (add/soft-delete/restore/
+permanent-delete), Inquiries (list/detail/status/delete), and Revisions
+(list/restore) were all exercised directly, not just reviewed.
+
+**End-to-end flows**, all verified for real (not just structurally):
+Admin content edit → confirmed on a separately-loaded public page →
+reverted → confirmed the public page returned to the original text.
+Admin image upload/replace → confirmed the new media row and FK were
+correctly persisted (pixel-level rendering couldn't be confirmed in this
+sandboxed test environment, since the local mock backend doesn't serve
+real image bytes — a testing-environment limitation, not an application
+one; see Issues). A real test inquiry was submitted through the public
+form, confirmed it reached the database, confirmed it was visible in
+Admin Inquiries, and deleted it — no test data was left behind. No
+Founder Profile fact was altered for any of this testing.
+
+**A real, previously-flagged bug was found and fixed:** `profile.js`'s
+`images` map (`hero.jpg`, `portrait.jpg`, each case study's image)
+stored root-relative paths with no `import.meta.env.BASE_URL` prefix —
+flagged as a risk in Phase 3-F's audit but not fixed there (out of that
+phase's audit-only scope). This QA pass reproduced it live: every page
+load requested `/images/hero.jpg` instead of
+`/leo-business-advisory/images/hero.jpg`, a guaranteed 404 the moment a
+real photo file exists at that path. Fixed with a small shared resolver
+(`src/lib/content/imagePath.js`) applied at the three points these
+paths are used (`hero.js`, `about.js`, `caseStudies.js`); confirmed live
+that the browser now requests the correctly-prefixed URL. The remaining
+404 in testing is solely because no real photo file exists yet at that
+path (expected, unchanged since Phase 1, and already gracefully handled
+by `ImagePlaceholder`'s fallback) — not the path bug.
+
+**Security:** confirmed all 26 tables across every migration
+(0001–0007) have Row Level Security enabled — zero gaps (verified by
+diffing every `create table` against every `enable row level security`
+statement, not just spot-checking). Storage bucket enforces file-size
+and MIME-type limits server-side, not just client-side. Exactly three
+env vars are referenced anywhere in the codebase
+(`VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY`/`VITE_GA_MEASUREMENT_ID`,
+all safe to expose client-side) — confirmed by grep, not assumption. No
+real secret exists anywhere in git history (re-confirmed; only
+documentation mentions of "service_role" as a warning never to use it).
+`/admin/` carries page-level `noindex` and crawl-level `Disallow`, has
+no sign-up path, and is gated by the same `admin_users` allowlist +
+`is_admin()` RLS mechanism throughout.
+
+**SEO:** title, description, canonical, OpenGraph (incl. image),
+Twitter/X Card, JSON-LD (Person + ProfessionalService), robots.txt, and
+sitemap.xml all confirmed present and correct in the actual built
+`dist/` output, not just the source.
+
+**Performance:** dependencies remain minimal (react, react-dom,
+`@supabase/supabase-js` — nothing else); no unused/oversized
+dependency was added across any phase. Total JS is small
+(~28KB gzipped for the public bundle, ~17KB for admin, plus a ~69KB
+gzipped shared `@supabase/supabase-js` chunk cached across both — a
+library, not app code, and appropriately shared/cached rather than
+duplicated). Every image renders through a fixed-aspect-ratio container,
+so layout shift is already structurally prevented. No real photography
+exists yet, so "does an oversized original slow the site down" has no
+current answer — revisit once real photos are uploaded.
+
+**Deployment:** confirmed via the GitHub Actions API, not assumed — all
+17 "Deploy to GitHub Pages" runs on this branch (Phase 2-A through this
+phase's own commit) show `conclusion: success`, including the most
+recent one.
+
+**Build:** `npm run lint` and `npm run build` both pass with zero
+errors — the final state, after the fix above, not before it.
+
 ## Phase 3-G — Admin Data-Loss Prevention & Recovery
 
 **Status: complete.** Public Website design unchanged — the only

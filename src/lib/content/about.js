@@ -1,6 +1,7 @@
 import { about, person, images } from '../../data/profile.js';
 import { fetchWithFallback } from './fetchWithFallback.js';
 import { fetchSingletonRow, resolveImageUrl } from './publicTable.js';
+import { resolvePublicImage } from './imagePath.js';
 
 export function aboutFallback() {
   return {
@@ -10,7 +11,7 @@ export function aboutFallback() {
     headlineEn: about.headlineEn,
     bioKo: about.bioKo,
     bioEn: about.bioEn,
-    imageUrl: images.portrait,
+    imageUrl: resolvePublicImage(images.portrait),
     imageAltKo: person.portraitLabelKo,
     imageAltEn: person.portraitLabelEn,
   };
@@ -30,7 +31,7 @@ export async function fetchAbout() {
       headlineEn: row.headline_en,
       bioKo: row.bio_ko,
       bioEn: row.bio_en,
-      imageUrl: media?.url ?? images.portrait,
+      imageUrl: media?.url ?? resolvePublicImage(images.portrait),
       imageAltKo: media?.altKo ?? person.portraitLabelKo,
       imageAltEn: media?.altEn ?? person.portraitLabelEn,
     };

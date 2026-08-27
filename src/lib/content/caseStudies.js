@@ -1,6 +1,7 @@
 import { caseStudies, caseStudiesSection, images } from '../../data/profile.js';
 import { fetchWithFallback } from './fetchWithFallback.js';
 import { fetchSingletonRow, fetchListRows, resolveImageUrl } from './publicTable.js';
+import { resolvePublicImage } from './imagePath.js';
 
 export function caseStudiesFallback() {
   return {
@@ -24,7 +25,7 @@ function fallbackCase(fc) {
     summaryEn: fc.summaryEn,
     metrics: (fc.metrics ?? []).map((m) => ({ valueKo: m.valueKo, valueEn: m.valueEn, labelKo: m.labelKo, labelEn: m.labelEn })),
     highlights: (fc.highlights ?? []).map((h) => ({ ko: h.ko, en: h.en })),
-    imageUrl: images[fc.image],
+    imageUrl: resolvePublicImage(images[fc.image]),
   };
 }
 

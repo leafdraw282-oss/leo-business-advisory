@@ -1,6 +1,7 @@
 import { hero, person, images } from '../../data/profile.js';
 import { fetchWithFallback } from './fetchWithFallback.js';
 import { fetchSingletonRow, resolveImageUrl } from './publicTable.js';
+import { resolvePublicImage } from './imagePath.js';
 
 export function heroFallback() {
   return {
@@ -16,7 +17,7 @@ export function heroFallback() {
     ctaSecondaryKo: hero.ctaSecondaryKo,
     ctaSecondaryEn: hero.ctaSecondaryEn,
     ctaSecondaryTarget: hero.ctaSecondaryTarget,
-    imageUrl: images.hero,
+    imageUrl: resolvePublicImage(images.hero),
     imageAltKo: person.portraitLabelKo,
     imageAltEn: person.portraitLabelEn,
   };
@@ -46,7 +47,7 @@ export async function fetchHero() {
       ctaSecondaryKo: row.cta_secondary_ko,
       ctaSecondaryEn: row.cta_secondary_en,
       ctaSecondaryTarget: row.cta_secondary_target ?? hero.ctaSecondaryTarget,
-      imageUrl: media?.url ?? images.hero,
+      imageUrl: media?.url ?? resolvePublicImage(images.hero),
       imageAltKo: media?.altKo ?? person.portraitLabelKo,
       imageAltEn: media?.altEn ?? person.portraitLabelEn,
     };
