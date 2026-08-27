@@ -10,6 +10,109 @@ build with zero console errors/warnings. See Phase 1-G directly below for
 the final QA pass, and each earlier phase's section for how every part
 was built.
 
+## Phase 2-C — Admin Content Editor (text content, Admin ↔ Database only)
+
+**Status: complete for the 9 sections in scope (Hero, Impact, About, Case
+Studies, Advisory, Career, Education, Contact, Footer). Full save→reload
+round trips against a live database still require a real Supabase
+project — see "Testing limits" below.**
+
+Scope was the admin-side Content editor only: view current values, edit
+KR/EN, save to the Phase 2-A Supabase schema, re-fetch to confirm. The
+public site's data source is **not** switched to the database yet (still
+reads only from `src/data/profile.js`, unchanged) — that's Phase 2-E per
+the user's own instruction.
+
+**What was built:**
+
+- **`src/admin/content/supabaseTable.js`** — generic CRUD helpers over the
+  Phase 2-A schema (`fetchSingleton`/`upsertSingleton` for the id=1
+  tables, `fetchList`/`saveListRow` for id-keyed list tables,
+  `upsertByNaturalKey` for tables with a stable text key — `item_key` on
+  `advisory_items`, `case_key` on `case_studies`).
+- **`src/admin/content/useAdminForm.js`** — the state machine behind every
+  section: load (database if configured and populated, `profile.js`
+  otherwise), track dirty state (`JSON.stringify` diff against the last
+  loaded/saved snapshot), save, and re-load to confirm what's actually
+  persisted. One hook, reused by all 9 sections instead of 9 bespoke
+  state machines.
+- **`src/admin/content/validation.js`** — `requireFilled()`: every
+  bilingual field must have both KO and EN text before a save is
+  attempted (enforces CLAUDE.md's "never a partial switch" rule at the
+  admin layer). Runs client-side, before any network call, and before the
+  "is Supabase configured" check, so validation errors are visible even
+  when no backend exists yet.
+- **`src/admin/components/BilingualField.jsx`**, **`PlainField.jsx`**,
+  **`SectionStatus.jsx`** — shared field/status UI so every section looks
+  and behaves the same: KO and EN inputs always shown together, a
+  Reload/Save toolbar with an explicit "Unsaved changes" badge and a
+  distinct save-success / save-failure message.
+- **`src/admin/pages/content/*.jsx`** (9 files) — one page per section,
+  each mapping its Supabase table(s) to/from `profile.js`'s exact current
+  content field-for-field, with no rewriting, summarizing, or number
+  changes (existing copy becomes the database's initial value verbatim
+  the first time it's saved, per this phase's explicit constraint).
+  `HeroSection`/`AboutSection`/`FooterSection` are single tables;
+  `ImpactSection`/`AdvisorySection`/`CareerSection` combine a heading
+  singleton with a list; `EducationSection` is a plain list (no heading
+  table exists, matching `profile.js`'s own shape); `ContactSection`
+  combines four tables (`contact_info`, `contact_cta`,
+  `contact_form_content`, `inquiry_types`); `CaseStudiesSection` is the
+  most complex — a heading, 6 case rows, and each case's nested metrics
+  and highlights, saved in FK-safe order (parent case row first, so
+  children can reference its real database id). Structural/non-copy
+  fields (`cta_*_target` nav ids, portrait/hero image ids) are
+  deliberately left out of this phase's editable fields.
+- **`src/admin/pages/Content.jsx`** — the Content tab's own sub-navigation
+  between the 9 sections; wired into `Dashboard.jsx`'s existing "Content"
+  tab (previously a placeholder).
+
+**Why the public site is unchanged:** no file under `src/components/`,
+`src/sections/`, `src/context/`, `src/data/`, or `src/styles/` was
+touched; every new file lives under `src/admin/`, reachable only from the
+already-isolated admin bundle (see Phase 2-B). Verified via dev server +
+Playwright that `/` still renders unchanged.
+
+**Testing performed:** with the repo's actual current configuration (no
+Supabase project — `isSupabaseConfigured` is `false`), loaded all 9
+sections and confirmed every field is pre-filled with `profile.js`'s
+exact current text (spot-checked Hero field-by-field against the source
+object). Edited a KO field only and confirmed the paired EN field stayed
+untouched in the form state (KR/EN independent editing), confirmed the
+"Unsaved changes" badge and Save-button enablement track dirtiness
+correctly, confirmed Reload discards an unsaved edit and restores the
+last-loaded value, confirmed clearing one side of a bilingual field and
+saving is blocked with a specific validation message ("Missing KO or EN
+text for: ..."), and confirmed that saving valid content with no backend
+configured fails with a clear, distinct message ("Supabase is not
+configured — cannot save") rather than a false success. Found and fixed
+one real bug during this testing: non-`Error` failures (e.g. Supabase
+client errors) were rendering as the literal string "[object Object]"
+instead of their actual message — fixed in `useAdminForm.js`.
+
+**Testing limits (honest, per this phase's own "don't create a real
+Supabase project" constraint carried over from Phase 2-A):** a full
+save→re-fetch round trip against a live, populated database table could
+not be exercised end-to-end, since doing so requires a real Supabase
+project. The write logic follows documented `@supabase/supabase-js` v2
+call patterns exactly (`.select().eq().maybeSingle()`,
+`.upsert().select().single()`, `.update().eq().select().single()`,
+`.insert().select().single()`, `.upsert(values, { onConflict }).select().single()`)
+and re-fetches after every write to confirm persistence once a real
+project exists — but this remains unverified against a real database
+until the user completes their own Supabase setup (see Phase 2-A/2-B's
+"User action required").
+
+**Not built in this phase (by design):** image editing (`hero_image_id`,
+`about_content.portrait_image_id`, case study/gallery images), the
+`cta_primary_target`/`cta_secondary_target` nav-id fields, add/remove-row
+UI for list sections (only existing rows are edited, per this phase's
+"기존 값을 확인하고 수정" scope), a `profile.js`→Supabase seed *script*
+(seeding instead happens naturally the first time each section is
+loaded-then-saved, exactly once, by an admin), and any change to the
+public site's own data source or `.github/workflows/deploy.yml`. These
+are Phase 2-D / Phase 2-E, not started.
+
 ## Phase 2-B — Admin Auth & `/admin` Entry Point
 
 **Status: complete (login/dashboard implemented; end-to-end auth flow

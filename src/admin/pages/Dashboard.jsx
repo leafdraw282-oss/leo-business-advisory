@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabase.js';
+import Content from './Content.jsx';
 
 const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard' },
@@ -8,9 +9,8 @@ const NAV_ITEMS = [
   { id: 'settings', label: 'Settings' },
 ];
 
-// Minimal, functional shell only — no real content-editing, image-upload,
-// or settings UI yet. That's Phase 2-C. This just proves the authenticated
-// area exists and logout works.
+// Content editing (Phase 2-C) is implemented; Images and Settings are
+// still placeholders (Phase 2-D+).
 function Dashboard({ session }) {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [signingOut, setSigningOut] = useState(false);
@@ -59,19 +59,18 @@ function Dashboard({ session }) {
 
         {activeTab === 'dashboard' && (
           <p>
-            This is the admin dashboard shell built in Phase 2-B. Content,
-            image, and settings editing are not implemented yet — see
-            docs/PROJECT_STATUS.md for what's planned in Phase 2-C.
+            Use the Content tab to edit the public site's text (Hero,
+            Impact, About, Case Studies, Advisory, Career, Education,
+            Contact, Footer) in Korean and English. Images and Settings
+            are not implemented yet — see docs/PROJECT_STATUS.md.
           </p>
         )}
-        {activeTab === 'content' && (
-          <p>Content editing is not implemented yet (planned for Phase 2-C).</p>
-        )}
+        {activeTab === 'content' && <Content />}
         {activeTab === 'images' && (
-          <p>Image management is not implemented yet (planned for Phase 2-C).</p>
+          <p>Image management is not implemented yet (planned for a later phase).</p>
         )}
         {activeTab === 'settings' && (
-          <p>Settings are not implemented yet (planned for Phase 2-C).</p>
+          <p>Settings are not implemented yet (planned for a later phase).</p>
         )}
       </main>
     </div>
