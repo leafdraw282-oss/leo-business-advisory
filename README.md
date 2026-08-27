@@ -3,11 +3,14 @@
 Personal-brand / business-advisory website for Boosuk "Leo" Suh, Founder &
 President of LEO Business Advisory. Built with Vite + React.
 
-> **Status:** Phase 1 is complete. Every section (Header, Hero, Impact,
-> About, Case Studies, Advisory, Career, Gallery, Contact, Footer) is
-> built, fully bilingual (KR/EN), and responsive. See
-> `docs/PROJECT_STATUS.md` for the full phase-by-phase history and what's
-> planned next.
+> **Status:** Phase 2 is complete. The public site (every section, fully
+> bilingual, responsive) is deployed to GitHub Pages via
+> `.github/workflows/deploy.yml`. An admin CMS at `/admin` lets an admin
+> edit the site's text and images through Supabase, with
+> `src/data/profile.js` as the automatic fallback if Supabase isn't
+> configured or is unreachable — see `docs/ADMIN_CMS_ARCHITECTURE.md` and
+> `supabase/README.md` for how to set up the backend, and
+> `docs/PROJECT_STATUS.md` for the full phase-by-phase history.
 
 ## Run the site locally
 
@@ -51,6 +54,11 @@ components, so editing content never requires touching component code.
 All facts (name, titles, company names, career years, revenue/growth/P&L
 figures) are sourced from the official Founder Profile document — see
 `CLAUDE.md` before changing any of them.
+
+Once the Supabase backend (see above) is set up, most of this content
+and every image can also be edited live at `/admin` without touching
+code — `profile.js` stays in place underneath as the automatic fallback
+either way, so it must still be kept accurate.
 
 ## Adding photos
 
@@ -123,23 +131,24 @@ The field markup, labels, and inquiry-type options (from `profile.js`
 
 ## Deploying to GitHub Pages / a custom domain
 
-Not yet configured. When you're ready to deploy:
+**Already configured** for repository (project) Pages at
+`https://<username>.github.io/leo-business-advisory/`:
+`vite.config.js` sets `base: '/leo-business-advisory/'`, and
+`.github/workflows/deploy.yml` builds and publishes `dist/` on every
+push to this branch (or via manual `workflow_dispatch`). In the repo's
+Settings → Pages, the source must be set to **GitHub Actions**. Note
+this repo is currently Private, and GitHub Pages requires a paid plan to
+serve Pages from a private repo on the Free tier — make the repo public,
+or upgrade, before Pages will actually go live.
 
-1. **Repository (project) Pages** — e.g. `https://<username>.github.io/leo-business-advisory/`:
-   - Set `base: '/leo-business-advisory/'` in `vite.config.js` (must match
-     the repo name).
-   - Build (`npm run build`) and publish the `dist/` folder to a
-     `gh-pages` branch, or configure a GitHub Actions workflow that runs
-     the build and deploys `dist/` on every push.
-   - In the repo's Settings → Pages, set the source to that branch.
-2. **Custom domain**:
-   - Add a `CNAME` file containing your domain to the `public/` folder
-     (it will be copied into `dist/` on build).
-   - Set `base: '/'` in `vite.config.js` instead of a subpath.
-   - Point your domain's DNS at GitHub Pages per
-     [GitHub's custom domain docs](https://docs.github.com/pages/configuring-a-custom-domain-for-your-github-pages-site),
-     and set the custom domain in the repo's Settings → Pages.
+To switch to a **custom domain** instead:
+- Add a `CNAME` file containing your domain to the `public/` folder (it
+  will be copied into `dist/` on build).
+- Set `base: '/'` in `vite.config.js` instead of the subpath.
+- Point your domain's DNS at GitHub Pages per
+  [GitHub's custom domain docs](https://docs.github.com/pages/configuring-a-custom-domain-for-your-github-pages-site),
+  and set the custom domain in the repo's Settings → Pages.
 
 Either way, re-run `npm run build` and spot-check the deployed site (all
-image paths, nav anchors, and the KR/EN toggle) before considering the
-deploy done.
+image paths, nav anchors, the KR/EN toggle, and `/admin`) before
+considering the deploy done.

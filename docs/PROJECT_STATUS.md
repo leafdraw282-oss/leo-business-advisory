@@ -1,5 +1,14 @@
 # Project Status
 
+## PHASE 2 COMPLETE
+
+All Phase 2 scope (Admin CMS: Phases 2-A through 2-H) is built, wired to
+the public site with `src/data/profile.js` fallback, security-reviewed,
+and integration-tested end to end — see Phase 2-H directly below for the
+final integration pass, and each earlier phase's section for how every
+part was built. The public site's design is unchanged from Phase 1
+throughout all of Phase 2.
+
 ## PHASE 1 COMPLETE
 
 All Phase 1 scope from the Master Specification is built, verified, and
@@ -9,6 +18,80 @@ bilingual (KR/EN), responsive at 1440/1024/768/390px, and passing lint +
 build with zero console errors/warnings. See Phase 1-G directly below for
 the final QA pass, and each earlier phase's section for how every part
 was built.
+
+## Phase 2-H — Final Integration Test & Deployment Readiness
+
+**Status: complete. Zero code changes were needed** — every check in
+this pass confirmed Phase 2-A–2-G's work already correct. This phase was
+verification only, per its own scope ("새로운 기능을 추가하는 Phase가
+아니다").
+
+**Fact integrity confirmed:** `git diff` of `src/data/profile.js` between
+Phase 1-G's commit (`baca351`, the last commit that touched it) and the
+current `HEAD` is empty — the Founder Profile source-of-truth content
+has not been touched by any Phase 2 work.
+
+**Public website**, swept at Desktop (1440px)/Tablet (768px)/Mobile
+(390px) with Supabase unconfigured (this repo's actual, current state —
+i.e. testing the real fallback path, not a simulation): all 8 sections
+(Hero, Impact, About, Case Studies, Advisory, Career, Gallery, Contact)
++ Header + Footer present at every width, zero horizontal overflow, zero
+console/page errors. KR/EN toggle updates every section simultaneously,
+persists across reload, and updates `<html lang>`. Anchor nav + smooth
+scroll land correctly under the sticky header (confirmed via
+`scroll-margin-top` offset, not hidden). Mobile hamburger menu opens,
+navigates, and closes correctly. `mailto:`/`tel:` links correct. SEO
+(title, meta description, OpenGraph, JSON-LD, `<html lang>`) present.
+No dedicated scroll-reveal/keyframe animation exists in this codebase
+(confirmed via grep) — "animations" here means the smooth-scroll +
+hover/focus transitions already verified working, consistent with
+CLAUDE.md's explicit no-flashy-animation design philosophy.
+
+**Admin CMS — tested against a real (locally mocked, not a real Supabase
+project) Auth + REST + Storage backend for the first time this
+integration pass**, rather than structural review alone:
+
+- **Login → session → logout, for real**: unauthenticated `/admin` shows
+  Login (no sign-up link anywhere); signing in via the actual form
+  reaches the Dashboard; **refreshing the browser kept the session**
+  (real `@supabase/supabase-js` localStorage persistence exercised end
+  to end, not just reviewed); Logout returns to Login; a second refresh
+  after logout correctly stays logged out.
+- **Content**: loaded Footer's "Back to top" label (조회), edited both
+  KO and EN (수정), saved successfully, then tested validation by
+  clearing EN only and confirming Save is blocked with a specific
+  message, then restored and re-saved — reverted to the exact original
+  values afterward.
+- **Images**: uploaded a file to the Hero slot (current/new comparison
+  panels both rendered correctly), saved, replaced it with a second
+  file, saved again, then removed the image (confirm dialog) — Gallery
+  loaded its 6 fallback photos correctly.
+- All of the above against **Supabase data only** — `src/data/profile.js`
+  was never written to at any point; the mock backend is disposable and
+  was torn down after testing.
+
+**End-to-end (the exact flow requested):** changed Contact's submit
+button label to a non-factual test string in the admin, saved, reloaded
+the **public site** and confirmed the change appeared there; reverted
+the label in the admin, saved, reloaded the public site again and
+confirmed it was back to the original text. This is the first time in
+Phase 2 this exact admin→database→public round trip was verified with
+the public site reload included in the same test run (earlier phases
+verified the pieces separately).
+
+**Fallback**: the entire public-website sweep above ran with Supabase
+completely unconfigured — by construction, every result in that section
+*is* the fallback-path result, not a separate simulation.
+
+**Deployment**: `vite.config.js` and `.github/workflows/deploy.yml`
+diffed against the commit that first set up GitHub Pages (`9bf39a3`) —
+`deploy.yml` is byte-identical (unchanged); `vite.config.js`'s only
+change since then is the Phase 2-B multi-page `admin/index.html` entry
+(intentional, already documented), `base: '/leo-business-advisory/'`
+untouched. Rebuilt and confirmed `dist/admin/index.html` remains a real,
+separate static file with correctly base-prefixed asset URLs — direct
+navigation to `/admin/` on GitHub Pages still needs no SPA-fallback
+trick. `npm run lint` / `npm run build` both clean.
 
 ## Phase 2-G — Security, Data Integrity & Operational Safety Review
 
