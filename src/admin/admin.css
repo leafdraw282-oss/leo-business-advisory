@@ -796,6 +796,82 @@ body {
   margin-top: 0.5rem;
 }
 
+/* Gallery trash (Phase 3-G) */
+
+.admin-gallery-trash {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e5e1d6;
+}
+
+.admin-gallery-trash h3 {
+  margin: 0 0 0.5rem;
+  color: #0b1625;
+}
+
+.admin-gallery-trash-item {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 1rem;
+  align-items: start;
+  border: 1px solid #e5e1d6;
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.6rem;
+  opacity: 0.85;
+}
+
+.admin-gallery-trash-item .image-placeholder {
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.admin-gallery-trash-item-caption {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0b1625;
+}
+
+/* Revisions (Phase 3-G) */
+
+.admin-revision-summary {
+  grid-template-columns: 1fr auto;
+}
+
+.admin-revision-fields {
+  max-height: 16rem;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #e5e1d6;
+  border-radius: 4px;
+  padding: 0.75rem;
+}
+
+.admin-revision-field {
+  padding: 0.3rem 0;
+  border-bottom: 1px solid #f0eee7;
+}
+
+.admin-revision-field:last-child {
+  border-bottom: none;
+}
+
+.admin-revision-field dt {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #8b8984;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.admin-revision-field dd {
+  margin: 0.1rem 0 0;
+  font-size: 0.85rem;
+  color: #222222;
+  word-break: break-word;
+}
+
 /* Inquiries (Phase 3-C) */
 
 .admin-inquiry-item {
@@ -944,7 +1020,8 @@ body {
   }
 
   .admin-image-slot-body,
-  .admin-gallery-item {
+  .admin-gallery-item,
+  .admin-gallery-trash-item {
     grid-template-columns: 1fr;
   }
 

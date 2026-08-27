@@ -15,7 +15,12 @@ export function galleryFallback() {
 
 export async function fetchGallery() {
   return fetchWithFallback(async () => {
-    const rows = await fetchListRows('gallery_items');
+    const allRows = await fetchListRows('gallery_items');
+    // Soft-deleted rows (Phase 3-G, supabase/migrations/0007_gallery_soft_delete.sql)
+    // are already excluded by RLS's public read policy — this filter is a
+    // second, independently-testable layer, not the only thing standing
+    // between a deleted photo and the public site.
+    const rows = allRows.filter((row) => !row.deleted_at);
     if (rows.length === 0) return null;
 
     return Promise.all(

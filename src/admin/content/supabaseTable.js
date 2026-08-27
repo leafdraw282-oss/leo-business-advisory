@@ -7,6 +7,33 @@ import { supabase } from '../../lib/supabase.js';
 // isSupabaseConfigured before calling any of these; they assume `supabase`
 // is a real client.
 
+// Phase 3-G: every write that goes through upsertSingleton/saveListRow's
+// update path/upsertByNaturalKey snapshots the row's PRE-write state into
+// content_revisions (0006_content_revisions.sql) first — a rolling "undo
+// my last edit" safety net covering every content section at once,
+// without each of them needing to know this exists. Recording a snapshot
+// is always best-effort: if it fails for any reason, the real save still
+// proceeds — a backup mechanism must never become a new way for a
+// legitimate save to fail.
+async function recordRevision(table, rowId, previousRow) {
+  if (!previousRow) return; // nothing to snapshot on first-ever create
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const { error } = await supabase.from('content_revisions').insert({
+      table_name: table,
+      row_id: String(rowId),
+      snapshot: previousRow,
+      changed_by: user?.id ?? null,
+    });
+    if (error) throw error;
+    // eslint-disable-next-line no-unused-vars
+  } catch (err) {
+    console.warn(`[admin] revision snapshot skipped for ${table}:${rowId} (save still proceeds):`, err);
+  }
+}
+
 /** Singleton content tables (id=1). Returns null if the row doesn't exist yet. */
 export async function fetchSingleton(table) {
   const { data, error } = await supabase.from(table).select('*').eq('id', 1).maybeSingle();
@@ -15,6 +42,8 @@ export async function fetchSingleton(table) {
 }
 
 export async function upsertSingleton(table, values) {
+  const previous = await fetchSingleton(table).catch(() => null);
+  await recordRevision(table, 1, previous);
   const { data, error } = await supabase
     .from(table)
     .upsert({ id: 1, ...values })
@@ -43,6 +72,8 @@ export async function fetchList(table, { match } = {}) {
  */
 export async function saveListRow(table, id, values) {
   if (id) {
+    const { data: previous } = await supabase.from(table).select('*').eq('id', id).maybeSingle();
+    await recordRevision(table, id, previous);
     const { data, error } = await supabase.from(table).update(values).eq('id', id).select().single();
     if (error) throw error;
     return data;
@@ -59,6 +90,8 @@ export async function saveListRow(table, id, values) {
  * src/data/profile.js's own id.
  */
 export async function upsertByNaturalKey(table, conflictColumn, values) {
+  const { data: previous } = await supabase.from(table).select('*').eq(conflictColumn, values[conflictColumn]).maybeSingle();
+  if (previous) await recordRevision(table, previous.id, previous);
   const { data, error } = await supabase
     .from(table)
     .upsert(values, { onConflict: conflictColumn })
@@ -76,8 +109,41 @@ export async function fetchRowById(table, id) {
   return data;
 }
 
-/** Permanently deletes one row by id (Phase 2-D: media rows, gallery_items rows). */
+/** Permanently deletes one row by id (Phase 2-D: media rows; Phase 3-G: gallery_items permanent-delete only — everyday Gallery delete is a soft delete, see useGalleryImages.js). */
 export async function deleteRow(table, id) {
   const { error } = await supabase.from(table).delete().eq('id', id);
+  if (error) throw error;
+}
+
+/**
+ * Most recent content_revisions rows across every table, newest first —
+ * backs the admin's "최근 변경 기록" (Revisions) screen. Not scoped to one
+ * table/row, since the whole point is one place to see everything that
+ * changed recently.
+ */
+export async function fetchRecentRevisions(limit = 50) {
+  const { data, error } = await supabase
+    .from('content_revisions')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return data ?? [];
+}
+
+/**
+ * Restores one revision's snapshot back onto its live row. Snapshots the
+ * row's current (pre-restore) state first, through the same
+ * recordRevision() used by every other write here — so restoring is
+ * itself undoable, not a one-way trip.
+ */
+export async function restoreRevision(revision) {
+  const { table_name: table, row_id: rowId, snapshot } = revision;
+  const { data: current } = await supabase.from(table).select('*').eq('id', rowId).maybeSingle();
+  await recordRevision(table, rowId, current);
+
+  const fields = { ...snapshot };
+  delete fields.id; // id is the update target (.eq below), never a field to write
+  const { error } = await supabase.from(table).update(fields).eq('id', rowId);
   if (error) throw error;
 }

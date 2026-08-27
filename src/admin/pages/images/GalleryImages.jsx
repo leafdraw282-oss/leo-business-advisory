@@ -16,12 +16,16 @@ function GalleryImages() {
     status,
     loadError,
     items,
+    trashedItems,
+    trashRowState,
     saveState,
     saveError,
     isDirty,
     updateItem,
     addItem,
     removeItem,
+    restoreFromTrash,
+    permanentlyDelete,
     moveItem,
     selectFileForItem,
     save,
@@ -35,7 +39,8 @@ function GalleryImages() {
       <p className="admin-section-help">
         사진을 추가·삭제하거나 순서를 바꿀 수 있습니다. 새 사진을 선택하면 저장 전까지 현재 사진과 나란히
         미리보기가 표시됩니다. &quot;비활성&quot;으로 표시하면 삭제하지 않고 사진을 보관할 수 있습니다 (Public
-        Website 반영은 다음 단계 작업입니다).
+        Website 반영은 다음 단계 작업입니다). &quot;삭제&quot;한 사진은 즉시 없어지지 않고 휴지통으로 이동하며,
+        아래에서 언제든 복원하거나 영구 삭제할 수 있습니다.
       </p>
       <SectionStatus
         status={status}
@@ -142,7 +147,7 @@ function GalleryImages() {
                       ↓ 아래로
                     </button>
                     <button type="button" className="admin-image-reset" onClick={() => removeItem(index)}>
-                      이 사진 삭제
+                      휴지통으로 이동
                     </button>
                   </div>
                 </div>
@@ -152,6 +157,63 @@ function GalleryImages() {
           <button type="button" className="admin-gallery-add" onClick={addItem}>
             + 사진 추가
           </button>
+
+          <div className="admin-gallery-trash">
+            <h3>휴지통 ({trashedItems.length}장)</h3>
+            {trashedItems.length === 0 ? (
+              <p className="admin-section-help">휴지통이 비어 있습니다.</p>
+            ) : (
+              <>
+                <p className="admin-section-help">
+                  삭제된 사진은 Public Website와 위 목록에 더 이상 표시되지 않습니다. 복원하면 목록 맨 끝에
+                  다시 추가됩니다.
+                </p>
+                {trashedItems.map((item) => {
+                  const trashSrc = isSupabaseConfigured && item.storagePath ? publicUrlFor(item.storagePath) : undefined;
+                  const label = item.captionEn || item.captionKo || item.itemKey;
+                  const rs = trashRowState[item.id];
+                  return (
+                    <div className="admin-gallery-trash-item" key={item.id}>
+                      <ImagePlaceholder src={trashSrc} alt={label} label={label} aspectRatio={item.aspectRatio} />
+                      <div className="admin-gallery-trash-item-body">
+                        <p className="admin-gallery-trash-item-caption">{label}</p>
+                        {rs?.error && (
+                          <p className="admin-status-error" role="alert">
+                            {rs.error}
+                          </p>
+                        )}
+                        <div className="admin-gallery-item-actions">
+                          <button
+                            type="button"
+                            disabled={rs?.action === 'restoring' || rs?.action === 'purging'}
+                            onClick={() => restoreFromTrash(item)}
+                          >
+                            {rs?.action === 'restoring' ? '복원 중…' : '복원'}
+                          </button>
+                          <button
+                            type="button"
+                            className="admin-image-reset"
+                            disabled={rs?.action === 'restoring' || rs?.action === 'purging'}
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  `"${label}" 사진을 영구 삭제할까요? 파일까지 완전히 삭제되며 되돌릴 수 없습니다.`,
+                                )
+                              ) {
+                                permanentlyDelete(item);
+                              }
+                            }}
+                          >
+                            {rs?.action === 'purging' ? '영구 삭제 중…' : '영구 삭제'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </>
+            )}
+          </div>
         </>
       )}
     </section>

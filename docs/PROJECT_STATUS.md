@@ -1,5 +1,73 @@
 # Project Status
 
+## Phase 3-G — Admin Data-Loss Prevention & Recovery
+
+**Status: complete.** Public Website design unchanged — the only
+public-facing code touched is `src/lib/content/gallery.js` (a filter
+excluding soft-deleted rows, not a design/layout change, and necessary
+for the soft-delete feature to actually work on the public site). See
+`docs/BACKUP_RECOVERY.md` for the full design writeup; this entry is a
+summary.
+
+**Backup strategy:** documented as two layers — Supabase's own
+infrastructure-level backups (Dashboard-configured, outside this repo,
+protects against catastrophic loss) and a new application-level
+`content_revisions` table (self-service, protects against the much more
+common single-admin-mistake case). Not a replacement for real database
+backups, a faster complement to them.
+
+**Revision system:** new `content_revisions` table
+(`supabase/migrations/0006_content_revisions.sql`) — one generic table,
+not 14 per-table ones. Wired centrally into
+`src/admin/content/supabaseTable.js`'s `upsertSingleton`/`saveListRow`/
+`upsertByNaturalKey`, so every content section (Hero, About, Impact, Case
+Studies, Advisory, Career, Contact, plus Education/Footer as a side
+effect of centralizing rather than special-casing) gets a pre-write
+snapshot automatically, with no per-section code changes needed. A
+SECURITY DEFINER trigger caps retention at the 10 most recent snapshots
+per row. Snapshot recording is best-effort — never blocks a real save on
+failure.
+
+**Restore flow:** new admin "Revisions" screen (nav item + "변경 기록"
+Dashboard card) — lists recent changes with a plain-language label,
+timestamp, an expandable field-level preview, and a 복원 (restore)
+button that writes immediately and snapshots the pre-restore state first
+(so restoring is itself undoable). Verified live end to end: edited
+Hero's subhead, saved, confirmed the revision recorded the *old* value
+(not the new one), restored it, confirmed the live form reflected the
+old value again.
+
+**Delete protection:** Gallery photos gained real soft delete
+(`supabase/migrations/0007_gallery_soft_delete.sql`'s `deleted_at`
+column) — "삭제" now moves a photo to a Trash section (immediate write,
+same pattern as Inquiries' status changes) instead of permanently
+removing it; Trash offers 복원 (restore) or a separate, explicitly
+irreversible 영구 삭제 (permanent delete). The public gallery read policy
+is tightened to `deleted_at is null` at the RLS level, plus a client-side
+filter in `gallery.js` as a second, independently-testable layer (RLS
+itself can't be exercised against this repo's local mock-backend tests).
+No other admin section has a delete control at all currently (confirmed
+by grep), so nothing else needed this treatment.
+
+A real bug was found and fixed via live testing during this phase: the
+first Trash implementation left `savedItems`/the reset snapshot out of
+sync after an immediate soft-delete/restore, so the Gallery editor
+incorrectly showed an "unsaved changes" badge for an action that was
+already persisted. Fixed by updating that bookkeeping alongside every
+immediate-write action, not just the draft `items` array.
+
+**Storage strategy:** reviewed and changed, per this phase's explicit
+question — replacing an image (Hero/About/Case Study slots, Gallery
+photos) or clearing a slot no longer deletes the previous media
+row/Storage file immediately; it's left orphaned but recoverable, at the
+cost of Storage slowly accumulating replaced images over time. Verified
+live: replacing a Hero image and a Gallery photo both leave the old
+`media` row intact afterward. `ImageSlotEditor.jsx`'s "이미지 삭제"
+button/confirm text was renamed to "이미지 제거" with accurate copy (no
+longer claims the file is deleted, since it no longer is).
+
+**Build:** `npm run lint` and `npm run build` both pass with zero errors.
+
 ## Phase 3-F — Custom Domain Readiness (Audit + Documentation Only)
 
 **Status: complete. Zero production files changed** — no real domain was

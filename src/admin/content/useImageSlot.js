@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useState } from 'react';
 import { isSupabaseConfigured } from '../../lib/supabase.js';
-import { saveListRow, deleteRow } from './supabaseTable.js';
-import { validateImageFile, uploadImageFile, removeStorageFile } from './supabaseStorage.js';
+import { saveListRow } from './supabaseTable.js';
+import { validateImageFile, uploadImageFile } from './supabaseStorage.js';
 import { setDirtyState } from './dirtyTracker.js';
 import { recordSave } from './lastSaved.js';
 
@@ -109,8 +109,6 @@ export function useImageSlot({ folder, fallbackAlt, loadParent, applyParent }) {
     }
     setSaveState('saving');
     setSaveError('');
-    const previousMediaId = mediaId;
-    const previousStoragePath = storagePath;
     try {
       if (pendingFile) {
         const path = await uploadImageFile(folder, pendingFile);
@@ -120,16 +118,11 @@ export function useImageSlot({ folder, fallbackAlt, loadParent, applyParent }) {
           alt_en: altEn,
         });
         await applyParent(mediaRow.id);
-
-        if (previousMediaId) {
-          try {
-            await removeStorageFile(previousStoragePath);
-            await deleteRow('media', previousMediaId);
-            // eslint-disable-next-line no-unused-vars
-          } catch (cleanupErr) {
-            console.warn(`Old image cleanup failed for ${folder} (new image is already live):`, cleanupErr);
-          }
-        }
+        // The previous media row/storage file (if any) is deliberately
+        // NOT deleted here — see docs/BACKUP_RECOVERY.md's Storage
+        // Strategy. It's now orphaned (nothing references it) but still
+        // recoverable, at the cost of Storage slowly accumulating replaced
+        // images over time.
       } else if (mediaId && (altKo !== savedAlt.ko || altEn !== savedAlt.en)) {
         await saveListRow('media', mediaId, { alt_ko: altKo, alt_en: altEn });
       }
@@ -162,6 +155,10 @@ export function useImageSlot({ folder, fallbackAlt, loadParent, applyParent }) {
     setSaveError('');
   }
 
+  // Detaches the current image from this slot — no longer also deletes
+  // the underlying media row/storage file (see docs/BACKUP_RECOVERY.md's
+  // Storage Strategy): the file becomes orphaned but stays recoverable,
+  // matching the same policy applied to a replaced image in save() above.
   async function resetSlot() {
     if (!isSupabaseConfigured) {
       setSaveState('error');
@@ -172,15 +169,6 @@ export function useImageSlot({ folder, fallbackAlt, loadParent, applyParent }) {
     setSaveError('');
     try {
       await applyParent(null);
-      if (mediaId) {
-        try {
-          await removeStorageFile(storagePath);
-          await deleteRow('media', mediaId);
-          // eslint-disable-next-line no-unused-vars
-        } catch (cleanupErr) {
-          console.warn(`Image cleanup failed after reset for ${folder}:`, cleanupErr);
-        }
-      }
       await load();
       setSaveState('success');
       recordSave('images');

@@ -55,7 +55,7 @@ function ImageSlotEditor({ title, aspectRatio = '4 / 3', slot }) {
   }
 
   function handleReset() {
-    if (window.confirm(`현재 ${title} 이미지를 삭제할까요? 저장소에서도 삭제되며 되돌릴 수 없습니다.`)) {
+    if (window.confirm(`현재 ${title} 이미지를 이 위치에서 제거할까요? 파일 자체는 삭제되지 않고 그대로 보관됩니다.`)) {
       resetSlot();
     }
   }
@@ -122,7 +122,7 @@ function ImageSlotEditor({ title, aspectRatio = '4 / 3', slot }) {
 
             {hasImage && (
               <button type="button" className="admin-image-reset" onClick={handleReset} disabled={saveState === 'saving'}>
-                이미지 삭제
+                이미지 제거
               </button>
             )}
           </div>

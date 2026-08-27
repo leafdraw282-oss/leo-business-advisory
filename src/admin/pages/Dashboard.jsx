@@ -5,12 +5,14 @@ import { getAllLastSaved } from '../content/lastSaved.js';
 import Content from './Content.jsx';
 import Images from './Images.jsx';
 import Inquiries from './Inquiries.jsx';
+import Revisions from './Revisions.jsx';
 
 const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'content', label: 'Content' },
   { id: 'images', label: 'Images' },
   { id: 'inquiries', label: 'Inquiries' },
+  { id: 'revisions', label: 'Revisions' },
   { id: 'settings', label: 'Settings' },
 ];
 
@@ -156,6 +158,10 @@ function Dashboard({ session }) {
                 <h2>문의 관리</h2>
                 <p>Contact Form으로 접수된 실제 문의 목록을 확인하고 처리 상태를 관리합니다.</p>
               </button>
+              <button type="button" className="admin-dashboard-card" onClick={() => selectTab('revisions')}>
+                <h2>변경 기록</h2>
+                <p>콘텐츠를 저장할 때마다 자동으로 남는 이전 값 기록을 확인하고, 필요하면 되돌립니다.</p>
+              </button>
               <a
                 className="admin-dashboard-card admin-dashboard-card--link"
                 href={import.meta.env.BASE_URL}
@@ -190,6 +196,7 @@ function Dashboard({ session }) {
         {activeTab === 'content' && <Content key={contentKey} initialSectionId={contentInitialSection} />}
         {activeTab === 'images' && <Images />}
         {activeTab === 'inquiries' && <Inquiries />}
+        {activeTab === 'revisions' && <Revisions />}
         {activeTab === 'settings' && (
           <p>Settings are not implemented yet (planned for a later phase).</p>
         )}

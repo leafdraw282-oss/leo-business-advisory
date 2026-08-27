@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { gallery } from '../../data/profile.js';
-import { isSupabaseConfigured } from '../../lib/supabase.js';
+import { isSupabaseConfigured, supabase } from '../../lib/supabase.js';
 import { fetchList, upsertByNaturalKey, fetchRowById, saveListRow, deleteRow } from './supabaseTable.js';
 import { uploadImageFile, removeStorageFile, validateImageFile } from './supabaseStorage.js';
 import { requireFilled } from './validation.js';
@@ -39,14 +39,8 @@ function comparable(item) {
   return { id, itemKey, captionKo, captionEn, aspectRatio, isWide, isActive, mediaId };
 }
 
-async function load() {
-  if (!isSupabaseConfigured) return fallbackItems();
-
-  const rows = await fetchList('gallery_items');
-  if (rows.length === 0) return fallbackItems();
-
-  const mediaRows = await Promise.all(rows.map((r) => fetchRowById('media', r.image_id)));
-  return rows.map((r, i) => ({
+function fromRow(r, mediaRow) {
+  return {
     id: r.id,
     itemKey: r.item_key,
     captionKo: r.caption_ko,
@@ -57,29 +51,55 @@ async function load() {
     // for every pre-existing row, so `?? true` only matters when running
     // against a database that predates that migration.
     isActive: r.is_active ?? true,
+    deletedAt: r.deleted_at ?? null,
     mediaId: r.image_id,
-    storagePath: mediaRows[i]?.storage_path ?? null,
+    storagePath: mediaRow?.storage_path ?? null,
     pendingFile: null,
     previewUrl: null,
-  }));
+  };
+}
+
+// Loads every gallery_items row regardless of deleted_at — the admin's
+// own RLS write policy (is_admin()) already grants full access
+// independent of the public-facing policy's `deleted_at is null`
+// restriction (0007_gallery_soft_delete.sql), and the admin needs to see
+// soft-deleted rows to offer restoring them (the Trash section below).
+async function load() {
+  if (!isSupabaseConfigured) return { items: fallbackItems(), trashedItems: [] };
+
+  const rows = await fetchList('gallery_items');
+  if (rows.length === 0) return { items: fallbackItems(), trashedItems: [] };
+
+  const mediaRows = await Promise.all(rows.map((r) => fetchRowById('media', r.image_id)));
+  const all = rows.map((r, i) => fromRow(r, mediaRows[i]));
+  return {
+    items: all.filter((item) => !item.deletedAt),
+    trashedItems: all.filter((item) => item.deletedAt),
+  };
 }
 
 /**
  * State machine behind the Gallery image editor: a variable-length list
- * (add/delete/reorder), each row with its own optional pending upload.
- * Kept as its own hook (mirroring useAdminForm/useImageSlot) rather than
- * inline in GalleryImages.jsx, so the load-on-mount state updates live in
- * a hook, not directly in the component's own effect body.
+ * (add/edit/reorder/upload, batch-saved together via one Save button —
+ * unchanged from Phase 2-D/3-B) plus, since Phase 3-G, a Trash of
+ * soft-deleted photos managed separately with immediate (non-draft)
+ * restore/permanent-delete actions — the same "writes right away, no
+ * Save step" pattern already used for Inquiries' status changes, since
+ * each is a single, self-contained action rather than a field accumulating
+ * into a larger draft.
  */
 export function useGalleryImages() {
   const instanceId = useId();
   const [status, setStatus] = useState('loading');
   const [loadError, setLoadError] = useState('');
   const [items, setItems] = useState([]);
+  const [trashedItems, setTrashedItems] = useState([]);
   const [savedItems, setSavedItems] = useState([]);
-  const [pendingDeletions, setPendingDeletions] = useState([]);
   const [saveState, setSaveState] = useState('idle');
   const [saveError, setSaveError] = useState('');
+  // Per-trash-item action state (restoring/purging), mirroring
+  // useInquiries.js's rowState — keyed by item id.
+  const [trashRowState, setTrashRowState] = useState({});
   // Full last-loaded rows (not just the `comparable()` projection used for
   // dirty-checking) so `resetToSaved` can restore storagePath etc. locally
   // without a network round-trip.
@@ -90,10 +110,10 @@ export function useGalleryImages() {
     setLoadError('');
     try {
       const loaded = await load();
-      setItems(loaded);
-      setSavedItems(loaded.map(comparable));
-      savedSnapshotRef.current = loaded;
-      setPendingDeletions([]);
+      setItems(loaded.items);
+      setTrashedItems(loaded.trashedItems);
+      setSavedItems(loaded.items.map(comparable));
+      savedSnapshotRef.current = loaded.items;
       setStatus('ready');
       setSaveState('idle');
       setSaveError('');
@@ -110,9 +130,7 @@ export function useGalleryImages() {
   }, [runLoad]);
 
   const isDirty =
-    items.some((item) => item.pendingFile) ||
-    pendingDeletions.length > 0 ||
-    JSON.stringify(items.map(comparable)) !== JSON.stringify(savedItems);
+    items.some((item) => item.pendingFile) || JSON.stringify(items.map(comparable)) !== JSON.stringify(savedItems);
 
   useEffect(() => {
     setDirtyState(instanceId, isDirty);
@@ -135,6 +153,7 @@ export function useGalleryImages() {
         aspectRatio: '4 / 3',
         isWide: false,
         isActive: true,
+        deletedAt: null,
         mediaId: null,
         storagePath: null,
         pendingFile: null,
@@ -143,15 +162,93 @@ export function useGalleryImages() {
     ]);
   }
 
-  function removeItem(index) {
+  // A never-yet-saved item (no id) just disappears locally — nothing was
+  // ever written, so there's nothing to soft-delete. An already-saved
+  // item is soft-deleted immediately (not deferred to Save): it's a safe,
+  // reversible action now, so there's no reason to make it wait for a
+  // batch save the way a destructive delete used to need to.
+  async function removeItem(index) {
     const item = items[index];
-    if (!window.confirm('이 갤러리 사진을 삭제할까요? 저장해야 실제로 반영됩니다.')) return;
+    if (!window.confirm('이 사진을 휴지통으로 이동할까요? 나중에 Trash에서 복원할 수 있습니다.')) return;
     if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
-    if (item.id) {
-      setPendingDeletions((prev) => [...prev, { id: item.id, mediaId: item.mediaId, storagePath: item.storagePath }]);
+
+    if (!item.id) {
+      setItems((prev) => prev.filter((_, i) => i !== index));
+      return;
     }
-    setItems((prev) => prev.filter((_, i) => i !== index));
-    if (saveState !== 'idle') setSaveState('idle');
+
+    try {
+      const { data, error } = await supabase
+        .from('gallery_items')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', item.id)
+        .select()
+        .single();
+      if (error) throw error;
+      // Also drop the item from savedItems/savedSnapshotRef, not just
+      // items — this was already written to the database immediately, so
+      // it must not still register as an "unsaved change" against the
+      // draft-save flow (isDirty), and "되돌리기" (reset) must not bring a
+      // soft-deleted item back into the draft either.
+      setItems((prev) => prev.filter((_, i) => i !== index));
+      setSavedItems((prev) => prev.filter((saved) => saved.id !== item.id));
+      savedSnapshotRef.current = savedSnapshotRef.current.filter((saved) => saved.id !== item.id);
+      setTrashedItems((prev) => [fromRow(data, { storage_path: item.storagePath }), ...prev]);
+      // eslint-disable-next-line no-unused-vars
+    } catch (err) {
+      setSaveState('error');
+      setSaveError(extractErrorMessage(err));
+    }
+  }
+
+  async function restoreFromTrash(trashedItem) {
+    setTrashRowState((prev) => ({ ...prev, [trashedItem.id]: { action: 'restoring', error: '' } }));
+    try {
+      const { data, error } = await supabase
+        .from('gallery_items')
+        .update({ deleted_at: null })
+        .eq('id', trashedItem.id)
+        .select()
+        .single();
+      if (error) throw error;
+      const restored = fromRow(data, { storage_path: trashedItem.storagePath });
+      setTrashedItems((prev) => prev.filter((t) => t.id !== trashedItem.id));
+      // Mirrors removeItem's bookkeeping above: this already happened in
+      // the database, so items/savedItems/savedSnapshotRef all need the
+      // restored row, not just items — otherwise it would immediately
+      // show as an "unsaved change," and "되돌리기" could discard it again.
+      setItems((prev) => [...prev, restored]);
+      setSavedItems((prev) => [...prev, comparable(restored)]);
+      savedSnapshotRef.current = [...savedSnapshotRef.current, restored];
+      setTrashRowState((prev) => ({ ...prev, [trashedItem.id]: { action: null, error: '' } }));
+      // eslint-disable-next-line no-unused-vars
+    } catch (err) {
+      setTrashRowState((prev) => ({ ...prev, [trashedItem.id]: { action: null, error: extractErrorMessage(err) } }));
+    }
+  }
+
+  // The one genuinely irreversible action left in Gallery management —
+  // removes the gallery_items row AND its media row/storage file for
+  // real. Only reachable from the Trash view, on an already
+  // soft-deleted item, so it always takes two deliberate steps.
+  async function permanentlyDelete(trashedItem) {
+    setTrashRowState((prev) => ({ ...prev, [trashedItem.id]: { action: 'purging', error: '' } }));
+    try {
+      await deleteRow('gallery_items', trashedItem.id);
+      if (trashedItem.mediaId) {
+        try {
+          await removeStorageFile(trashedItem.storagePath);
+          await deleteRow('media', trashedItem.mediaId);
+          // eslint-disable-next-line no-unused-vars
+        } catch (cleanupErr) {
+          console.warn('Gallery image cleanup failed after permanent delete:', cleanupErr);
+        }
+      }
+      setTrashedItems((prev) => prev.filter((t) => t.id !== trashedItem.id));
+      // eslint-disable-next-line no-unused-vars
+    } catch (err) {
+      setTrashRowState((prev) => ({ ...prev, [trashedItem.id]: { action: null, error: extractErrorMessage(err) } }));
+    }
   }
 
   function moveItem(index, direction) {
@@ -196,23 +293,8 @@ export function useGalleryImages() {
     setSaveState('saving');
     setSaveError('');
     try {
-      for (const deletion of pendingDeletions) {
-        await deleteRow('gallery_items', deletion.id);
-        if (deletion.mediaId) {
-          try {
-            await removeStorageFile(deletion.storagePath);
-            await deleteRow('media', deletion.mediaId);
-            // eslint-disable-next-line no-unused-vars
-          } catch (cleanupErr) {
-            console.warn('Gallery image cleanup failed after delete:', cleanupErr);
-          }
-        }
-      }
-
       for (const [index, item] of items.entries()) {
         let mediaId = item.mediaId;
-        const previousMediaId = item.mediaId;
-        const previousStoragePath = item.storagePath;
 
         if (item.pendingFile) {
           const path = await uploadImageFile('gallery', item.pendingFile);
@@ -222,6 +304,10 @@ export function useGalleryImages() {
             alt_en: item.captionEn,
           });
           mediaId = mediaRow.id;
+          // The previous media row/storage file (if any) is deliberately
+          // NOT deleted here — see docs/BACKUP_RECOVERY.md's Storage
+          // Strategy: keeping a replaced image recoverable is worth more
+          // than reclaiming its storage automatically.
         }
 
         await upsertByNaturalKey('gallery_items', 'item_key', {
@@ -234,16 +320,6 @@ export function useGalleryImages() {
           sort_order: index,
           image_id: mediaId,
         });
-
-        if (item.pendingFile && previousMediaId) {
-          try {
-            await removeStorageFile(previousStoragePath);
-            await deleteRow('media', previousMediaId);
-            // eslint-disable-next-line no-unused-vars
-          } catch (cleanupErr) {
-            console.warn('Old gallery image cleanup failed (new image is already live):', cleanupErr);
-          }
-        }
       }
 
       await runLoad();
@@ -256,17 +332,18 @@ export function useGalleryImages() {
     }
   }
 
-  // Reverts every add/remove/reorder/edit/pending-upload back to the last
+  // Reverts every add/reorder/edit/pending-upload back to the last
   // database-confirmed state (savedSnapshotRef) — a local, no-network undo.
   // If nothing has ever been saved, that snapshot is whatever load()
   // returned (possibly the src/data/profile.js fallback list) — this never
-  // pulls in a separate "original" value on top of real DB content.
+  // pulls in a separate "original" value on top of real DB content. Trash
+  // actions (soft delete/restore/permanent delete) write immediately and
+  // aren't part of this draft state, so they're unaffected by Reset.
   function resetToSaved() {
     items.forEach((item) => {
       if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
     });
     setItems(savedSnapshotRef.current.map((item) => ({ ...item })));
-    setPendingDeletions([]);
     setSaveState('idle');
     setSaveError('');
   }
@@ -275,12 +352,16 @@ export function useGalleryImages() {
     status,
     loadError,
     items,
+    trashedItems,
+    trashRowState,
     saveState,
     saveError,
     isDirty,
     updateItem,
     addItem,
     removeItem,
+    restoreFromTrash,
+    permanentlyDelete,
     moveItem,
     selectFileForItem,
     save,
