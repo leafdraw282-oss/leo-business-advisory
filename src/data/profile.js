@@ -16,8 +16,17 @@
 export const site = {
   name: 'LEO BUSINESS ADVISORY',
   titleTag: 'LEO Business Advisory | Boosuk Leo Suh',
+  // "LEO Business Advisory" is the brand/site name itself (a proper noun,
+  // used as-is in both languages, same as index.html's og:site_name) —
+  // only the person name half is swapped to Korean.
+  titleTagKo: 'LEO Business Advisory | 서부석',
   descriptionEn:
     'Global executive and business advisor with 30+ years of experience in brand growth, retail strategy, market expansion and business transformation.',
+  // Reuses the first sentence of `about.bioKo` below verbatim (not a new
+  // translation of descriptionEn) — every fact in it is already sourced
+  // from the Founder Profile document per this file's own header rule.
+  descriptionKo:
+    '30년 이상 소비재·패션·라이프스타일·트래블 산업에서 브랜드를 만들고 성장시켜 온 글로벌 경영자입니다.',
 };
 
 export const person = {

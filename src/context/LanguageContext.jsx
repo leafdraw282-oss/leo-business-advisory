@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LanguageContext } from './languageContext.js';
 import { trackEvent } from '../lib/analytics.js';
+import { site } from '../data/profile.js';
 
 const STORAGE_KEY = 'leo-advisory-language';
 
@@ -31,6 +32,20 @@ export function LanguageProvider({ children }) {
       // Non-fatal — the site still works for this session without persistence.
     }
     document.documentElement.lang = language;
+
+    // Phase 4-G — keeps the browser tab title and meta description in the
+    // language the visitor is actually reading, for both real users
+    // (tab/history/screen-reader announcements) and a search engine that
+    // re-crawls the page after JS runs. og:*/twitter:* tags are left as
+    // index.html's static defaults: social-preview crawlers fetch the page
+    // without running this toggle, so there's nothing for them to read
+    // here — only document.title and meta[name=description] are ever
+    // actually seen in this state by anyone.
+    document.title = language === 'ko' ? site.titleTagKo : site.titleTag;
+    const descriptionMeta = document.querySelector('meta[name="description"]');
+    if (descriptionMeta) {
+      descriptionMeta.setAttribute('content', language === 'ko' ? site.descriptionKo : site.descriptionEn);
+    }
   }, [language]);
 
   // Tracks only an actual change (clicking the already-active language is

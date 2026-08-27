@@ -89,7 +89,8 @@ a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
-select:focus-visible {
+select:focus-visible,
+main:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
@@ -157,6 +158,28 @@ section {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Phase 4-G — skip-to-content link (App.jsx). Off-screen like
+   .visually-hidden while unfocused, but — unlike that utility — becomes
+   visible the moment a keyboard user tabs to it, so it actually serves its
+   purpose instead of staying permanently hidden. z-index above .header's
+   (100) so it isn't drawn under the sticky header once revealed. */
+.skip-link {
+  position: absolute;
+  top: -3rem;
+  left: var(--space-md);
+  z-index: 200;
+  padding: 0.75rem 1.25rem;
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+  font-size: 0.875rem;
+  border-radius: var(--card-radius);
+  transition: top var(--transition-base);
+}
+
+.skip-link:focus-visible {
+  top: var(--space-sm);
 }
 
 /* ============================================================================

@@ -2,6 +2,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import SectionErrorBoundary from './components/SectionErrorBoundary';
 import { useApplyDesignSettings } from './hooks/useApplyDesignSettings';
+import { useLanguage } from './context/languageContext';
 import Hero from './sections/Hero';
 import Impact from './sections/Impact';
 import Profile from './sections/Profile';
@@ -23,11 +24,19 @@ import Contact from './sections/Contact';
 // or break the page either.
 function App() {
   useApplyDesignSettings();
+  const { t } = useLanguage();
 
   return (
     <>
+      {/* Phase 4-G — WCAG 2.4.1 Bypass Blocks: lets a keyboard user jump
+          straight to #main-content instead of tabbing through the header's
+          logo, full nav, and language toggle on every page load. Hidden
+          via .skip-link (global.css) until it receives focus. */}
+      <a href="#main-content" className="skip-link">
+        {t('본문으로 바로가기', 'Skip to content')}
+      </a>
       <Header />
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <SectionErrorBoundary>
           <Hero />
         </SectionErrorBoundary>
