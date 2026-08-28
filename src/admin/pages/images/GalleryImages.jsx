@@ -60,7 +60,12 @@ function GalleryImages() {
           {items.map((item, index) => {
             const currentSrc = isSupabaseConfigured && item.storagePath ? publicUrlFor(item.storagePath) : undefined;
             const label = item.captionEn || item.captionKo || `Photo ${index + 1}`;
-            const guideline = recommendedSizeForRatio(item.aspectRatio);
+            // Phase 5-E — a `wide` tile spans two grid columns and renders
+            // roughly twice as wide as a standard tile (measured on the
+            // real page: ~596px vs ~278px at this site's container cap),
+            // so it needs a correspondingly larger recommended size, not
+            // the same one every other photo gets.
+            const guideline = recommendedSizeForRatio(item.aspectRatio, item.isWide ? 1200 : 600);
 
             return (
               <div
@@ -82,6 +87,7 @@ function GalleryImages() {
                           url={item.previewUrl}
                           recommendedWidth={guideline.width}
                           recommendedHeight={guideline.height}
+                          fileSizeBytes={item.pendingFile?.size}
                         />
                       </div>
                     )}

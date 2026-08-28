@@ -29,7 +29,7 @@ function AboutImage() {
   return (
     <ImageSlotEditor
       title="Founder Profile (소개 섹션 프로필 사진)"
-      aspectRatio="4 / 5"
+      aspectRatio="1 / 1"
       guideline={ABOUT_IMAGE_GUIDELINE}
       slot={slot}
     />

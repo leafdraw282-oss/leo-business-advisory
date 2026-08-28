@@ -29,7 +29,7 @@ function HeroImage() {
   return (
     <ImageSlotEditor
       title="Hero Portrait (첫 화면 인물 사진)"
-      aspectRatio="4 / 5"
+      aspectRatio="3 / 4"
       guideline={HERO_IMAGE_GUIDELINE}
       slot={slot}
     />

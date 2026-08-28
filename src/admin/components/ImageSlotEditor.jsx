@@ -91,7 +91,12 @@ function ImageSlotEditor({ title, aspectRatio = '4 / 3', guideline, slot }) {
                 <span className="admin-image-compare-label">새 이미지 (저장 전 미리보기)</span>
                 <ImagePlaceholder src={previewUrl} alt={previewLabel} label={previewLabel} aspectRatio={aspectRatio} />
                 {guideline && (
-                  <ImageActualInfo url={previewUrl} recommendedWidth={guideline.width} recommendedHeight={guideline.height} />
+                  <ImageActualInfo
+                    url={previewUrl}
+                    recommendedWidth={guideline.width}
+                    recommendedHeight={guideline.height}
+                    fileSizeBytes={pendingFile?.size}
+                  />
                 )}
               </div>
             )}

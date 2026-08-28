@@ -1,11 +1,23 @@
+/* Phase 5-E — this component is shared between the public bundle (which
+   loads variables.css, so these tokens are always defined and admin-
+   editable via Design Settings) and the admin bundle (which deliberately
+   never imports variables.css — see admin.css's own file-level comment —
+   so these custom properties don't exist there at all). Without a
+   fallback, `var(--undefined-token)` makes the whole declaration invalid,
+   which is why every image slot's placeholder box was rendering fully
+   transparent in Admin > Images — invisible, not just unstyled, making it
+   impossible to actually see the aspect-ratio frame this phase's
+   guidance is about. The var() fallback (2nd argument) only ever
+   activates where the token is undefined; the public site's actual
+   Design Settings-driven color is completely unaffected. */
 .image-placeholder {
   width: 100%;
   overflow: hidden;
-  background-color: var(--color-primary);
+  background-color: var(--color-primary, #0b1625);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--image-radius);
+  border-radius: var(--image-radius, 2px);
 }
 
 .image-placeholder__img {
@@ -29,10 +41,10 @@
 }
 
 .image-placeholder__label {
-  color: var(--color-secondary);
+  color: var(--color-secondary, #f4f1ea);
   opacity: 0.6;
   font-size: 0.8125rem;
   letter-spacing: 0.04em;
   text-align: center;
-  padding: var(--space-sm);
+  padding: var(--space-sm, 1rem);
 }

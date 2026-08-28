@@ -669,6 +669,12 @@ body {
   margin: 0;
 }
 
+.admin-image-guideline-min {
+  font-size: 0.75rem;
+  color: #8b8984;
+  margin: 0.15rem 0 0;
+}
+
 .admin-image-guideline-format {
   font-size: 0.75rem;
   color: #8b8984;
