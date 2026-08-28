@@ -8,9 +8,14 @@
   margin-bottom: var(--space-2xl);
 }
 
+/* Phase 5-D — sized up from --font-size-h2 toward H1 scale: the closing
+   line should read as a genuine final statement, not a same-weight
+   repeat of every other section's heading. Font-family already comes
+   from global.css's h1-h4 rule (KR sans by default, serif under
+   :lang(en)) since this is a real <h2> — no extra rule needed here. */
 .contact__headline {
-  font-size: var(--font-size-h2);
-  line-height: 1.15;
+  font-size: clamp(2rem, 2.2vw + 1.5rem, 3.25rem);
+  line-height: 1.12;
   margin-bottom: var(--space-lg);
 }
 
@@ -34,11 +39,19 @@
   margin-bottom: var(--space-xs);
 }
 
+/* Phase 5-D — a touch larger and set in the same KR-sans/EN-serif pairing
+   as headings, so the direct contact details read like a personal
+   signature line closing the page, not another plain link list. */
 .contact__info-link {
-  font-size: 1.1rem;
+  font-family: var(--font-kr);
+  font-size: 1.25rem;
   border-bottom: 1px solid transparent;
   width: fit-content;
   transition: border-color var(--transition-base);
+}
+
+:lang(en) .contact__info-link {
+  font-family: var(--font-heading);
 }
 
 .contact__info-link:hover {

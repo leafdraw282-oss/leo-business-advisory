@@ -1,12 +1,26 @@
+/* Phase 5-D — Gallery reads as the page's one visual "breathing space"
+   (photos only, no metrics/CTAs competing for attention) between Career's
+   dense timeline and Contact's closing pitch — its own --color-surface
+   band (same white used by Impact/Case Studies) makes that pause visible,
+   not just implied by spacing. */
 .gallery {
   padding-block: var(--section-spacing);
-  background-color: var(--color-background);
+  background-color: var(--color-surface);
 }
 
 .gallery__grid {
   display: grid;
+  /* Phase 5-D — kept at four columns: three columns leaves a lone,
+     stranded photo in its own near-empty row with this list's current
+     6-item/1-wide shape (any column count not dividing the item count's
+     "cell units" evenly does this for *some* future admin-edited count,
+     but 4 is the one that happens to look right for the content as it
+     exists today, and grid-auto-flow: dense was ruled out precisely
+     because it would silently reorder photos away from the admin's own
+     sort_order). The wider gap is the actual "breathing space" change,
+     alongside the section's new --color-surface band above. */
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .gallery__item--wide {

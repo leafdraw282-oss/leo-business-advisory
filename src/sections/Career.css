@@ -57,6 +57,22 @@
   font-size: 0.95rem;
 }
 
+/* Phase 5-D — the timeline is chronological-ascending (career.js), so the
+   last entry is the current role: it closes the story with more visual
+   weight instead of reading identically to the six entries before it,
+   avoiding the flat "résumé table" feel while keeping the same period/
+   role/company markup — pure CSS, no new content. */
+.career__entry:last-child .career__dot {
+  width: 0.875rem;
+  height: 0.875rem;
+  background-color: var(--color-primary);
+}
+
+.career__entry:last-child .career__role {
+  color: var(--color-primary);
+  font-size: clamp(1.3rem, 0.9vw + 1.05rem, 1.85rem);
+}
+
 @media (max-width: 768px) {
   .career {
     padding-block: var(--section-spacing-mobile);

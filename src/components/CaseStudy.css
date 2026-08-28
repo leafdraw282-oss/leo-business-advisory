@@ -5,10 +5,32 @@
   align-items: center;
 }
 
+/* Phase 5-D — the flagship case (already larger type + a wider image via
+   `emphasis`) also gets a wider image column, so it reads as the one
+   full-weight story the rest of the list supports, not six equally-
+   proportioned entries that only alternate sides. */
+.case-study--emphasis {
+  grid-template-columns: 1.15fr 1fr;
+}
+
 .case-study + .case-study {
   margin-top: var(--space-2xl);
   padding-top: var(--space-2xl);
   border-top: 1px solid var(--color-border);
+}
+
+/* The supporting cases (everything after the flagship) flow as a tighter,
+   connected list — extra separation stays reserved for the flagship's own
+   trailing edge, reinforcing "one story, then highlights" instead of six
+   evenly-spaced repeats. */
+.case-study--emphasis + .case-study {
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-2xl);
+}
+
+.case-study:not(.case-study--emphasis) + .case-study:not(.case-study--emphasis) {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-xl);
 }
 
 .case-study__media {

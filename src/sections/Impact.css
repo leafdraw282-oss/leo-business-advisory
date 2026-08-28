@@ -9,10 +9,23 @@
   gap: var(--space-lg);
 }
 
+/* Phase 5-D — the first figure (the site's single headline stat) reads as
+   a lead number the other three support, rather than four mechanically
+   identical grid cells — the "text/image dominant/split/wide" variation
+   this phase asks for, applied to a stat row instead of a media section.
+   CSS-only (:first-child), no new content or markup. */
+.impact__grid > .impact-metric:first-child .impact-metric__value {
+  font-size: clamp(3rem, 3.2vw + 2rem, 4.75rem);
+}
+
 @media (max-width: 1024px) {
   .impact__grid {
     grid-template-columns: repeat(2, 1fr);
     row-gap: var(--space-xl);
+  }
+
+  .impact__grid > .impact-metric:first-child {
+    grid-column: 1 / -1;
   }
 }
 

@@ -5,15 +5,32 @@
 
 .profile__grid {
   display: grid;
-  grid-template-columns: 0.85fr 1.15fr;
+  /* Phase 5-D — text is now the dominant column (was the narrower one),
+     with a smaller, square "headshot" portrait supporting it, instead of
+     a same-weight image column that reads as the same text+dominant-
+     image shape Hero already uses right before this section. */
+  grid-template-columns: 1fr 0.62fr;
   gap: var(--space-xl);
-  align-items: center;
+  align-items: start;
 }
 
 /* Desktop reading order is Text + Image (spec), but the image sits first
    in the DOM so it naturally leads on mobile — see the override below. */
 .profile__media {
   order: 2;
+  max-width: 16rem;
+}
+
+/* Nudged down from the top so the portrait sits beside the bio copy
+   (which starts lower, under the eyebrow+heading) rather than beside the
+   heading itself — reads as an inset next to the essay, not a matching
+   column. Scoped to the desktop two-column layout only — at <=1024px the
+   portrait becomes the first, full-width stacked element (see below) and
+   must not carry this extra top offset. */
+@media (min-width: 1025px) {
+  .profile__media {
+    margin-top: var(--space-xl);
+  }
 }
 
 .profile__body {
@@ -22,6 +39,22 @@
 
 .profile__bio {
   margin-top: var(--space-md);
+}
+
+/* Editorial dropcap on the bio's first letter — a founder-profile-essay
+   cue, entirely typographic, no new content. */
+.profile__bio::first-letter {
+  float: left;
+  font-family: var(--font-kr);
+  font-size: 3.4em;
+  line-height: 0.85;
+  font-weight: 600;
+  padding-right: 0.1em;
+  color: var(--color-primary);
+}
+
+:lang(en) .profile__bio::first-letter {
+  font-family: var(--font-heading);
 }
 
 @media (max-width: 1024px) {
