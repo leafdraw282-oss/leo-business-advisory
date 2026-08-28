@@ -5,6 +5,10 @@ import {
   SECTION_SPACING_PRESETS,
   RADIUS_PRESETS,
   HEADING_SCALE_PRESETS,
+  FONT_KO_PRESETS,
+  FONT_EN_PRESETS,
+  BODY_FONT_SIZE_PRESETS,
+  LETTER_SPACING_PRESETS,
 } from '../content/layoutPresets.js';
 import SectionStatus from '../components/SectionStatus.jsx';
 import ColorField from '../components/ColorField.jsx';
@@ -25,18 +29,6 @@ async function load() {
 
 async function save(values) {
   return saveDesignSettings(values);
-}
-
-function TextField({ label, hint, value, onChange }) {
-  return (
-    <label className="admin-field">
-      <span className="admin-field-label">
-        {label}
-        {hint && <span className="admin-field-unit-hint"> — {hint}</span>}
-      </span>
-      <input type="text" value={value ?? ''} onChange={(event) => onChange(event.target.value)} spellCheck={false} />
-    </label>
-  );
 }
 
 function NumberField({ label, hint, value, min = 0.01, step = 0.001, onChange }) {
@@ -133,22 +125,22 @@ function Settings() {
             <ColorField label="Border Color" value={values.colorBorder} onChange={(v) => update({ colorBorder: v })} />
 
             <h3>Typography</h3>
-            <TextField
+            <PresetField
               label="Korean Font"
-              hint="CSS font-family 값"
               value={values.fontKo}
+              presets={FONT_KO_PRESETS}
               onChange={(v) => update({ fontKo: v })}
             />
-            <TextField
+            <PresetField
               label="English Font"
-              hint="CSS font-family 값"
               value={values.fontEn}
+              presets={FONT_EN_PRESETS}
               onChange={(v) => update({ fontEn: v })}
             />
-            <TextField
+            <PresetField
               label="본문 Font Size"
-              hint="예: 1rem, 16px"
               value={values.bodyFontSize}
+              presets={BODY_FONT_SIZE_PRESETS}
               onChange={(v) => update({ bodyFontSize: v })}
             />
             <PresetField
@@ -165,10 +157,10 @@ function Settings() {
               value={values.lineHeight}
               onChange={(v) => update({ lineHeight: v })}
             />
-            <TextField
+            <PresetField
               label="본문 Letter Spacing"
-              hint="예: normal, 0.02em"
               value={values.letterSpacing}
+              presets={LETTER_SPACING_PRESETS}
               onChange={(v) => update({ letterSpacing: v })}
             />
 

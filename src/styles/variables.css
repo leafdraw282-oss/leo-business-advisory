@@ -110,6 +110,10 @@
   --font-en: var(--font-body);
   --font-size-body: 1rem;
   --font-size-small: 0.875rem;
+  /* Phase 5-B — one shared size for every eyebrow/label-style element
+     (Hero/SectionTitle eyebrow, CaseStudy tag), which previously drifted
+     between 0.8rem and 0.75rem with no shared source. */
+  --font-size-eyebrow: 0.8rem;
   /* Phase 4-E: --heading-scale-factor turns the admin-editable
      --heading-scale ratio into a small, safe multiplier applied to every
      heading level together (hierarchy preserved — h1/h2/h3 all scale by

@@ -25,15 +25,21 @@
 }
 
 .hero__name {
-  font-family: var(--font-heading);
+  font-family: var(--font-kr);
   font-size: clamp(1rem, 0.6vw + 0.85rem, 1.25rem);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   margin-bottom: var(--space-sm);
 }
 
+/* Real bilingual text (the person's name, via t()) — same language-aware
+   serif/sans split as headings (see global.css). */
+:lang(en) .hero__name {
+  font-family: var(--font-heading);
+}
+
 .hero__eyebrow {
-  font-size: 0.8rem;
+  font-size: var(--font-size-eyebrow);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-accent);

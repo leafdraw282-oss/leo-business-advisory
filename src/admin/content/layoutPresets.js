@@ -48,3 +48,50 @@ export const HEADING_SCALE_PRESETS = [
 export function matchPreset(presets, value) {
   return presets.find((preset) => String(preset.value) === String(value)) ?? null;
 }
+
+// Phase 5-B — font_ko/font_en/body_font_size/letter_spacing were previously
+// free-text inputs: an admin could type any CSS font-family/size/spacing
+// string, including one that renders badly or means nothing. site_design_
+// settings still stores a plain string/CSS value in these columns (no
+// schema change) — these are just a curated, safe set of values per
+// column, same pattern as CONTENT_WIDTH_PRESETS etc. above.
+//
+// Every "Standard" value below is the exact literal
+// supabase/migrations/0009_site_design_settings.sql already seeds, so any
+// already-deployed row is recognized as a real preset via matchPreset(),
+// never shown as "custom". Only sans-serif stacks are offered — CLAUDE.md
+// is explicit that body text stays sans-serif in both languages (headings,
+// which may use an editorial serif for English, are a separate, non-
+// admin-editable token — see global.css's :lang(en) h1..h4 rule).
+export const FONT_KO_PRESETS = [
+  {
+    value: "'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif",
+    label: 'Pretendard 우선 (기본값)',
+  },
+  {
+    value: "-apple-system, BlinkMacSystemFont, 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif",
+    label: 'System UI (시스템 기본 글꼴)',
+  },
+];
+
+export const FONT_EN_PRESETS = [
+  {
+    value: "'Inter', 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif",
+    label: 'Inter 우선 (기본값)',
+  },
+  {
+    value: '-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif',
+    label: 'System UI (시스템 기본 글꼴)',
+  },
+];
+
+export const BODY_FONT_SIZE_PRESETS = [
+  { value: '0.9375rem', label: 'Compact (15px)' },
+  { value: '1rem', label: 'Standard (16px, 기본값)' },
+  { value: '1.0625rem', label: 'Large (17px)' },
+];
+
+export const LETTER_SPACING_PRESETS = [
+  { value: 'normal', label: 'Standard (기본값)' },
+  { value: '-0.01em', label: 'Tight (약간 좁게)' },
+];

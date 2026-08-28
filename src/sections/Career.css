@@ -40,7 +40,7 @@
 }
 
 .career__period {
-  font-size: 0.8rem;
+  font-size: var(--font-size-eyebrow);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--color-accent);

@@ -28,7 +28,7 @@
 }
 
 .case-study__tag {
-  font-size: 0.75rem;
+  font-size: var(--font-size-eyebrow);
   letter-spacing: 0.1em;
   color: var(--color-accent);
   margin-bottom: var(--space-sm);
@@ -50,11 +50,17 @@
 }
 
 .case-study--statement .case-study__summary {
-  font-family: var(--font-heading);
+  font-family: var(--font-kr);
   font-size: clamp(1.25rem, 1vw + 1rem, 1.6rem);
   line-height: 1.5;
   color: var(--color-primary);
   max-width: 34rem;
+}
+
+/* Real bilingual pull-quote text — same language-aware serif/sans split
+   as headings (see global.css). */
+:lang(en) .case-study--statement .case-study__summary {
+  font-family: var(--font-heading);
 }
 
 .case-study__highlights {
