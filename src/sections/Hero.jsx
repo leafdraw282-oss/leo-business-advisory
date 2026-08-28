@@ -57,7 +57,7 @@ function Hero() {
             src={hero.imageUrl}
             alt={portraitLabel}
             label={portraitLabel}
-            aspectRatio="4 / 5"
+            aspectRatio="3 / 4"
             loading="eager"
             fetchPriority="high"
             fadeInOnLoad

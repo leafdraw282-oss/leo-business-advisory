@@ -3,6 +3,18 @@
   display: flex;
   align-items: center;
   background-color: var(--color-background);
+  /* Phase 5-C — a very subtle warm-toned glow behind the portrait side,
+     built entirely from existing 5-A color tokens (never a new hardcoded
+     hex). A separate background-image (not the `background` shorthand) so
+     a browser without color-mix() support simply has no background-image
+     and falls through to the solid background-color above — never a
+     broken/transparent hero. Kept intentionally faint (6%) — depth, not
+     a decorative gradient. */
+  background-image: radial-gradient(
+    ellipse 70% 65% at 78% 45%,
+    color-mix(in srgb, var(--color-primary) 6%, var(--color-background)) 0%,
+    var(--color-background) 72%
+  );
 }
 
 .hero__grid {
@@ -18,10 +30,14 @@
      whatever .hero__media happens to be showing at any given moment. */
   width: 100%;
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
+  grid-template-columns: 1.35fr 1fr;
   gap: var(--space-xl);
   align-items: center;
-  padding-block: var(--section-spacing);
+  /* Slightly less padding above than below — an "optically centered"
+     block sits marginally above true vertical center, which reads as
+     composed/anchored rather than adrift in the middle of a tall 90vh
+     section. Purely static spacing, no dependency on image load state. */
+  padding-block: calc(var(--section-spacing) * 0.75) var(--section-spacing);
 }
 
 .hero__name {
@@ -29,7 +45,12 @@
   font-size: clamp(1rem, 0.6vw + 0.85rem, 1.25rem);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  margin-bottom: var(--space-sm);
+  /* Phase 5-C — tightened from --space-sm so name+eyebrow read as one
+     grouped "identity" cluster (editorial byline) rather than two
+     competing all-caps label lines; the fuller --space-lg gap stays
+     between the eyebrow and the headline below to keep that separation
+     clear. */
+  margin-bottom: var(--space-xs);
 }
 
 /* Real bilingual text (the person's name, via t()) — same language-aware
@@ -86,10 +107,16 @@
     grid-template-columns: 1fr;
   }
 
+  /* Phase 5-C — text now leads on tablet/mobile too (natural DOM order:
+     name/eyebrow/headline/subhead/CTA, then portrait), not the previous
+     image-first stack: a visitor's first 3 seconds should read who this
+     is and why it matters before a placeholder/portrait block, per this
+     phase's brief. The portrait also drops its old "small centered card"
+     treatment (max-width + auto margins) for a full-width band that
+     actually integrates with the section instead of floating in it. */
   .hero__media {
-    order: -1;
-    max-width: 22rem;
-    margin-inline: auto;
+    max-width: none;
+    margin-inline: 0;
   }
 }
 
