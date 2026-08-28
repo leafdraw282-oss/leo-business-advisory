@@ -71,7 +71,23 @@ export function useReveal() {
       reveal();
     }
 
-    const fallback = window.setTimeout(reveal, 1500);
+    // Phase 6-A — was 1500ms, sized back when this hook only ever ran ONE
+    // instance per section (mounted, at most, a couple viewports below the
+    // fold). Extending it to a per-LIST-ITEM instance (every Case Study,
+    // every Career entry — all mounted immediately on page load, per
+    // Contact.jsx's own comment: "every section is mounted immediately, no
+    // route-based lazy loading") turned this safety net into an accidental
+    // normal-path trigger: any item a visitor hadn't scrolled to within
+    // 1.5s of PAGE LOAD (not "of scrolling near it") silently flipped to
+    // reveal--visible off-screen, defeating the whole point of giving each
+    // item its own scroll-triggered entrance — verified via direct
+    // computed-opacity checks during this phase's own QA. 6s keeps this a
+    // true "IntersectionObserver never fired at all" safety net (a real
+    // bug elsewhere, not a matter of scroll speed) while giving normal
+    // browsing — reading Hero, then scrolling at an ordinary pace — room
+    // to reach a sixth Case Study or Career entry on its own, on-scroll
+    // trigger, the way the rest of this hook is designed to work.
+    const fallback = window.setTimeout(reveal, 6000);
 
     return () => {
       observer?.disconnect();

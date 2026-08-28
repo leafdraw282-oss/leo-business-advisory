@@ -2,6 +2,7 @@ import { navigation } from '../data/navigation';
 import { site, person } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
 import { useSectionContent } from '../hooks/useSectionContent';
+import { useReveal } from '../hooks/useReveal';
 import { fetchContactInfo, contactInfoFallback } from '../lib/content/contactInfo';
 import { fetchFooter, footerFallback } from '../lib/content/footer';
 import './Footer.css';
@@ -15,15 +16,20 @@ import './Footer.css';
  * available, falling back to src/data/profile.js — see
  * src/lib/content/contactInfo.js and footer.js. `site`/`person` identity
  * fields are not part of the CMS, so they stay direct profile.js reads.
+ *
+ * Phase 6-A: a plain, un-staggered fade via the shared .reveal/.reveal--
+ * visible base rule (global.css) — the brief explicitly asks for nothing
+ * more elaborate here ("전체 footer가 자연스럽게 fade-in 정도면 충분").
  */
 function Footer() {
   const { t } = useLanguage();
   const year = new Date().getFullYear();
   const contact = useSectionContent(fetchContactInfo, contactInfoFallback());
   const footer = useSectionContent(fetchFooter, footerFallback());
+  const { ref, className: revealClassName } = useReveal();
 
   return (
-    <footer className="footer">
+    <footer ref={ref} className={`footer ${revealClassName}`.trim()}>
       <div className="container footer__grid">
         <div className="footer__brand">
           <a href="#top" className="footer__logo">

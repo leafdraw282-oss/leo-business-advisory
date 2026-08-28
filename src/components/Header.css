@@ -5,11 +5,22 @@
   width: 100%;
   background-color: transparent;
   border-bottom: 1px solid transparent;
-  transition: background-color var(--transition-base), border-color var(--transition-base);
+  transition: background-color var(--transition-base), border-color var(--transition-base), backdrop-filter var(--transition-base);
 }
 
+/* Phase 6-A — was a hard cut to a fully opaque background; now a light,
+   translucent scrim + blur, so the header reads as "the page showing
+   through, gently dimmed" instead of a flat bar snapping into place.
+   color-mix() keeps this on the same --color-background token every other
+   section already uses (no new hardcoded color), just partially
+   transparent. backdrop-filter is the one part without a same-color
+   fallback: a browser without it simply keeps the translucent background
+   with no blur behind it — still legible, never broken, no layout
+   change either way (height/padding are untouched, see .header__bar). */
 .header--scrolled {
-  background-color: var(--color-background);
+  background-color: color-mix(in srgb, var(--color-background) 82%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom-color: var(--color-border);
 }
 

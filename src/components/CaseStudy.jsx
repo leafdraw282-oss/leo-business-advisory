@@ -1,3 +1,4 @@
+import { useReveal } from '../hooks/useReveal';
 import ImagePlaceholder from './ImagePlaceholder';
 import './CaseStudy.css';
 
@@ -12,14 +13,29 @@ import './CaseStudy.css';
  * All text arriving here is already resolved to the current language by
  * the caller (src/sections/CaseStudies.jsx) — this component has no
  * language logic of its own.
+ *
+ * Phase 6-A: each case study observes its OWN scroll entrance (its own
+ * useReveal() instance) instead of relying on the parent section's single
+ * trigger. The full case-studies list runs 3400-5500px tall (6 cases,
+ * each with a real image), well past one viewport — a section-wide
+ * trigger fired the moment the FIRST case entered view and immediately
+ * marked every case (including the sixth, still thousands of pixels
+ * below the fold) as "revealed", so by the time a visitor actually
+ * scrolled to case four, five, six, their entrance had already finished
+ * off-screen — the single largest reason motion read as "barely felt"
+ * on this page. See global.css's `.case-study.reveal` rules for the
+ * image-leads/body-then/metrics-then internal stagger.
  */
 function CaseStudy({ tag, title, summary, metrics = [], highlights = [], image, imageAlt, imageLabel, reverse = false, emphasis = false }) {
   const hasMetrics = metrics.length > 0;
+  const { ref, className: revealClassName } = useReveal();
 
   return (
     <article
+      ref={ref}
       className={[
         'case-study',
+        revealClassName,
         reverse ? 'case-study--reverse' : '',
         emphasis ? 'case-study--emphasis' : '',
         hasMetrics ? '' : 'case-study--statement',

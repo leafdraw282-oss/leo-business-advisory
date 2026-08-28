@@ -165,10 +165,25 @@
      "Subtle" behavior, matching site_design_settings' own DB default
      ('standard') and site_design_settings.js's designSettingsFallback()
      — see global.css's [data-motion-level] rules for how the admin's
-     Minimal/Standard/Expressive picks scale these up or force them off
-     entirely, and useReveal.js for the observer that applies .reveal. */
+     Minimal/Standard/Expressive picks scale these, and useReveal.js for
+     the observer that applies .reveal. */
   --reveal-distance: 16px;
   --reveal-duration: 500ms;
+  /* Phase 6-A — a smoother, more premium deceleration than the generic
+     `ease` every hover/UI transition already uses (--motion-easing,
+     below) — kept as its own token so this phase's reveal tuning never
+     touches button/header-background/hamburger transitions, which are
+     out of this phase's scope. */
+  --reveal-easing: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Phase 6-A — one shared "beat" every staggered reveal (SectionTitle's
+     eyebrow-before-heading, Case Study's image-before-text-before-metrics,
+     Impact's metric row, Advisory's item list, Contact's info-before-form)
+     multiplies via calc() instead of hardcoding its own delay — so a
+     single admin motion_level pick (see global.css's [data-motion-level]
+     rules) scales every stagger in the site at once ("거의 없음" under
+     minimal, a touch more under expressive) without needing a duplicate
+     override block per selector. */
+  --stagger-step: 70ms;
 
   /* --transition-base now composes the motion tokens above instead of a
      standalone literal — every existing `transition: X var(--transition-base)`
@@ -193,5 +208,6 @@
     --motion-distance: 0px;
     --reveal-distance: 0px;
     --reveal-duration: 0.01ms;
+    --stagger-step: 0ms;
   }
 }

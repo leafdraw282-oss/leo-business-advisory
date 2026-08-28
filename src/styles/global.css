@@ -211,32 +211,41 @@ section {
 }
 
 /* ============================================================================
- * Phase 4-F — Motion System (Section Reveal + Image Motion Style)
+ * Phase 4-F / 6-A — Motion System (Section Reveal + Image Motion Style)
  *
  * Wires the site_design_settings.motion_level / .image_motion_style values
- * (already admin-editable since Phase 4-C, previously inert) to real visual
- * behavior. useReveal.js (src/hooks/useReveal.js) is the only thing that
- * ever adds/removes the .reveal / .reveal--visible classes below, on each
- * major section's own <section> element and, opt-in, inside
- * ImagePlaceholder (its `revealMotion` prop) — and it only ever does so
- * once it has confirmed IntersectionObserver exists and the visitor hasn't
- * requested reduced motion, so content is never hidden without JS actively
- * (and successfully) choosing to hide it first. Everything here is
- * opacity/transform only — never a property that affects layout — so
- * reveal can never itself cause a layout shift.
+ * (admin-editable since Phase 4-C) to real visual behavior. useReveal.js
+ * (src/hooks/useReveal.js) is the only thing that ever adds/removes the
+ * .reveal / .reveal--visible classes below — called once per major section
+ * AND, since Phase 6-A, once per repeating list item long enough to run
+ * well past a single viewport (each Case Study article, each Career
+ * entry — see CaseStudy.jsx / CareerEntry.jsx) so that item plays its own
+ * entrance as it actually scrolls into view, instead of the whole list
+ * quietly finishing before a visitor has scrolled far enough to see it —
+ * this was Phase 6-A's actual "why motion barely felt" root cause: a
+ * 6-case, 3400-5500px-tall list had ONE observer on the whole section, so
+ * the moment its top 15% appeared, every case (including the sixth, still
+ * thousands of pixels below) was marked "revealed" — its transition
+ * finished off-screen long before anyone scrolled that far. It only ever
+ * hides content once it has confirmed IntersectionObserver exists and the
+ * visitor hasn't requested reduced motion, so content is never hidden
+ * without JS actively (and successfully) choosing to hide it first.
+ * Everything here is opacity/transform only — never a property that
+ * affects layout — so reveal can never itself cause a layout shift.
  *
- * The MAGNITUDE and on/off switch for each admin preset is decided purely
- * by CSS reading the data-motion-level / data-image-motion attributes
- * applyDesignSettings() sets on <html> (src/lib/content/designSettings.js)
- * — .reveal's own JS-side logic never needs to know the current value.
+ * The MAGNITUDE (distance/duration/stagger) for each admin preset is
+ * decided purely by CSS reading the data-motion-level / data-image-motion
+ * attributes applyDesignSettings() sets on <html>
+ * (src/lib/content/designSettings.js) — .reveal's own JS-side logic never
+ * needs to know the current value, and the DB schema/enum is unchanged.
  * ============================================================================ */
 
 .reveal {
   opacity: 0;
   transform: translateY(var(--reveal-distance));
   transition:
-    opacity var(--reveal-duration) var(--motion-easing),
-    transform var(--reveal-duration) var(--motion-easing);
+    opacity var(--reveal-duration) var(--reveal-easing),
+    transform var(--reveal-duration) var(--reveal-easing);
 }
 
 .reveal--visible {
@@ -247,29 +256,24 @@ section {
 /* Motion Level presets (site_design_settings.motion_level — existing DB
    enum, unchanged: 'minimal' | 'standard' | 'expressive'). 'standard' is
    the DB default and needs no override — variables.css's own
-   --reveal-distance/--reveal-duration already ARE that default ("Subtle"
-   per the spec: 16px / 500ms). */
+   --reveal-distance/--reveal-duration/--stagger-step already ARE that
+   default. Phase 6-A: 'minimal' used to force every .reveal element
+   straight to its final state (no motion at all, regardless of the
+   .reveal/.reveal--visible class useReveal.js's observer applied) — the
+   brief now asks for minimal to still be felt, just barely, so it gets
+   its own small-but-real distance/duration instead, and --stagger-step
+   collapses to 0 so a list's items still fade in together rather than in
+   a visible sequence ("stagger 거의 없음"). */
 html[data-motion-level='expressive'] {
   --reveal-distance: 24px;
   --reveal-duration: 650ms;
+  --stagger-step: 90ms;
 }
 
 html[data-motion-level='minimal'] {
-  --reveal-distance: 0px;
-  --reveal-duration: 0.01ms;
-}
-
-/* motion_level "minimal" (spec: "None" — every decorative reveal off) and
-   image_motion_style "none" each force full visibility UNCONDITIONALLY,
-   regardless of whatever .reveal/.reveal--visible state useReveal.js's
-   observer has (or hasn't yet) applied — this is a plain CSS override, not
-   a JS branch, so it also correctly covers the brief window between a
-   section mounting and the async site_design_settings fetch actually
-   resolving to a non-default value. */
-html[data-motion-level='minimal'] .reveal {
-  opacity: 1;
-  transform: none;
-  transition: none;
+  --reveal-distance: 8px;
+  --reveal-duration: 300ms;
+  --stagger-step: 0ms;
 }
 
 html[data-image-motion='none'] .image-placeholder.reveal {
@@ -282,21 +286,33 @@ html[data-image-motion='none'] .image-placeholder.reveal {
    DB enum, unchanged: 'none' | 'fade' | 'zoom' | 'parallax'). Only ever
    applies inside ImagePlaceholder's own opt-in reveal wrapper (its
    `revealMotion` prop — never used by Hero, protecting its own separate
-   load-triggered fade-in). 'fade' needs no extra rule: plain .reveal
-   opacity+translateY already reads as "opacity-centric" at this scale.
-   'zoom' and 'parallax' both render as one very small, one-time scale-in
-   (never a true continuously-scrolling parallax translate) — this site is
-   a business-advisory portfolio, not a marketing microsite, so both map to
-   the same restrained "Soft Zoom" the spec asks for rather than adding a
-   second, flashier effect. */
-html[data-image-motion='zoom'] .image-placeholder.reveal,
-html[data-image-motion='parallax'] .image-placeholder.reveal {
-  transform: scale(1.04);
+   load-triggered fade-in).
+   - 'fade' needs no extra rule: the base .reveal opacity+translateY
+     above already reads as "opacity-centric" at this scale.
+   - 'zoom' is a scale-only entrance, capped at a barely-there 1.03 so it
+     never reads as a marketing-site hero-zoom.
+   - 'parallax' (Phase 6-A) is now its own distinct effect — a slightly
+     larger vertical settle than the base reveal, not a true
+     scroll-linked parallax: this project's performance rule (§17 of the
+     brief) rules out recalculating a transform every scroll frame, so
+     useReveal.js stays IntersectionObserver-only, one-shot, exactly like
+     'zoom'/'fade'. Shrunk further on narrow viewports per the brief's
+     own "모바일에서는 자동 축소 또는 비활성화 가능" (see the ≤768px block
+     below). */
+html[data-image-motion='zoom'] .image-placeholder.reveal {
+  transform: scale(1.03);
 }
 
-html[data-image-motion='zoom'] .image-placeholder.reveal.reveal--visible,
-html[data-image-motion='parallax'] .image-placeholder.reveal.reveal--visible {
+html[data-image-motion='zoom'] .image-placeholder.reveal.reveal--visible {
   transform: scale(1);
+}
+
+html[data-image-motion='parallax'] .image-placeholder.reveal {
+  transform: translateY(20px);
+}
+
+html[data-image-motion='parallax'] .image-placeholder.reveal.reveal--visible {
+  transform: translateY(0);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -307,120 +323,267 @@ html[data-image-motion='parallax'] .image-placeholder.reveal.reveal--visible {
   }
 }
 
-/* ============================================================================
- * Phase 5-F — Final Motion Direction. Builds entirely on the Phase 4-F
- * system above — no new tokens, no new dependency, no per-component
- * IntersectionObserver. Two additions:
- *
- * 1. Mobile-scaled magnitude (§10 of the brief): the same --reveal-distance/
- *    --reveal-duration tokens every .reveal-based element already reads,
- *    just smaller on narrow viewports, and a reduced (not removed — this
- *    site already unifies zoom/parallax into one restrained "Soft Zoom",
- *    Phase 4-F's own deliberate choice) image scale.
- * 2. A short, capped internal stagger for section headings and short lists
- *    (Career/Case Studies), so a page-long scroll doesn't reveal eight
- *    identical flat-block fades in a row (§4, §6). Scoped to `.reveal
- *    <selector>` — never to a bare selector — so this can only ever hide
- *    content when the ANCESTOR section's own .reveal is present, exactly
- *    mirroring .reveal's own progressive-enhancement guarantee: when
- *    reveal isn't supported/enabled (no IntersectionObserver, reduced
- *    motion), the ancestor never gets the .reveal class at all, so these
- *    child selectors never apply opacity:0 in the first place.
- * ============================================================================ */
-
+/* Phase 6-A — mobile-scaled magnitude, per motion_level (previously a
+   single :root override — since `html[data-motion-level='expressive']`'s
+   own rule above is MORE specific than a bare `:root`, that one value
+   was never actually being overridden on mobile; each tier now gets its
+   own explicit, smaller mobile value instead, keeping minimal < standard
+   < expressive at every viewport). */
 @media (max-width: 768px) {
-  :root {
+  html[data-motion-level='standard'],
+  html:not([data-motion-level]) {
     --reveal-distance: 10px;
     --reveal-duration: 380ms;
   }
 
-  html[data-image-motion='zoom'] .image-placeholder.reveal,
-  html[data-image-motion='parallax'] .image-placeholder.reveal {
+  html[data-motion-level='expressive'] {
+    --reveal-distance: 14px;
+    --reveal-duration: 450ms;
+  }
+
+  html[data-motion-level='minimal'] {
+    --reveal-distance: 6px;
+    --reveal-duration: 220ms;
+  }
+
+  html[data-image-motion='zoom'] .image-placeholder.reveal {
     transform: scale(1.02);
+  }
+
+  /* The one image-motion style the brief explicitly asks to shrink on
+     mobile (§15) — a narrower viewport gives it less scroll distance to
+     read as "movement" in the first place, so it's throttled down near
+     the base reveal's own distance rather than staying a visibly larger,
+     distinct effect. */
+  html[data-image-motion='parallax'] .image-placeholder.reveal {
+    transform: translateY(10px);
   }
 }
 
+/* ============================================================================
+ * Phase 6-A — Editorial stagger rhythm.
+ *
+ * Every delay below is a multiple of --stagger-step (variables.css),
+ * never a hardcoded ms value, so a single admin motion_level pick scales
+ * every stagger on the site at once (§14 of the brief) without a
+ * duplicate override block per selector per level. Every selector is
+ * scoped to `.reveal <child>` (or, for Case Study/Career, to the item's
+ * own `.reveal` class directly — see the file-level note above) — never
+ * to a bare selector — so content can only ever be hidden when its own
+ * reveal state is actually active, mirroring .reveal's own
+ * progressive-enhancement guarantee.
+ * ============================================================================ */
+
+/* ---- SectionTitle: eyebrow leads, heading follows one beat later —
+   shared by every section via the SectionTitle component, so every
+   section gets the same reveal "language" without popping in as one
+   mechanically-identical flat block. ---- */
 .reveal .section-title__eyebrow,
-.reveal .section-title__heading,
-.reveal .career__entry,
-.reveal .case-study,
-.reveal .contact__headline,
-.reveal .contact__cta .btn {
+.reveal .section-title__heading {
   opacity: 0;
   transform: translateY(var(--reveal-distance));
   transition:
-    opacity var(--reveal-duration) var(--motion-easing),
-    transform var(--reveal-duration) var(--motion-easing);
+    opacity var(--reveal-duration) var(--reveal-easing),
+    transform var(--reveal-duration) var(--reveal-easing);
 }
 
 .reveal--visible .section-title__eyebrow,
-.reveal--visible .section-title__heading,
-.reveal--visible .career__entry,
-.reveal--visible .case-study,
-.reveal--visible .contact__headline,
-.reveal--visible .contact__cta .btn {
-  opacity: 1;
-  transform: none;
-}
-
-/* Eyebrow leads (0ms, the default), heading follows by one short beat —
-   applies uniformly via the shared SectionTitle component, so every
-   section gets the same reveal LANGUAGE without popping in as one
-   mechanically-identical flat block. */
 .reveal--visible .section-title__heading {
-  transition-delay: 70ms;
-}
-
-/* Contact's closing headline, then its CTA one short beat later —
-   reinforces the "closing" moment without a bigger/flashier effect than
-   anything else on the page (§8: "과장하지 마세요"). */
-.reveal--visible .contact__cta .btn {
-  transition-delay: 100ms;
-}
-
-/* Short per-item stagger for Career/Case Studies, capped at 5 steps
-   (§6: "누적 delay 상한 설정") — a 7-entry Career timeline or any future
-   longer list never grows the wait past this ceiling; every item from
-   the 5th on shares the same final delay. */
-.reveal--visible .career__entry:nth-child(1),
-.reveal--visible .case-study:nth-child(1) {
-  transition-delay: 0ms;
-}
-.reveal--visible .career__entry:nth-child(2),
-.reveal--visible .case-study:nth-child(2) {
-  transition-delay: 60ms;
-}
-.reveal--visible .career__entry:nth-child(3),
-.reveal--visible .case-study:nth-child(3) {
-  transition-delay: 120ms;
-}
-.reveal--visible .career__entry:nth-child(4),
-.reveal--visible .case-study:nth-child(4) {
-  transition-delay: 180ms;
-}
-.reveal--visible .career__entry:nth-child(n + 5),
-.reveal--visible .case-study:nth-child(n + 5) {
-  transition-delay: 240ms;
-}
-
-html[data-motion-level='minimal'] .reveal .section-title__eyebrow,
-html[data-motion-level='minimal'] .reveal .section-title__heading,
-html[data-motion-level='minimal'] .reveal .career__entry,
-html[data-motion-level='minimal'] .reveal .case-study,
-html[data-motion-level='minimal'] .reveal .contact__headline,
-html[data-motion-level='minimal'] .reveal .contact__cta .btn {
   opacity: 1;
   transform: none;
-  transition: none;
+}
+
+.reveal--visible .section-title__heading {
+  transition-delay: var(--stagger-step);
+}
+
+/* ---- Impact: the 4 metrics step in left-to-right / row-major (§5 of
+   the brief) — no count-up, the figures themselves are correct
+   immediately, only opacity/position animate. ---- */
+.reveal .impact-metric {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance));
+  transition:
+    opacity var(--reveal-duration) var(--reveal-easing),
+    transform var(--reveal-duration) var(--reveal-easing);
+}
+
+.reveal--visible .impact-metric {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal--visible .impact-metric:nth-child(1) {
+  transition-delay: calc(var(--stagger-step) * 1);
+}
+.reveal--visible .impact-metric:nth-child(2) {
+  transition-delay: calc(var(--stagger-step) * 2);
+}
+.reveal--visible .impact-metric:nth-child(3) {
+  transition-delay: calc(var(--stagger-step) * 3);
+}
+.reveal--visible .impact-metric:nth-child(4) {
+  transition-delay: calc(var(--stagger-step) * 4);
+}
+
+/* ---- Advisory: the list steps down top-to-bottom, capped at 5 steps
+   (§8: "전체 stagger 시간은 짧게 제한") — every item from the 5th on
+   shares the final delay, so 8 items never grow the wait past it. ---- */
+.reveal .advisory__item {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance));
+  transition:
+    opacity var(--reveal-duration) var(--reveal-easing),
+    transform var(--reveal-duration) var(--reveal-easing);
+}
+
+.reveal--visible .advisory__item {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal--visible .advisory__item:nth-child(1) {
+  transition-delay: calc(var(--stagger-step) * 1);
+}
+.reveal--visible .advisory__item:nth-child(2) {
+  transition-delay: calc(var(--stagger-step) * 2);
+}
+.reveal--visible .advisory__item:nth-child(3) {
+  transition-delay: calc(var(--stagger-step) * 3);
+}
+.reveal--visible .advisory__item:nth-child(4) {
+  transition-delay: calc(var(--stagger-step) * 4);
+}
+.reveal--visible .advisory__item:nth-child(n + 5) {
+  transition-delay: calc(var(--stagger-step) * 5);
+}
+
+/* ---- About/Profile: text first, portrait settles in about two beats
+   later (§6: "약 100~160ms 늦게") — the portrait's own fade/translate
+   only, never a zoom (the brief explicitly caps any zoom here at
+   scale(1.02) or skip it entirely; this project skips it — a translate
+   read is enough, and Profile's portrait never opts into
+   image_motion_style's zoom/parallax to begin with, see Profile.jsx). ---- */
+.reveal .profile__media {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance));
+  transition:
+    opacity var(--reveal-duration) var(--reveal-easing),
+    transform var(--reveal-duration) var(--reveal-easing);
+}
+
+.reveal--visible .profile__media {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--stagger-step) * 2);
+}
+
+/* ---- Contact: headline, then its CTA one short beat later, then the
+   info block and the form — EACH treated as one plain block (§11: "Form
+   field 하나하나가 따로 움직일 필요는 없습니다"), never per-field. ---- */
+.reveal .contact__headline,
+.reveal .contact__cta .btn,
+.reveal .contact__info,
+.reveal .contact__form-wrapper {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance));
+  transition:
+    opacity var(--reveal-duration) var(--reveal-easing),
+    transform var(--reveal-duration) var(--reveal-easing);
+}
+
+.reveal--visible .contact__headline,
+.reveal--visible .contact__cta .btn,
+.reveal--visible .contact__info,
+.reveal--visible .contact__form-wrapper {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal--visible .contact__cta .btn {
+  transition-delay: calc(var(--stagger-step) * 1.5);
+}
+.reveal--visible .contact__info {
+  transition-delay: calc(var(--stagger-step) * 1);
+}
+.reveal--visible .contact__form-wrapper {
+  transition-delay: calc(var(--stagger-step) * 2);
+}
+
+/* ---- Case Study — each article now carries its OWN .reveal/.reveal--
+   visible (see CaseStudy.jsx's own useReveal() call and the file-level
+   note above), not a descendant-of-the-section selector. Image leads
+   with no delay of its own (§7: "Image → Title/Text → Metrics"), body
+   and metrics follow — regardless of which side the image sits on
+   (`.case-study--reverse` only changes CSS `order`, i.e. layout
+   position, never paint/opacity timing), so a visually left-image and a
+   visually right-image case both still read image-first in time. ---- */
+.case-study.reveal {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance));
+  transition:
+    opacity var(--reveal-duration) var(--reveal-easing),
+    transform var(--reveal-duration) var(--reveal-easing);
+}
+
+.case-study.reveal--visible {
+  opacity: 1;
+  transform: none;
+}
+
+.case-study.reveal .case-study__body,
+.case-study.reveal .case-study__metrics {
+  opacity: 0;
+  transform: translateY(calc(var(--reveal-distance) * 0.6));
+  transition:
+    opacity var(--reveal-duration) var(--reveal-easing),
+    transform var(--reveal-duration) var(--reveal-easing);
+}
+
+.case-study.reveal--visible .case-study__body {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--stagger-step) * 1);
+}
+
+.case-study.reveal--visible .case-study__metrics {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--stagger-step) * 2);
+}
+
+/* ---- Career — same per-item fix as Case Study: each entry carries its
+   own .reveal/.reveal--visible (see CareerEntry.jsx). No internal child
+   stagger needed — period/role/company read as one small block, and the
+   entry-to-entry rhythm now comes naturally from each one's own,
+   independent scroll trigger rather than a shared artificial delay. ---- */
+.career__entry.reveal {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance));
+  transition:
+    opacity var(--reveal-duration) var(--reveal-easing),
+    transform var(--reveal-duration) var(--reveal-easing);
+}
+
+.career__entry.reveal--visible {
+  opacity: 1;
+  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .reveal .section-title__eyebrow,
   .reveal .section-title__heading,
-  .reveal .career__entry,
-  .reveal .case-study,
+  .reveal .impact-metric,
+  .reveal .advisory__item,
+  .reveal .profile__media,
   .reveal .contact__headline,
-  .reveal .contact__cta .btn {
+  .reveal .contact__cta .btn,
+  .reveal .contact__info,
+  .reveal .contact__form-wrapper,
+  .case-study.reveal,
+  .case-study.reveal .case-study__body,
+  .case-study.reveal .case-study__metrics,
+  .career__entry.reveal {
     opacity: 1;
     transform: none;
     transition: none;

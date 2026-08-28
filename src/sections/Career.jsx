@@ -3,6 +3,7 @@ import { useSectionContent } from '../hooks/useSectionContent';
 import { useReveal } from '../hooks/useReveal';
 import { fetchCareer, careerFallback } from '../lib/content/career';
 import SectionTitle from '../components/SectionTitle';
+import CareerEntry from '../components/CareerEntry';
 import './Career.css';
 
 /**
@@ -23,16 +24,12 @@ function Career() {
         <SectionTitle eyebrow={t(content.eyebrowKo, content.eyebrowEn)} title={t(content.titleKo, content.titleEn)} />
         <ol className="career__timeline">
           {content.entries.map((entry) => (
-            <li className="career__entry" key={entry.period}>
-              <div className="career__marker" aria-hidden="true">
-                <span className="career__dot" />
-              </div>
-              <div className="career__detail">
-                <p className="career__period">{entry.period}</p>
-                <h3 className="career__role">{t(entry.roleKo, entry.roleEn)}</h3>
-                <p className="career__company">{t(entry.companyKo, entry.companyEn)}</p>
-              </div>
-            </li>
+            <CareerEntry
+              key={entry.period}
+              period={entry.period}
+              role={t(entry.roleKo, entry.roleEn)}
+              company={t(entry.companyKo, entry.companyEn)}
+            />
           ))}
         </ol>
       </div>
