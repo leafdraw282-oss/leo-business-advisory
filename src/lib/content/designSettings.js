@@ -63,7 +63,7 @@ export function designSettingsFallback() {
     colorBackground: '#f4f1ea',
     colorSurface: '#ffffff',
     colorText: '#222222',
-    colorTextMuted: '#8b8984',
+    colorTextMuted: '#696764',
     colorBorder: 'rgba(34, 34, 34, 0.12)',
     contentMaxWidth: '1280px',
     sectionSpacing: '6rem',

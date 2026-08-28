@@ -1,5 +1,6 @@
 .profile {
   padding-block: var(--section-spacing);
+  background-color: var(--color-background);
 }
 
 .profile__grid {

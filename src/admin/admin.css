@@ -1177,6 +1177,53 @@ body {
   transition: height 0.2s ease;
 }
 
+/* Phase 5-A — the 8 color-role swatch grid (ColorRoleSwatches in
+   DesignSettingsPreview.jsx), sitting between the layout schematic bars
+   and the sample card so an admin can see how Primary/Secondary/Accent/
+   Background/Surface/Text/Muted Text/Border relate before saving. */
+.admin-design-preview-swatches {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.admin-design-preview-swatch {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.admin-design-preview-swatch-chip {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  border-radius: 4px;
+  border: 1px solid rgba(11, 22, 37, 0.15);
+}
+
+.admin-design-preview-swatch-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.admin-design-preview-swatch-role {
+  font-size: 0.7rem;
+  color: #222222;
+  line-height: 1.2;
+}
+
+.admin-design-preview-swatch-hex {
+  font-size: 0.65rem;
+  color: #8b8984;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Phase 4-F — Motion Level / Image Motion Style preview (DesignSettingsPreview.jsx).
    Sits below the existing static preview card; only ever animates when the
    admin explicitly clicks its own Play button (see MotionPreview's

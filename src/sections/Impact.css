@@ -1,5 +1,6 @@
 .impact {
   padding-block: var(--section-spacing);
+  background-color: var(--color-surface);
 }
 
 .impact__grid {

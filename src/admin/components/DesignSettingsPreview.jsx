@@ -96,13 +96,13 @@ function MotionPreview({ settings }) {
       <div className="admin-design-preview-bar-row">
         <span className="admin-design-preview-bar-label">Motion Level: {settings.motionLevel}</span>
       </div>
-      <p style={{ fontSize: '0.75rem', color: settings.colorTextMuted || '#8b8984', margin: '0.2rem 0 0' }}>
+      <p style={{ fontSize: '0.75rem', color: settings.colorTextMuted || '#696764', margin: '0.2rem 0 0' }}>
         {level.description}
       </p>
       <div className="admin-design-preview-bar-row" style={{ marginTop: '0.5rem' }}>
         <span className="admin-design-preview-bar-label">Image Motion Style: {settings.imageMotionStyle}</span>
       </div>
-      <p style={{ fontSize: '0.75rem', color: settings.colorTextMuted || '#8b8984', margin: '0.2rem 0 0' }}>
+      <p style={{ fontSize: '0.75rem', color: settings.colorTextMuted || '#696764', margin: '0.2rem 0 0' }}>
         {imageMotion.description}
       </p>
       <button type="button" className="admin-design-preview-motion-play" onClick={playPreview}>
@@ -110,6 +110,44 @@ function MotionPreview({ settings }) {
       </button>
       <div style={sectionSampleStyle}>Sample Section</div>
       <div style={imageSampleStyle} aria-hidden="true" />
+    </div>
+  );
+}
+
+// Phase 5-A — the 8 color roles Admin > Settings actually exposes, in the
+// same order the form lists them, each labeled with its role name so an
+// admin can see how Primary/Secondary/Accent/Background/Surface/Text/
+// Muted Text/Border relate to each other before saving. Text/Muted Text
+// swatches show their sample text set IN that color, on the current
+// Surface color, so a contrast problem is visible directly in the
+// preview rather than only inferable from hex values.
+const COLOR_ROLES = [
+  { key: 'colorPrimary', label: 'Primary' },
+  { key: 'colorSecondary', label: 'Secondary' },
+  { key: 'colorAccent', label: 'Accent' },
+  { key: 'colorBackground', label: 'Background' },
+  { key: 'colorSurface', label: 'Surface' },
+  { key: 'colorText', label: 'Text' },
+  { key: 'colorTextMuted', label: 'Muted Text' },
+  { key: 'colorBorder', label: 'Border' },
+];
+
+function ColorRoleSwatches({ settings }) {
+  return (
+    <div className="admin-design-preview-swatches">
+      {COLOR_ROLES.map(({ key, label }) => (
+        <div className="admin-design-preview-swatch" key={key}>
+          <span
+            className="admin-design-preview-swatch-chip"
+            style={{ background: settings[key] || 'transparent' }}
+            aria-hidden="true"
+          />
+          <span className="admin-design-preview-swatch-text">
+            <span className="admin-design-preview-swatch-role">{label}</span>
+            <span className="admin-design-preview-swatch-hex">{settings[key] || '—'}</span>
+          </span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -163,7 +201,7 @@ function DesignSettingsPreview({ settings }) {
     fontSize: bodyFontSize,
     lineHeight: settings.lineHeight || 1.75,
     letterSpacing: settings.letterSpacing || 'normal',
-    color: settings.colorTextMuted || '#8b8984',
+    color: settings.colorTextMuted || '#696764',
     margin: 0,
   };
   const buttonStyle = {
@@ -204,6 +242,8 @@ function DesignSettingsPreview({ settings }) {
           </div>
         </div>
       </div>
+
+      <ColorRoleSwatches settings={settings} />
 
       <div style={cardStyle}>
         <p style={eyebrowStyle}>Sample Eyebrow</p>

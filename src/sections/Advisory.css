@@ -1,5 +1,6 @@
 .advisory {
   padding-block: var(--section-spacing);
+  background-color: var(--color-background);
 }
 
 .advisory__list {

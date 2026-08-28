@@ -9,7 +9,7 @@
 }
 
 .header--scrolled {
-  background-color: var(--color-bg);
+  background-color: var(--color-background);
   border-bottom-color: var(--color-border);
 }
 
@@ -80,7 +80,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  background-color: var(--color-navy);
+  background-color: var(--color-primary);
   padding: var(--space-lg) var(--container-padding-inline) var(--space-xl);
   box-shadow: var(--shadow-elevated);
 }
@@ -93,7 +93,7 @@
 
 .header__mobile-panel a {
   display: block;
-  color: var(--color-ivory);
+  color: var(--color-secondary);
   font-family: var(--font-heading);
   font-size: 1.25rem;
 }

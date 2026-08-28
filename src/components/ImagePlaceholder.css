@@ -1,7 +1,7 @@
 .image-placeholder {
   width: 100%;
   overflow: hidden;
-  background-color: var(--color-navy);
+  background-color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -29,7 +29,7 @@
 }
 
 .image-placeholder__label {
-  color: var(--color-ivory);
+  color: var(--color-secondary);
   opacity: 0.6;
   font-size: 0.8125rem;
   letter-spacing: 0.04em;

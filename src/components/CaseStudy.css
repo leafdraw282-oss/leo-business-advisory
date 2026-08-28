@@ -53,7 +53,7 @@
   font-family: var(--font-heading);
   font-size: clamp(1.25rem, 1vw + 1rem, 1.6rem);
   line-height: 1.5;
-  color: var(--color-navy);
+  color: var(--color-primary);
   max-width: 34rem;
 }
 
@@ -91,7 +91,7 @@
 .case-study__metric-value {
   font-family: var(--font-heading);
   font-size: clamp(1.4rem, 1.2vw + 1rem, 2rem);
-  color: var(--color-navy);
+  color: var(--color-primary);
 }
 
 .case-study__metric-label {
