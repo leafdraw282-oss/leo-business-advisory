@@ -109,7 +109,37 @@
     display: none;
   }
 
+  /* Phase 5-G — a real tap target (44px, the standard mobile minimum) in
+     place of the 32px box used at desktop pointer sizes; the icon itself
+     (span width/height) is untouched, only the surrounding hit area grows. */
   .header__hamburger {
     display: flex;
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Logo remains a single inline link — padding-block grows its own tap
+     area without affecting --header-height (the bar centers it via
+     align-items, so this never changes the header's overall height). */
+  .header__logo {
+    padding-block: var(--space-xs);
+  }
+
+  /* Frees up the width the larger hamburger/KR-EN tap targets now need
+     next to a full-length logo on a narrow phone. */
+  .header__controls {
+    gap: var(--space-sm);
+  }
+}
+
+@media (max-width: 400px) {
+  /* Phase 5-G — "LEO BUSINESS ADVISORY" at the desktop logo size, plus
+     44px-minimum tap targets for the hamburger and KR/EN toggle, no longer
+     fit a 360-390px bar without one of them shrinking. The logo is the
+     one safe to scale down: it's a wordmark, not a tap-target-sensitive
+     control, and clamp() keeps every other viewport untouched. */
+  .header__logo {
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
   }
 }

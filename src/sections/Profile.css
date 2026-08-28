@@ -62,8 +62,16 @@
     grid-template-columns: 1fr;
   }
 
+  /* Phase 5-G — a grid item with auto inline margins is sized shrink-to-fit
+     (CSS Box Alignment §7.1: auto margins suppress `justify-items: stretch`),
+     so without an explicit width this shrank to the placeholder label's own
+     min-content text width — a founder portrait rendering ~130px wide
+     regardless of viewport. width: 100% gives the item a definite size
+     again (capped by max-width), so margin-inline: auto centers an
+     intentionally-sized image instead of collapsing it. */
   .profile__media {
     order: initial;
+    width: 100%;
     max-width: 26rem;
     margin-inline: auto;
   }

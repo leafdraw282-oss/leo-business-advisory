@@ -21,3 +21,17 @@
 .language-toggle span {
   opacity: 0.35;
 }
+
+/* Phase 5-G — at 23x29px this was well under the ~44px mobile tap-target
+   minimum, sitting right next to the hamburger where a mis-tap is easy.
+   display:flex + min-height/width lets padding grow the hit area without
+   changing the visible "KR"/"EN" text size or desktop's tighter layout. */
+@media (max-width: 768px) {
+  .language-toggle button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    min-height: 2.75rem;
+  }
+}

@@ -102,4 +102,14 @@
     align-items: flex-start;
     gap: var(--space-sm);
   }
+
+  /* Phase 5-G — footer nav/contact links measured 17-27px tall (just
+     line-height, no padding) at 390px, well under a comfortable mobile tap
+     target. block + vertical padding grows the hit area around each link's
+     existing text size, without touching desktop's tighter list. */
+  .footer__nav a,
+  .footer__contact a {
+    display: block;
+    padding-block: 0.5rem;
+  }
 }

@@ -40,6 +40,19 @@ body {
   /* Prevents Phase-1 rules like "no horizontal overflow on mobile" from
      being silently broken by a single oversized child element. */
   overflow-x: hidden;
+  /* Phase 5-G — without this, CJK line-breaking treats every Hangul
+     syllable as its own break opportunity (there are no spaces between
+     "words" the way Latin script has them), so a narrow mobile viewport
+     can split a single phrase mid-word — e.g. Hero's own
+     "사업을 성장시키고," breaking into "사업을 성장시키" / "고," at 360px,
+     a lone trailing comma orphaned on its own line. keep-all makes CJK
+     text break only at actual spaces, exactly like English already does;
+     overflow-wrap: break-word stays as a safety net so one truly
+     unbreakable long token (a URL, an unbroken English string) still
+     can't force horizontal overflow. Global on body — harmless for
+     English copy, which already only breaks at spaces. */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 img,
