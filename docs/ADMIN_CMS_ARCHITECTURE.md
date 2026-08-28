@@ -1,5 +1,14 @@
 # Admin CMS Architecture (Phase 2-A design)
 
+> **This is a historical design document, kept as-is for its original
+> rationale.** Everything it describes as "future phase" / "not built
+> yet" — the admin login screen, content-edit UI, image-upload UI, a real
+> Supabase project, Gallery active/inactive + Trash, Design/Layout/Motion
+> Settings — **has since been built and is live in Production.** For the
+> current, code-verified state of all of this, see **`docs/FOUNDATION.md`**
+> instead. This file is left unedited below so it still accurately
+> reflects what Phase 2-A actually decided and why.
+
 This document is the architecture design for turning the current
 static, `profile.js`-driven site into one an admin can edit through a
 `/admin` page — without ever risking the public site breaking. **Phase

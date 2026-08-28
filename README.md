@@ -3,14 +3,22 @@
 Personal-brand / business-advisory website for Boosuk "Leo" Suh, Founder &
 President of LEO Business Advisory. Built with Vite + React.
 
-> **Status:** Phase 2 is complete. The public site (every section, fully
-> bilingual, responsive) is deployed to GitHub Pages via
-> `.github/workflows/deploy.yml`. An admin CMS at `/admin` lets an admin
-> edit the site's text and images through Supabase, with
-> `src/data/profile.js` as the automatic fallback if Supabase isn't
-> configured or is unreachable — see `docs/ADMIN_CMS_ARCHITECTURE.md` and
-> `supabase/README.md` for how to set up the backend, and
-> `docs/PROJECT_STATUS.md` for the full phase-by-phase history.
+> **Status:** Production Foundation frozen as of Phase 4-J (Phase 4-I's
+> Final Production QA found no blockers). The public site (every section,
+> fully bilingual, responsive, CMS-backed) and the admin CMS at `/admin`
+> (content editing, image management, Gallery active/inactive + Trash,
+> Design/Layout/Motion Settings, Inquiries, revision history) are both
+> live and deployed to GitHub Pages via `.github/workflows/deploy.yml`.
+> `src/data/profile.js` remains the permanent automatic fallback if
+> Supabase isn't configured or is unreachable.
+>
+> **Read `docs/FOUNDATION.md` first** — it's the current, code-verified
+> reference for the whole system (project/CMS/DB/Auth/RLS/Image/Design
+> Settings/Motion structure, environment variables, and a "DO NOT BREAK"
+> list) and supersedes `docs/ADMIN_CMS_ARCHITECTURE.md`'s original design
+> doc for anything about the CURRENT implementation. `supabase/README.md`
+> has the migration-application steps; `docs/PROJECT_STATUS.md` has the
+> full phase-by-phase build history.
 
 ## Run the site locally
 
@@ -105,6 +113,10 @@ index.html          title, meta description, canonical, robots, OpenGraph,
 CLAUDE.md           permanent project rules and content source-of-truth
 docs/PROJECT_STATUS.md   phase-by-phase build history
 ```
+
+The tree above covers the **public site** only. For `src/admin/` (the CMS),
+`src/lib/` (the public content-fetch layer), `src/hooks/`, and the full
+Supabase schema/RLS/Storage structure, see `docs/FOUNDATION.md`.
 
 ## Language system
 
