@@ -126,3 +126,93 @@
     padding-block: var(--section-spacing-mobile) 0;
   }
 }
+
+/* ============================================================================
+ * Phase 5-F — Hero entrance. Hero is deliberately excluded from the
+ * scroll-reveal system (useReveal.js's own doc comment: "its content must
+ * never be gated behind a scroll reveal") since it's the first thing a
+ * visitor sees — so this is a plain CSS keyframe animation, triggered by
+ * the element simply existing in the DOM, never by an IntersectionObserver
+ * or any JS state. It reads the exact same --reveal-distance/--reveal-
+ * duration/--motion-easing tokens the rest of the Motion System uses (so
+ * it already respects the admin's motion_level pick and the mobile-scaled
+ * values above), just with its own short, capped per-element delays.
+ *
+ * This animates .hero__media itself — the wrapper around ImagePlaceholder,
+ * never the <img> inside it — so it only ever affects the placeholder
+ * box's own entrance (always ready immediately, no network dependency).
+ * The real photo's separate fadeInOnLoad opacity transition (on the <img>
+ * itself, only once it has actually finished loading) is completely
+ * independent of this and untouched — there is no scenario where this
+ * animation finishes before the image and reveals a blank gap, because
+ * what it reveals is the placeholder/container, not the network-dependent
+ * photo.
+ * ============================================================================ */
+
+@keyframes hero-enter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--reveal-distance));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hero__name,
+.hero__eyebrow,
+.hero__headline,
+.hero__subhead,
+.hero__cta,
+.hero__media {
+  animation: hero-enter var(--reveal-duration) var(--motion-easing) both;
+}
+
+.hero__name {
+  animation-delay: 0ms;
+}
+
+.hero__media {
+  animation-delay: 80ms;
+}
+
+.hero__eyebrow {
+  animation-delay: 50ms;
+}
+
+.hero__headline {
+  animation-delay: 100ms;
+}
+
+.hero__subhead {
+  animation-delay: 150ms;
+}
+
+.hero__cta {
+  animation-delay: 200ms;
+}
+
+html[data-motion-level='minimal'] .hero__name,
+html[data-motion-level='minimal'] .hero__eyebrow,
+html[data-motion-level='minimal'] .hero__headline,
+html[data-motion-level='minimal'] .hero__subhead,
+html[data-motion-level='minimal'] .hero__cta,
+html[data-motion-level='minimal'] .hero__media {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__name,
+  .hero__eyebrow,
+  .hero__headline,
+  .hero__subhead,
+  .hero__cta,
+  .hero__media {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

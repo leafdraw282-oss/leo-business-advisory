@@ -293,3 +293,123 @@ html[data-image-motion='parallax'] .image-placeholder.reveal.reveal--visible {
     transition: none;
   }
 }
+
+/* ============================================================================
+ * Phase 5-F — Final Motion Direction. Builds entirely on the Phase 4-F
+ * system above — no new tokens, no new dependency, no per-component
+ * IntersectionObserver. Two additions:
+ *
+ * 1. Mobile-scaled magnitude (§10 of the brief): the same --reveal-distance/
+ *    --reveal-duration tokens every .reveal-based element already reads,
+ *    just smaller on narrow viewports, and a reduced (not removed — this
+ *    site already unifies zoom/parallax into one restrained "Soft Zoom",
+ *    Phase 4-F's own deliberate choice) image scale.
+ * 2. A short, capped internal stagger for section headings and short lists
+ *    (Career/Case Studies), so a page-long scroll doesn't reveal eight
+ *    identical flat-block fades in a row (§4, §6). Scoped to `.reveal
+ *    <selector>` — never to a bare selector — so this can only ever hide
+ *    content when the ANCESTOR section's own .reveal is present, exactly
+ *    mirroring .reveal's own progressive-enhancement guarantee: when
+ *    reveal isn't supported/enabled (no IntersectionObserver, reduced
+ *    motion), the ancestor never gets the .reveal class at all, so these
+ *    child selectors never apply opacity:0 in the first place.
+ * ============================================================================ */
+
+@media (max-width: 768px) {
+  :root {
+    --reveal-distance: 10px;
+    --reveal-duration: 380ms;
+  }
+
+  html[data-image-motion='zoom'] .image-placeholder.reveal,
+  html[data-image-motion='parallax'] .image-placeholder.reveal {
+    transform: scale(1.02);
+  }
+}
+
+.reveal .section-title__eyebrow,
+.reveal .section-title__heading,
+.reveal .career__entry,
+.reveal .case-study,
+.reveal .contact__headline,
+.reveal .contact__cta .btn {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance));
+  transition:
+    opacity var(--reveal-duration) var(--motion-easing),
+    transform var(--reveal-duration) var(--motion-easing);
+}
+
+.reveal--visible .section-title__eyebrow,
+.reveal--visible .section-title__heading,
+.reveal--visible .career__entry,
+.reveal--visible .case-study,
+.reveal--visible .contact__headline,
+.reveal--visible .contact__cta .btn {
+  opacity: 1;
+  transform: none;
+}
+
+/* Eyebrow leads (0ms, the default), heading follows by one short beat —
+   applies uniformly via the shared SectionTitle component, so every
+   section gets the same reveal LANGUAGE without popping in as one
+   mechanically-identical flat block. */
+.reveal--visible .section-title__heading {
+  transition-delay: 70ms;
+}
+
+/* Contact's closing headline, then its CTA one short beat later —
+   reinforces the "closing" moment without a bigger/flashier effect than
+   anything else on the page (§8: "과장하지 마세요"). */
+.reveal--visible .contact__cta .btn {
+  transition-delay: 100ms;
+}
+
+/* Short per-item stagger for Career/Case Studies, capped at 5 steps
+   (§6: "누적 delay 상한 설정") — a 7-entry Career timeline or any future
+   longer list never grows the wait past this ceiling; every item from
+   the 5th on shares the same final delay. */
+.reveal--visible .career__entry:nth-child(1),
+.reveal--visible .case-study:nth-child(1) {
+  transition-delay: 0ms;
+}
+.reveal--visible .career__entry:nth-child(2),
+.reveal--visible .case-study:nth-child(2) {
+  transition-delay: 60ms;
+}
+.reveal--visible .career__entry:nth-child(3),
+.reveal--visible .case-study:nth-child(3) {
+  transition-delay: 120ms;
+}
+.reveal--visible .career__entry:nth-child(4),
+.reveal--visible .case-study:nth-child(4) {
+  transition-delay: 180ms;
+}
+.reveal--visible .career__entry:nth-child(n + 5),
+.reveal--visible .case-study:nth-child(n + 5) {
+  transition-delay: 240ms;
+}
+
+html[data-motion-level='minimal'] .reveal .section-title__eyebrow,
+html[data-motion-level='minimal'] .reveal .section-title__heading,
+html[data-motion-level='minimal'] .reveal .career__entry,
+html[data-motion-level='minimal'] .reveal .case-study,
+html[data-motion-level='minimal'] .reveal .contact__headline,
+html[data-motion-level='minimal'] .reveal .contact__cta .btn {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal .section-title__eyebrow,
+  .reveal .section-title__heading,
+  .reveal .career__entry,
+  .reveal .case-study,
+  .reveal .contact__headline,
+  .reveal .contact__cta .btn {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
