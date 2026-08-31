@@ -1,4 +1,6 @@
+/* Advisory Sales repositioning — see Impact.css's matching note; rhythm
+   re-derived for the new section order. */
 .case-studies {
   padding-block: var(--section-spacing);
-  background-color: var(--color-surface);
+  background-color: var(--color-background);
 }

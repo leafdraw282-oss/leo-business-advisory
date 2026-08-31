@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { defaultInquiryType } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
 import { useSectionContent } from '../hooks/useSectionContent';
 import { fetchContactForm, contactFormFallback } from '../lib/content/contactForm';
@@ -21,6 +22,14 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * — no fake success, no error, just nothing, since a legitimate user can
  * never trigger that path. Basic format/length validation runs both here
  * and again at the database (supabase/migrations/0005_inquiries.sql).
+ *
+ * Advisory Sales repositioning: simplified to the 4 fields the brief asks
+ * for (name / company / email / the visitor's current business problem).
+ * The "문의 유형" dropdown is no longer shown — `inquiries.inquiry_type` is
+ * still NOT NULL at the database level (supabase/migrations/0005_inquiries.sql,
+ * never altered here), so every submission silently carries
+ * `defaultInquiryType` (src/data/profile.js) in its place instead of
+ * asking the visitor to pick one.
  */
 function ContactForm() {
   const { t } = useLanguage();
@@ -37,13 +46,12 @@ function ContactForm() {
     });
   }
 
-  function validate({ name, email, inquiryType, message }) {
+  function validate({ name, email, message }) {
     const errors = {};
     const required = t(contactForm.requiredKo, contactForm.requiredEn);
     if (!name) errors.name = required;
     if (!email) errors.email = required;
     else if (!EMAIL_PATTERN.test(email)) errors.email = t(contactForm.invalidEmailKo, contactForm.invalidEmailEn);
-    if (!inquiryType) errors.inquiryType = required;
     if (!message) errors.message = required;
     return errors;
   }
@@ -60,10 +68,10 @@ function ContactForm() {
     const name = data.get('name')?.toString().trim() || '';
     const company = data.get('company')?.toString().trim() || '';
     const email = data.get('email')?.toString().trim() || '';
-    const inquiryType = data.get('inquiryType')?.toString().trim() || '';
+    const inquiryType = t(defaultInquiryType.ko, defaultInquiryType.en);
     const message = data.get('message')?.toString().trim() || '';
 
-    const errors = validate({ name, email, inquiryType, message });
+    const errors = validate({ name, email, message });
     setFieldErrors(errors);
     if (Object.keys(errors).length > 0) return;
 
@@ -142,49 +150,22 @@ function ContactForm() {
         </div>
       </div>
 
-      <div className="contact-form__row">
-        <div className="contact-form__field">
-          <label htmlFor="contact-email">{t(contactForm.labels.email.ko, contactForm.labels.email.en)}</label>
-          <input
-            id="contact-email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            aria-invalid={Boolean(fieldErrors.email)}
-            aria-describedby={fieldErrors.email ? 'contact-email-error' : undefined}
-            onChange={() => clearFieldError('email')}
-          />
-          {fieldErrors.email && (
-            <span className="contact-form__error" id="contact-email-error" role="alert">
-              {fieldErrors.email}
-            </span>
-          )}
-        </div>
-        <div className="contact-form__field">
-          <label htmlFor="contact-inquiry-type">{t(contactForm.labels.inquiryType.ko, contactForm.labels.inquiryType.en)}</label>
-          <select
-            id="contact-inquiry-type"
-            name="inquiryType"
-            defaultValue=""
-            aria-invalid={Boolean(fieldErrors.inquiryType)}
-            aria-describedby={fieldErrors.inquiryType ? 'contact-inquiry-type-error' : undefined}
-            onChange={() => clearFieldError('inquiryType')}
-          >
-            <option value="" disabled>
-              {t(contactForm.inquiryPlaceholderKo, contactForm.inquiryPlaceholderEn)}
-            </option>
-            {contactForm.inquiryTypes.map((type) => (
-              <option key={type.en} value={t(type.ko, type.en)}>
-                {t(type.ko, type.en)}
-              </option>
-            ))}
-          </select>
-          {fieldErrors.inquiryType && (
-            <span className="contact-form__error" id="contact-inquiry-type-error" role="alert">
-              {fieldErrors.inquiryType}
-            </span>
-          )}
-        </div>
+      <div className="contact-form__field">
+        <label htmlFor="contact-email">{t(contactForm.labels.email.ko, contactForm.labels.email.en)}</label>
+        <input
+          id="contact-email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          aria-invalid={Boolean(fieldErrors.email)}
+          aria-describedby={fieldErrors.email ? 'contact-email-error' : undefined}
+          onChange={() => clearFieldError('email')}
+        />
+        {fieldErrors.email && (
+          <span className="contact-form__error" id="contact-email-error" role="alert">
+            {fieldErrors.email}
+          </span>
+        )}
       </div>
 
       <div className="contact-form__field">

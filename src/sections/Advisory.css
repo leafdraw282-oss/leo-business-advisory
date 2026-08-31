@@ -1,37 +1,88 @@
 .advisory {
   padding-block: var(--section-spacing);
-  background-color: var(--color-background);
+  background-color: var(--color-surface);
 }
 
-.advisory__list {
+.advisory__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  column-gap: var(--space-2xl);
+  gap: var(--space-xl) var(--space-2xl);
 }
 
-.advisory__item {
+/* Flat, typographic panel — a top border and generous padding stand in
+   for a "card" without shadow/gradient/rounded chrome, per the brief's
+   "카드 UI 남용 지양" direction. */
+.advisory-card {
+  padding-top: var(--space-lg);
+  border-top: 2px solid var(--color-primary);
   display: flex;
-  align-items: baseline;
-  gap: var(--space-md);
-  padding-block: var(--space-md);
-  border-top: 1px solid var(--color-border);
+  flex-direction: column;
 }
 
-.advisory__index {
-  font-family: var(--font-heading);
+.advisory-card__name {
+  font-size: var(--font-size-h3);
+  margin-bottom: var(--space-xs);
+}
+
+.advisory-card__target {
+  color: var(--color-text-muted);
   font-size: 0.95rem;
-  color: var(--color-accent);
-  flex-shrink: 0;
+  margin-bottom: var(--space-md);
 }
 
-.advisory__label {
-  font-size: clamp(1rem, 0.3vw + 0.9rem, 1.15rem);
+.advisory-card__focus {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+}
+
+.advisory-card__focus li {
+  position: relative;
+  padding-left: var(--space-md);
+  font-size: 0.95rem;
   color: var(--color-text);
 }
 
+.advisory-card__focus li::before {
+  content: '·';
+  position: absolute;
+  left: 0.3rem;
+  color: var(--color-accent);
+}
+
+.advisory-card__deliverable {
+  font-size: 0.95rem;
+  color: var(--color-text);
+  margin-bottom: var(--space-md);
+}
+
+.advisory-card__deliverable-label {
+  display: block;
+  font-size: var(--font-size-eyebrow);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: 2px;
+}
+
+.advisory-card__cta {
+  margin-top: auto;
+  align-self: flex-start;
+  font-size: 0.9rem;
+  border-bottom: 1px solid currentColor;
+  color: var(--color-primary);
+  transition: opacity var(--transition-base);
+}
+
+.advisory-card__cta:hover {
+  opacity: 0.7;
+}
+
 @media (max-width: 1024px) {
-  .advisory__list {
+  .advisory__grid {
     grid-template-columns: 1fr;
+    gap: var(--space-xl);
   }
 }
 

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { contactCta } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
 import { useSectionContent } from '../hooks/useSectionContent';
 import { useReveal } from '../hooks/useReveal';
@@ -63,7 +64,14 @@ function Contact() {
     >
       <div className="container">
         <div className="contact__cta">
+          {/* eyebrowKo/En and introKo/En are new Advisory Sales copy with
+              no Supabase-editable counterpart yet (contact_cta only stores
+              headline/button — see src/lib/content/contactInfo.js), so
+              these two read directly from profile.js, same pattern as
+              Challenge/HowWeWork/TargetClients/InsightsPreview above. */}
+          <p className="contact__eyebrow">{t(contactCta.eyebrowKo, contactCta.eyebrowEn)}</p>
           <h2 className="contact__headline">{t(contact.ctaHeadlineKo, contact.ctaHeadlineEn)}</h2>
+          <p className="contact__intro">{t(contactCta.introKo, contactCta.introEn)}</p>
           <button type="button" className="btn btn--primary" onClick={focusForm}>
             {t(contact.ctaButtonKo, contact.ctaButtonEn)}
           </button>
@@ -92,6 +100,18 @@ function Contact() {
           <div className="contact__form-wrapper" ref={formWrapperRef}>
             <ContactForm />
           </div>
+        </div>
+
+        {/* Closing line, repeated at the very bottom of the page — the
+            site's last conversion point, per the brief's "페이지 맨 아래에
+            다시 한번 짧은 클로징 문구 + 버튼". Reuses the same button copy
+            (contact.ctaButtonKo/En) and focusForm() as the CTA above, so
+            both buttons do the exact same thing. */}
+        <div className="contact__closing">
+          <p className="contact__closing-line">{t(contactCta.finalLineKo, contactCta.finalLineEn)}</p>
+          <button type="button" className="btn btn--primary" onClick={focusForm}>
+            {t(contact.ctaButtonKo, contact.ctaButtonEn)}
+          </button>
         </div>
       </div>
     </section>

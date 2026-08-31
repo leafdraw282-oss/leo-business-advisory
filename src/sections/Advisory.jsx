@@ -1,32 +1,45 @@
+import { advisorySection, advisoryProducts, advisoryCta } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
-import { useSectionContent } from '../hooks/useSectionContent';
 import { useReveal } from '../hooks/useReveal';
-import { fetchAdvisory, advisoryFallback } from '../lib/content/advisory';
 import SectionTitle from '../components/SectionTitle';
+import AdvisoryCard from '../components/AdvisoryCard';
 import './Advisory.css';
 
 /**
- * Advisory section (id: "advisory", matches src/data/navigation.js).
- * Content comes from Supabase (Phase 2-E) when available, falling back
- * to src/data/profile.js — see src/lib/content/advisory.js.
+ * "What We Do" (id: "advisory", matches src/data/navigation.js) — Advisory
+ * Sales repositioning: the section formerly rendered `advisory.items` (a
+ * flat 8-item CMS-backed list, still exported from profile.js and still
+ * editable in the admin panel — see src/lib/content/advisory.js — but no
+ * longer shown on the public site) and now renders the 4 named Advisory
+ * Products instead. Not CMS-backed for the same reason as Challenge below:
+ * these are 4 fixed, structured products (name/target/focus list/
+ * deliverable), not a shape the existing advisory_items admin editor
+ * supports — see this phase's report, "Remaining TODO".
  */
 function Advisory() {
   const { t } = useLanguage();
-  const advisory = useSectionContent(fetchAdvisory, advisoryFallback());
   const { ref, className: revealClassName } = useReveal();
 
   return (
-    <section id="advisory" ref={ref} className={`advisory ${revealClassName}`.trim()} aria-label={t('자문', 'Advisory')}>
+    <section id="advisory" ref={ref} className={`advisory ${revealClassName}`.trim()} aria-label={t(advisorySection.titleKo, advisorySection.titleEn)}>
       <div className="container">
-        <SectionTitle eyebrow={t(advisory.eyebrowKo, advisory.eyebrowEn)} title={t(advisory.titleKo, advisory.titleEn)} />
-        <ol className="advisory__list">
-          {advisory.items.map((item, index) => (
-            <li className="advisory__item" key={item.id}>
-              <span className="advisory__index">{String(index + 1).padStart(2, '0')}</span>
-              <span className="advisory__label">{t(item.ko, item.en)}</span>
-            </li>
+        <SectionTitle
+          eyebrow={t(advisorySection.eyebrowKo, advisorySection.eyebrowEn)}
+          title={t(advisorySection.titleKo, advisorySection.titleEn)}
+        />
+        <div className="advisory__grid">
+          {advisoryProducts.map((product) => (
+            <AdvisoryCard
+              key={product.id}
+              name={t(product.nameKo, product.nameEn)}
+              target={t(product.targetKo, product.targetEn)}
+              focus={t(product.focusKo, product.focusEn)}
+              deliverableLabel={t('제공 결과물', 'Deliverable')}
+              deliverable={t(product.deliverableKo, product.deliverableEn)}
+              ctaLabel={t(advisoryCta.ko, advisoryCta.en)}
+            />
           ))}
-        </ol>
+        </div>
       </div>
     </section>
   );

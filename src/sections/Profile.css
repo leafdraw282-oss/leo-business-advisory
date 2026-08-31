@@ -1,6 +1,8 @@
+/* Advisory Sales repositioning — see Impact.css's matching note; rhythm
+   re-derived for the new section order. */
 .profile {
   padding-block: var(--section-spacing);
-  background-color: var(--color-background);
+  background-color: var(--color-surface);
 }
 
 .profile__grid {

@@ -1,0 +1,71 @@
+.target-clients {
+  padding-block: var(--section-spacing);
+  background-color: var(--color-background);
+}
+
+.target-clients__list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: var(--space-2xl);
+}
+
+.target-clients__item {
+  padding-block: var(--space-md);
+  border-top: 1px solid var(--color-border);
+  font-size: clamp(1rem, 0.3vw + 0.9rem, 1.15rem);
+  color: var(--color-text);
+}
+
+/* Emphasized separately, per the brief — a distinct bordered block below
+   the four general segments, not just one more list item. */
+.target-clients__pe {
+  margin-top: var(--space-2xl);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-primary);
+  max-width: 40rem;
+}
+
+.target-clients__pe-label {
+  font-size: var(--font-size-eyebrow);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.target-clients__pe-intro {
+  color: var(--color-text);
+  margin-bottom: var(--space-md);
+  max-width: 34rem;
+}
+
+.target-clients__pe-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-md);
+}
+
+.target-clients__pe-items li {
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+@media (max-width: 1024px) {
+  .target-clients__list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .target-clients {
+    padding-block: var(--section-spacing-mobile);
+  }
+
+  .target-clients__pe {
+    padding: var(--space-md);
+  }
+}

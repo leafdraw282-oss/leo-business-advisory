@@ -690,6 +690,104 @@ html[data-image-motion='parallax'] .image-placeholder.reveal.reveal--visible {
   transform: scale(1);
 }
 
+/* ============================================================================
+ * Advisory Sales IA overhaul — reveal coverage for the new sections
+ * (Challenge / Advisory's product cards / How We Work / Target Clients /
+ * Insights) and the two new Contact elements (eyebrow/intro, closing
+ * block). Follows the exact same pattern as the Phase 6-A/6-B blocks
+ * above — never a new/duplicate motion system: body-weight for short text
+ * lines, metric-weight for small label-sized text, capped at 3 stagger
+ * steps per list. ---- */
+.reveal .challenge__item,
+.reveal .target-clients__item,
+.reveal .how-we-work__row {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance-body));
+  transition:
+    opacity var(--reveal-duration-body) var(--reveal-easing),
+    transform var(--reveal-duration-body) var(--reveal-easing);
+}
+
+.reveal--visible .challenge__item,
+.reveal--visible .target-clients__item,
+.reveal--visible .how-we-work__row {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal--visible .challenge__item:nth-child(1),
+.reveal--visible .target-clients__item:nth-child(1) {
+  transition-delay: calc(var(--stagger-step) * 0);
+}
+.reveal--visible .challenge__item:nth-child(2),
+.reveal--visible .target-clients__item:nth-child(2) {
+  transition-delay: calc(var(--stagger-step) * 1);
+}
+.reveal--visible .challenge__item:nth-child(3),
+.reveal--visible .target-clients__item:nth-child(3) {
+  transition-delay: calc(var(--stagger-step) * 2);
+}
+.reveal--visible .challenge__item:nth-child(n + 4),
+.reveal--visible .target-clients__item:nth-child(n + 4) {
+  transition-delay: calc(var(--stagger-step) * 3);
+}
+.reveal--visible .how-we-work__row--leo {
+  transition-delay: calc(var(--stagger-step) * 1);
+}
+
+.reveal .advisory-card,
+.reveal .insight-card {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance-body));
+  transition:
+    opacity var(--reveal-duration-body) var(--reveal-easing),
+    transform var(--reveal-duration-body) var(--reveal-easing);
+}
+
+.reveal--visible .advisory-card,
+.reveal--visible .insight-card {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal--visible .advisory__grid .advisory-card:nth-child(2),
+.reveal--visible .insights-preview__grid li:nth-child(2) .insight-card {
+  transition-delay: calc(var(--stagger-step) * 1);
+}
+.reveal--visible .advisory__grid .advisory-card:nth-child(3),
+.reveal--visible .insights-preview__grid li:nth-child(3) .insight-card {
+  transition-delay: calc(var(--stagger-step) * 2);
+}
+.reveal--visible .advisory__grid .advisory-card:nth-child(4) {
+  transition-delay: calc(var(--stagger-step) * 3);
+}
+
+.reveal .contact__eyebrow {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance-metric));
+  transition:
+    opacity var(--reveal-duration-metric) var(--reveal-easing),
+    transform var(--reveal-duration-metric) var(--reveal-easing);
+}
+
+.reveal .contact__intro {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance-body));
+  transition:
+    opacity var(--reveal-duration-body) var(--reveal-easing),
+    transform var(--reveal-duration-body) var(--reveal-easing);
+}
+
+.reveal--visible .contact__eyebrow,
+.reveal--visible .contact__intro {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal--visible .contact__intro {
+  transition-delay: var(--stagger-step);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .image-placeholder.reveal,
   .case-study__media .image-placeholder.reveal,
@@ -704,11 +802,18 @@ html[data-image-motion='parallax'] .image-placeholder.reveal.reveal--visible {
   .reveal .contact__cta .btn,
   .reveal .contact__info,
   .reveal .contact__form-wrapper,
+  .reveal .contact__eyebrow,
+  .reveal .contact__intro,
   .case-study.reveal,
   .case-study.reveal .case-study__body,
   .case-study.reveal .case-study__metrics,
   .career__entry.reveal,
-  .career__entry.reveal .career__dot {
+  .career__entry.reveal .career__dot,
+  .reveal .challenge__item,
+  .reveal .target-clients__item,
+  .reveal .how-we-work__row,
+  .reveal .advisory-card,
+  .reveal .insight-card {
     opacity: 1;
     transform: none;
     transition: none;

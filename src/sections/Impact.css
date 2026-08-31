@@ -1,6 +1,10 @@
+/* Advisory Sales repositioning — background rhythm re-derived for the new
+   section order (Challenge/bg → Advisory/surface → Impact/bg →
+   Profile/surface → Case Studies/bg → ...), not the original Impact-second
+   flow this alternation was first tuned for. */
 .impact {
   padding-block: var(--section-spacing);
-  background-color: var(--color-surface);
+  background-color: var(--color-background);
 }
 
 .impact__grid {

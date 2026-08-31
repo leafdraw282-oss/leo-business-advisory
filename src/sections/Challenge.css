@@ -1,0 +1,60 @@
+.challenge {
+  padding-block: var(--section-spacing);
+  background-color: var(--color-background);
+}
+
+.challenge__list {
+  max-width: var(--text-body-max-width);
+}
+
+.challenge__item {
+  position: relative;
+  padding: var(--space-md) 0 var(--space-md) var(--space-lg);
+  border-top: 1px solid var(--color-border);
+  font-size: clamp(1rem, 0.3vw + 0.9rem, 1.15rem);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+.challenge__item:last-child {
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* A plain dash marker, not a decorative icon/number — keeps the list
+   reading as a quiet, editorial checklist rather than a card grid. */
+.challenge__item::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--color-accent);
+}
+
+.challenge__statement {
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-primary);
+  max-width: 36rem;
+}
+
+.challenge__statement-main {
+  font-family: var(--font-kr);
+  font-size: clamp(1.35rem, 1.1vw + 1.05rem, 1.85rem);
+  line-height: 1.4;
+  color: var(--color-primary);
+  margin-bottom: var(--space-sm);
+}
+
+:lang(en) .challenge__statement-main {
+  font-family: var(--font-heading);
+}
+
+.challenge__statement-sub {
+  color: var(--color-text-muted);
+  font-size: 1.05rem;
+}
+
+@media (max-width: 768px) {
+  .challenge {
+    padding-block: var(--section-spacing-mobile);
+  }
+}

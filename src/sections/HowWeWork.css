@@ -1,0 +1,97 @@
+.how-we-work {
+  padding-block: var(--section-spacing);
+  background-color: var(--color-surface);
+}
+
+.how-we-work__compare {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  max-width: 42rem;
+}
+
+.how-we-work__row {
+  display: grid;
+  grid-template-columns: 11rem 1fr;
+  align-items: baseline;
+  gap: var(--space-md);
+  padding: var(--space-lg) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.how-we-work__row-label {
+  font-size: var(--font-size-eyebrow);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.how-we-work__row--leo .how-we-work__row-label {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.how-we-work__steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6em;
+  font-size: 1.05rem;
+  color: var(--color-text-muted);
+}
+
+.how-we-work__row--leo .how-we-work__steps {
+  color: var(--color-primary);
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+}
+
+:lang(ko) .how-we-work__row--leo .how-we-work__steps {
+  font-family: var(--font-kr);
+}
+
+.how-we-work__steps li:not(:last-child)::after {
+  content: '→';
+  margin-left: 0.6em;
+  color: var(--color-accent);
+}
+
+.how-we-work__quote {
+  margin: var(--space-2xl) 0 0;
+  padding-top: var(--space-lg);
+  border-top: 2px solid var(--color-primary);
+  max-width: 38rem;
+}
+
+.how-we-work__quote p {
+  font-family: var(--font-kr);
+  font-size: clamp(1.4rem, 1.2vw + 1.1rem, 1.9rem);
+  line-height: 1.4;
+  color: var(--color-primary);
+  margin-bottom: var(--space-sm);
+}
+
+:lang(en) .how-we-work__quote p {
+  font-family: var(--font-heading);
+}
+
+.how-we-work__quote cite {
+  display: block;
+  font-style: normal;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 640px) {
+  .how-we-work__row {
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+  }
+}
+
+@media (max-width: 768px) {
+  .how-we-work {
+    padding-block: var(--section-spacing-mobile);
+  }
+}
