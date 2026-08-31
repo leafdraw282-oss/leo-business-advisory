@@ -181,28 +181,36 @@
   animation: hero-enter var(--reveal-duration) var(--reveal-easing) both;
 }
 
+/* Phase 6-B — tightened from the 6-A multipliers (0 / 0.7 / 1.3 / 2 / 2.6
+   / 3.2) per the brief's repeated "촘촘하게" stagger direction and its
+   own Hero note ("Portrait는 headline보다 지나치게 늦게 등장하지 않게
+   합니다") — portrait's gap after headline shrinks from ~133ms to ~105ms
+   at the default 70ms step, and the full sequence now finishes at
+   175ms + --reveal-duration (500ms at the 'standard' default) = 675ms,
+   with more margin under the brief's own "약 1초 이내" ceiling than
+   before. */
 .hero__name {
   animation-delay: 0ms;
 }
 
 .hero__eyebrow {
-  animation-delay: calc(var(--stagger-step) * 0.7);
+  animation-delay: calc(var(--stagger-step) * 0.5);
 }
 
 .hero__headline {
-  animation-delay: calc(var(--stagger-step) * 1.3);
+  animation-delay: calc(var(--stagger-step) * 1);
 }
 
 .hero__subhead {
-  animation-delay: calc(var(--stagger-step) * 2);
+  animation-delay: calc(var(--stagger-step) * 1.5);
 }
 
 .hero__cta {
-  animation-delay: calc(var(--stagger-step) * 2.6);
+  animation-delay: calc(var(--stagger-step) * 2);
 }
 
 .hero__media {
-  animation-delay: calc(var(--stagger-step) * 3.2);
+  animation-delay: calc(var(--stagger-step) * 2.5);
 }
 
 @media (prefers-reduced-motion: reduce) {

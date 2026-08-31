@@ -34,6 +34,25 @@
   color: var(--color-text-muted);
 }
 
+/* Phase 6-B — a very small hover lift, desktop pointer devices only
+   (hover:hover + pointer:fine excludes touch, where a "hover" is really
+   just the tap that already navigates/does nothing here, so there's no
+   sensible hover state to fake). `.image-placeholder` already clips
+   overflow (see ImagePlaceholder.css), so scaling the <img> itself never
+   affects the grid's own layout — no reflow, no shift to neighboring
+   photos. Independent of and on top of this image's own scroll-reveal
+   scale (the two compose: reveal settles the photo in once, hover then
+   nudges it further on top, same as any card would). */
+@media (hover: hover) and (pointer: fine) {
+  .gallery__item .image-placeholder__img {
+    transition: transform var(--motion-duration-normal) var(--reveal-easing);
+  }
+
+  .gallery__item:hover .image-placeholder__img {
+    transform: scale(1.015);
+  }
+}
+
 @media (max-width: 1024px) {
   .gallery__grid {
     grid-template-columns: repeat(2, 1fr);

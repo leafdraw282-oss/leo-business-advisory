@@ -185,6 +185,31 @@
      override block per selector. */
   --stagger-step: 70ms;
 
+  /* Phase 6-B — per-element-type reveal "variants" (§ MOTION QUALITY of
+     the brief: "단일 fade-up만 반복하지 말고... subtle variant를 지원").
+     Each is a calc() ratio of the base --reveal-distance/--reveal-duration
+     above, not a standalone literal, so every variant automatically
+     inherits the current motion_level's scaling (including the mobile
+     ≤768px override in global.css) with no per-level duplicate block.
+     Ratios are tuned so that at the 'standard' default (16px/500ms) each
+     variant lands inside the brief's own recommended range:
+       heading: 16*1.25=20px / 500*1.6=800ms   (brief: 18-22px / 750-850ms)
+       body:    16*0.875=14px / 500*1.34=670ms (brief: 12-16px / 620-720ms)
+       image:   16*1.125=18px / 500*1.8=900ms  (brief: 16-20px / 850-950ms), + scale
+       metric:  16*0.75=12px / 500*1.3=650ms   (brief: 10-14px / 600-700ms)
+     'section' (a bare block-level fade — Contact's form block, Career's
+     own outer section-title area, etc.) intentionally has no variant of
+     its own — it stays exactly --reveal-distance/--reveal-duration. */
+  --reveal-distance-heading: calc(var(--reveal-distance) * 1.25);
+  --reveal-duration-heading: calc(var(--reveal-duration) * 1.6);
+  --reveal-distance-body: calc(var(--reveal-distance) * 0.875);
+  --reveal-duration-body: calc(var(--reveal-duration) * 1.34);
+  --reveal-distance-image: calc(var(--reveal-distance) * 1.125);
+  --reveal-duration-image: calc(var(--reveal-duration) * 1.8);
+  --reveal-scale-image: 0.985;
+  --reveal-distance-metric: calc(var(--reveal-distance) * 0.75);
+  --reveal-duration-metric: calc(var(--reveal-duration) * 1.3);
+
   /* --transition-base now composes the motion tokens above instead of a
      standalone literal — every existing `transition: X var(--transition-base)`
      declaration keeps resolving to the exact same "0.25s ease" and now

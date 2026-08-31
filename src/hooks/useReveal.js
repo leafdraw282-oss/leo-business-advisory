@@ -56,6 +56,14 @@ export function useReveal() {
 
     let observer;
     try {
+      // Phase 6-B — threshold 0.15/-10% meant an element had to already be
+      // noticeably inside the viewport before triggering, which read as an
+      // abrupt "it just snaps on" start rather than a continuous entrance.
+      // Lowered so the reveal starts as an element is still mostly below
+      // the fold and finishes settling right around when it's comfortably
+      // in view — still a one-shot trigger (never re-hidden, observer
+      // still disconnects immediately below), just timed to feel
+      // continuous with the scroll instead of catching up to it.
       observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
@@ -63,7 +71,7 @@ export function useReveal() {
             observer.disconnect();
           }
         },
-        { threshold: 0.15, rootMargin: '0px 0px -10% 0px' },
+        { threshold: 0.08, rootMargin: '0px 0px -6% 0px' },
       );
       observer.observe(node);
     } catch {
