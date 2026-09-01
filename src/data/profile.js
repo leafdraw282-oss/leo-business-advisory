@@ -420,11 +420,6 @@ export const advisoryProducts = [
   },
 ];
 
-export const advisoryCta = {
-  ko: 'Leo와 상담하기',
-  en: 'Talk to Leo',
-};
-
 // "How We Work" (id: "how-we-work") — traditional consulting vs. Leo
 // Business Advisory, plus the operator-vs-consultant positioning line.
 export const howWeWork = {
@@ -722,7 +717,6 @@ export const profile = {
   challenge,
   advisorySection,
   advisoryProducts,
-  advisoryCta,
   howWeWork,
   targetClientsSection,
   targetClients,

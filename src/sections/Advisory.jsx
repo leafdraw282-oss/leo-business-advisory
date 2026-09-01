@@ -1,4 +1,4 @@
-import { advisorySection, advisoryProducts, advisoryCta } from '../data/profile';
+import { advisorySection, advisoryProducts } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
 import { useReveal } from '../hooks/useReveal';
 import SectionTitle from '../components/SectionTitle';
@@ -36,7 +36,6 @@ function Advisory() {
               focus={t(product.focusKo, product.focusEn)}
               deliverableLabel={t('제공 결과물', 'Deliverable')}
               deliverable={t(product.deliverableKo, product.deliverableEn)}
-              ctaLabel={t(advisoryCta.ko, advisoryCta.en)}
             />
           ))}
         </div>
