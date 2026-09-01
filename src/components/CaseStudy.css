@@ -79,12 +79,6 @@
   max-width: 34rem;
 }
 
-/* Real bilingual pull-quote text — same language-aware serif/sans split
-   as headings (see global.css). */
-:lang(en) .case-study--statement .case-study__summary {
-  font-family: var(--font-heading);
-}
-
 .case-study__highlights {
   display: flex;
   flex-wrap: wrap;

@@ -51,8 +51,8 @@ export const DESIGN_TOKEN_MAP = {
  */
 export function designSettingsFallback() {
   return {
-    fontKo: "'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif",
-    fontEn: "'Inter', 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif",
+    fontKo: "'Noto Sans KR', 'Noto Sans', sans-serif",
+    fontEn: "'Noto Sans', 'Noto Sans KR', sans-serif",
     bodyFontSize: '1rem',
     headingScale: 1.333,
     lineHeight: 1.75,
@@ -133,7 +133,7 @@ function isUsableValue(key, value) {
 // --font-ko, so even a bare/unsafe custom font name (no fallback names
 // of its own) still degrades to this site's proven default stack instead
 // of an unstyled system font or invisible text — see composeFontBody().
-const FONT_SAFETY_FALLBACK = "'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif";
+const FONT_SAFETY_FALLBACK = "'Noto Sans KR', 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif";
 
 function composeFontBody(fontEn, fontKo) {
   const parts = [fontEn, fontKo, FONT_SAFETY_FALLBACK].filter((part) => typeof part === 'string' && part.trim());

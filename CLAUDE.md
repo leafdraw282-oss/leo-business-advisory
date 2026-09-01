@@ -85,8 +85,10 @@ values. Never define a section id independently of this file.
   sparingly), `--color-white #FFFFFF`.
 - Spacing is variable-based (`--space-xs` … `--space-2xl`); sections share
   one `.container` (max-width 1280px) rather than inventing per-section padding.
-- Typography: Korean via Pretendard/Noto Sans KR; English headings may use a
-  premium serif, body is sans-serif. Long-form body copy is capped near
+- Typography: a single family site-wide — Noto Sans, with Noto Sans KR as
+  its Korean-glyph companion (loaded via Google Fonts) — used for every
+  heading, body, nav, button, number and label with no exceptions. No
+  separate serif/display typeface. Long-form body copy is capped near
   720px wide with 1.7–1.9 line-height. Large headings/metrics use `clamp()`
   so they never overflow on mobile.
 - Aesthetic: **Global Consulting × Luxury Brand Editorial × Executive

@@ -5,6 +5,22 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0b1625" />
+
+    <!-- Typography unification — the whole site (headings, body, nav,
+         buttons, numbers) renders in a single family: Noto Sans, with
+         Noto Sans KR as its Korean-glyph companion — see
+         src/styles/variables.css's --font-kr/--font-heading/--font-body,
+         which all now point at this same stack. preconnect warms both
+         Google Fonts origins before the stylesheet request; display=swap
+         avoids invisible text while the font downloads (falls back to the
+         system sans-serif in --font-kr's own fallback chain until then). -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Noto+Sans+KR:wght@400;600;700&display=swap"
+    />
+
     <title>LEO Business Advisory | Boosuk Leo Suh</title>
     <meta
       name="description"

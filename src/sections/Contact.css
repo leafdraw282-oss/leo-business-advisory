@@ -64,10 +64,6 @@
   transition: border-color var(--transition-base);
 }
 
-:lang(en) .contact__info-link {
-  font-family: var(--font-heading);
-}
-
 .contact__info-link:hover {
   border-bottom-color: currentColor;
 }
@@ -93,10 +89,6 @@
   font-size: clamp(1.25rem, 1vw + 1rem, 1.6rem);
   color: var(--color-primary);
   max-width: 30rem;
-}
-
-:lang(en) .contact__closing-line {
-  font-family: var(--font-heading);
 }
 
 @media (max-width: 1024px) {

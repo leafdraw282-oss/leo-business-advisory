@@ -703,12 +703,13 @@ the deployed branch goes straight to the live Production site.
   places (Hero subhead, Career company name, Gallery captions, Contact
   labels). Pre-existing design value, not changed during QA (out of that
   phase's "report, don't redesign" scope) — flagged for a future decision.
-- **No web font is actually loaded.** `--font-kr` lists `'Pretendard',
-  'Noto Sans KR', ...` but no `@font-face`, CDN `<link>`, or `@import`
-  exists anywhere in the project — every visitor sees their OS's system
-  Korean font. Performance-wise this is neutral-to-good (zero font-loading
-  network cost); it is a gap versus `CLAUDE.md`'s stated typography intent
-  if actual Pretendard rendering matters.
+- **A web font is now loaded.** Following a typography unification pass,
+  `index.html` (and `public/404.html`) `<link>` to Google Fonts for Noto
+  Sans + Noto Sans KR, and every `--font-*` token in `variables.css`
+  points at that single stack — see `CLAUDE.md`'s Typography line. This
+  reverses the earlier Phase 5-B decision (below) to rely on system fonts
+  only; that tradeoff is now accepted in exchange for guaranteed Noto Sans
+  rendering across OSes.
 - **`sitemap.xml`'s `<lastmod>` is a static date**, not auto-updated on
   content edits — a low-priority, known characteristic of a hand-maintained
   static sitemap, not a bug.
@@ -732,10 +733,6 @@ None of the following exist today — listed as plausible, non-committal
 directions consistent with the architecture above, not a roadmap or a
 promise:
 
-- Loading a real Pretendard web font (with `font-display: swap` and a
-  `<link rel="preload">`), closing the gap noted in §23 — would need to be
-  weighed against the performance cost of adding a font-loading network
-  request at all.
 - Drag-to-reorder in the admin UI for list tables other than
   `gallery_items` (which already has ↑/↓ buttons) —
   `impact_metrics`/`career_entries`/`advisory_items`/etc. are `sort_order`-

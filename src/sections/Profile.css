@@ -55,10 +55,6 @@
   color: var(--color-primary);
 }
 
-:lang(en) .profile__bio::first-letter {
-  font-family: var(--font-heading);
-}
-
 @media (max-width: 1024px) {
   .profile__grid {
     grid-template-columns: 1fr;

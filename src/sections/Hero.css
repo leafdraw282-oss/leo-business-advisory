@@ -53,12 +53,6 @@
   margin-bottom: var(--space-xs);
 }
 
-/* Real bilingual text (the person's name, via t()) — same language-aware
-   serif/sans split as headings (see global.css). */
-:lang(en) .hero__name {
-  font-family: var(--font-heading);
-}
-
 .hero__eyebrow {
   font-size: var(--font-size-eyebrow);
   letter-spacing: 0.08em;
@@ -67,8 +61,21 @@
   margin-bottom: var(--space-lg);
 }
 
+/* Typography unification follow-up — Noto Sans renders noticeably wider
+   per character than the previous Fraunces serif at the same size, so
+   --font-size-h1's original clamp() (tuned for Fraunces) let the longest
+   English headline ("Growth Needs Execution,") wrap onto a second visual
+   line inside its own <span> at both the ≥1025px two-column width
+   (671px column) and at narrow mobile widths (~358px at 390px) —
+   confirmed by measuring actual rendered text width against the real
+   Noto Sans/Noto Sans KR webfont. --font-size-h1 itself is unchanged
+   (only Hero currently reads it, but it's still the shared "h1 size"
+   design-system token); this is a Hero-local override sized instead
+   against Hero's own actual column widths at each layout regime. The
+   ≤1024px value lives in the existing @media block below, where
+   .hero__grid already switches to full-width single-column. */
 .hero__headline {
-  font-size: var(--font-size-h1);
+  font-size: clamp(2.5rem, 2vw + 1.3rem, 3rem);
   line-height: 1.08;
   margin-bottom: var(--space-lg);
 }
@@ -118,6 +125,17 @@
 @media (max-width: 1024px) {
   .hero__grid {
     grid-template-columns: 1fr;
+  }
+
+  /* Below 1024px .hero__content becomes full-width (single column) —
+     a much wider box than the ≥1025px two-column layout's ~671px
+     column, so this range gets its own, larger clamp() rather than
+     inheriting the base rule above: fitted against the actual measured
+     column widths at 1024/768/390px (976/736/358px) so the longest
+     English line never wraps within its own <span> at any width in
+     this range, down to a 360px floor. */
+  .hero__headline {
+    font-size: clamp(1.5rem, 2.84vw + 0.93rem, 2.75rem);
   }
 
   /* Phase 5-C — text now leads on tablet/mobile too (natural DOM order:

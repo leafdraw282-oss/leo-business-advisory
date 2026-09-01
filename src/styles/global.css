@@ -62,14 +62,13 @@ svg {
   max-width: 100%;
 }
 
-/* Phase 5-B — heading font respects language per CLAUDE.md's Typography
-   rule ("Korean via Pretendard/Noto Sans KR; English headings may use a
-   premium serif"): Korean is the default (document.documentElement.lang
-   is 'ko' by default and on every KR toggle, src/context/LanguageContext.jsx),
-   so headings default to the KR sans stack and only switch to the
-   editorial serif under :lang(en) — never the other way round, so a
-   Korean headline is never accidentally set in a serif whose Korean
-   glyph coverage/weight was never designed for it. */
+/* Typography unification — every heading renders in the single site-wide
+   Noto Sans stack (--font-kr) regardless of language. The previous
+   KR-sans/EN-serif split (a :lang(en) override switching to
+   --font-heading) is gone along with the serif typeface itself — see
+   variables.css, where --font-heading now just aliases --font-kr, so
+   removing this override changes nothing further; it's deleted here only
+   because it would otherwise be dead, do-nothing CSS. */
 h1,
 h2,
 h3,
@@ -78,13 +77,6 @@ h4 {
   line-height: var(--line-height-heading);
   margin: 0;
   font-weight: 600;
-}
-
-:lang(en) h1,
-:lang(en) h2,
-:lang(en) h3,
-:lang(en) h4 {
-  font-family: var(--font-heading);
 }
 
 p {

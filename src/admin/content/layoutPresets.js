@@ -56,17 +56,18 @@ export function matchPreset(presets, value) {
 // schema change) — these are just a curated, safe set of values per
 // column, same pattern as CONTENT_WIDTH_PRESETS etc. above.
 //
-// Every "Standard" value below is the exact literal
-// supabase/migrations/0009_site_design_settings.sql already seeds, so any
-// already-deployed row is recognized as a real preset via matchPreset(),
-// never shown as "custom". Only sans-serif stacks are offered — CLAUDE.md
-// is explicit that body text stays sans-serif in both languages (headings,
-// which may use an editorial serif for English, are a separate, non-
-// admin-editable token — see global.css's :lang(en) h1..h4 rule).
+// Typography unification — the whole site now renders one family only
+// (Noto Sans / Noto Sans KR, loaded via Google Fonts — see index.html),
+// so both presets per field are Noto Sans stacks: "기본값" requests the
+// webfont, "시스템 폴백" is the same choice with the webfont request
+// dropped (falls straight to the OS's own sans-serif) for an admin who
+// wants to avoid the extra font request entirely. Neither preset can pick
+// a different typeface — see variables.css, where --font-heading (the
+// previous editorial-serif-for-English token) now just aliases --font-kr.
 export const FONT_KO_PRESETS = [
   {
-    value: "'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif",
-    label: 'Pretendard 우선 (기본값)',
+    value: "'Noto Sans KR', 'Noto Sans', sans-serif",
+    label: 'Noto Sans (기본값)',
   },
   {
     value: "-apple-system, BlinkMacSystemFont, 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif",
@@ -76,8 +77,8 @@ export const FONT_KO_PRESETS = [
 
 export const FONT_EN_PRESETS = [
   {
-    value: "'Inter', 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif",
-    label: 'Inter 우선 (기본값)',
+    value: "'Noto Sans', 'Noto Sans KR', sans-serif",
+    label: 'Noto Sans (기본값)',
   },
   {
     value: '-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif',

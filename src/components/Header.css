@@ -109,12 +109,6 @@
   font-size: 1.25rem;
 }
 
-/* Real bilingual nav labels (src/data/navigation.js) — same language-aware
-   serif/sans split as headings (see global.css). */
-:lang(en) .header__mobile-panel a {
-  font-family: var(--font-heading);
-}
-
 @media (max-width: 768px) {
   .header__nav {
     display: none;

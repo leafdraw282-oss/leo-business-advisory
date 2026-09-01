@@ -49,10 +49,19 @@
   --color-border: rgba(34, 34, 34, 0.12);
   --color-border-inverse: rgba(244, 241, 234, 0.18);
 
-  /* Typography */
-  --font-kr: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-heading: 'Fraunces', 'Noto Serif KR', Georgia, 'Times New Roman', serif;
-  --font-body: 'Inter', var(--font-kr), sans-serif;
+  /* Typography — unified to a single family site-wide: Noto Sans, with
+     Noto Sans KR as its Korean-glyph companion (loaded via Google Fonts,
+     see index.html). --font-heading and --font-body are kept as separate
+     named aliases rather than being deleted, purely so every existing
+     call site (var(--font-heading) for logos/large numbers/pull-quotes,
+     var(--font-body) for the base <body> element) keeps working
+     unchanged — same "alias pointing at a shared value" relationship
+     --font-ko/--font-en below already have. No serif (Fraunces/Noto Serif
+     KR), display, or separate body typeface (Inter/Pretendard) remains
+     anywhere in the codebase. */
+  --font-kr: 'Noto Sans KR', 'Noto Sans', sans-serif;
+  --font-heading: var(--font-kr);
+  --font-body: var(--font-kr);
 
   --text-body-max-width: 720px;
   --line-height-body: 1.75;

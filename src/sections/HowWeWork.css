@@ -46,10 +46,6 @@
   font-size: 1.2rem;
 }
 
-:lang(ko) .how-we-work__row--leo .how-we-work__steps {
-  font-family: var(--font-kr);
-}
-
 .how-we-work__steps li:not(:last-child)::after {
   content: '→';
   margin-left: 0.6em;
@@ -69,10 +65,6 @@
   line-height: 1.4;
   color: var(--color-primary);
   margin-bottom: var(--space-sm);
-}
-
-:lang(en) .how-we-work__quote p {
-  font-family: var(--font-heading);
 }
 
 .how-we-work__quote cite {
