@@ -1,46 +1,68 @@
-import { advisory } from '../../data/profile.js';
+import { advisorySection, advisoryProducts } from '../../data/profile.js';
 import { fetchWithFallback } from './fetchWithFallback.js';
 import { fetchSingletonRow, fetchListRows } from './publicTable.js';
 
+// Advisory Sales repositioning: this now serves the section heading
+// (advisory_section — unchanged table, previously written but never
+// actually read by Advisory.jsx) plus the 4 Advisory Products
+// (advisory_products, supabase/migrations/0018_advisory_sales_cms_wiring.sql)
+// that replaced the old flat advisory_items list as what the public
+// section renders. advisory_items itself is untouched and simply no
+// longer read anywhere (see that migration's own header comment).
 export function advisoryFallback() {
   return {
-    eyebrowKo: advisory.eyebrowKo,
-    eyebrowEn: advisory.eyebrowEn,
-    titleKo: advisory.titleKo,
-    titleEn: advisory.titleEn,
-    items: advisory.items.map((item) => ({ id: item.id, ko: item.ko, en: item.en })),
+    section: {
+      eyebrowKo: advisorySection.eyebrowKo,
+      eyebrowEn: advisorySection.eyebrowEn,
+      titleKo: advisorySection.titleKo,
+      titleEn: advisorySection.titleEn,
+    },
+    products: advisoryProducts.map((p) => ({
+      id: p.id,
+      nameKo: p.nameKo,
+      nameEn: p.nameEn,
+      targetKo: p.targetKo,
+      targetEn: p.targetEn,
+      focusKo: p.focusKo,
+      focusEn: p.focusEn,
+      deliverableKo: p.deliverableKo,
+      deliverableEn: p.deliverableEn,
+    })),
   };
 }
 
 export async function fetchAdvisory() {
   return fetchWithFallback(async () => {
-    // Phase 4-H: neither query depends on the other's result, so run them
-    // concurrently instead of one-after-another — same two requests, but
-    // this section's total fetch latency is now bounded by the slower of
-    // the two instead of their sum.
-    const [sectionRow, itemRows] = await Promise.all([
+    const [sectionRow, productRows] = await Promise.all([
       fetchSingletonRow('advisory_section'),
-      fetchListRows('advisory_items'),
+      fetchListRows('advisory_products'),
     ]);
-    if (!sectionRow && itemRows.length === 0) return null;
+    if (!sectionRow && productRows.length === 0) return null;
 
     const fallback = advisoryFallback();
-    const items =
-      itemRows.length > 0
-        ? advisory.items.map((fallbackItem) => {
-            const dbItem = itemRows.find((r) => r.item_key === fallbackItem.id);
-            return dbItem
-              ? { id: fallbackItem.id, ko: dbItem.label_ko, en: dbItem.label_en }
-              : { id: fallbackItem.id, ko: fallbackItem.ko, en: fallbackItem.en };
-          })
-        : fallback.items;
-
     return {
-      eyebrowKo: sectionRow?.eyebrow_ko ?? fallback.eyebrowKo,
-      eyebrowEn: sectionRow?.eyebrow_en ?? fallback.eyebrowEn,
-      titleKo: sectionRow?.title_ko ?? fallback.titleKo,
-      titleEn: sectionRow?.title_en ?? fallback.titleEn,
-      items,
+      section: sectionRow
+        ? {
+            eyebrowKo: sectionRow.eyebrow_ko,
+            eyebrowEn: sectionRow.eyebrow_en,
+            titleKo: sectionRow.title_ko,
+            titleEn: sectionRow.title_en,
+          }
+        : fallback.section,
+      products:
+        productRows.length > 0
+          ? productRows.map((r) => ({
+              id: r.item_key,
+              nameKo: r.name_ko,
+              nameEn: r.name_en,
+              targetKo: r.target_ko,
+              targetEn: r.target_en,
+              focusKo: r.focus_ko,
+              focusEn: r.focus_en,
+              deliverableKo: r.deliverable_ko,
+              deliverableEn: r.deliverable_en,
+            }))
+          : fallback.products,
     };
   }, advisoryFallback());
 }

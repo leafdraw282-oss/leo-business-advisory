@@ -1,19 +1,20 @@
-import { challenge } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
+import { useSectionContent } from '../hooks/useSectionContent';
 import { useReveal } from '../hooks/useReveal';
+import { fetchChallenge, challengeFallback } from '../lib/content/challenge';
 import SectionTitle from '../components/SectionTitle';
 import './Challenge.css';
 
 /**
  * "Your Challenge" (id: "challenge") — Advisory Sales IA, section 2. Leads
  * with the visitor's own problem before any of Leo's history, per the
- * repositioning brief. Not CMS-backed (same as the other new sections
- * added in this pass) — content is authored copy, not a fact from the
- * Founder Profile document, so it stays a direct src/data/profile.js
- * read, same pattern as Header's `site`/`navigation`.
+ * repositioning brief. Content comes from Supabase (Content -> Challenge)
+ * when available, falling back to src/data/profile.js — see
+ * src/lib/content/challenge.js.
  */
 function Challenge() {
   const { t } = useLanguage();
+  const challenge = useSectionContent(fetchChallenge, challengeFallback());
   const { ref, className: revealClassName } = useReveal();
 
   return (

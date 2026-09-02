@@ -1,17 +1,20 @@
-import { howWeWork } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
+import { useSectionContent } from '../hooks/useSectionContent';
 import { useReveal } from '../hooks/useReveal';
+import { fetchHowWeWork, howWeWorkFallback } from '../lib/content/howWeWork';
 import SectionTitle from '../components/SectionTitle';
 import './HowWeWork.css';
 
 /**
  * "How We Work" (id: "how-we-work") — Advisory Sales IA, section 6.
  * Traditional Consulting's step sequence vs. Leo Business Advisory's own,
- * plus the operator-vs-consultant positioning line. Fixed authored copy,
- * same direct profile.js pattern as Challenge.
+ * plus the operator-vs-consultant positioning line. Content comes from
+ * Supabase (Content -> How We Work) when available, falling back to
+ * src/data/profile.js — see src/lib/content/howWeWork.js.
  */
 function HowWeWork() {
   const { t } = useLanguage();
+  const howWeWork = useSectionContent(fetchHowWeWork, howWeWorkFallback());
   const { ref, className: revealClassName } = useReveal();
 
   return (

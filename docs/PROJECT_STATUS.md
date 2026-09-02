@@ -1,5 +1,74 @@
 # Project Status
 
+## Phase 6-C — Advisory Sales CMS Wiring (closing the admin/public gap)
+
+**Status: complete.** An admin/public content audit (requested after the
+site owner noticed the Advisory admin page had no visible effect) found
+two real bugs and a large gap left over from the Advisory Sales IA
+overhaul: an admin editor writing to data nothing displays, and five
+public sections with no admin editor at all.
+
+**Bugs fixed:**
+- **Advisory admin page edited dead data.** `AdvisorySection.jsx` wrote
+  to `advisory_items`/`advisory_section`, but `Advisory.jsx` had rendered
+  a completely different array (`advisoryProducts`, the 4 named
+  services) directly from `profile.js` since the repositioning — every
+  admin edit here had zero visible effect, confirmed live by the site
+  owner. Rewired: `AdvisorySection.jsx` now edits the 4 real products
+  (name/target/focus/deliverable each) via a new `advisory_products`
+  table, matched to `profile.js` by `item_key` (same pattern as Case
+  Studies' `case_key`); `advisory_section` (heading) is unchanged but now
+  actually read by `Advisory.jsx`. `advisory_items` is untouched but
+  fully orphaned going forward.
+- **Education admin page edited data nothing renders.** No section in
+  `App.jsx` has shown Education since the repositioning. Removed from
+  the Content nav and deleted `EducationSection.jsx`; `education_entries`
+  stays in the schema, unused.
+- **`.profile__bio::first-letter` drop-cap** grabbed only the leading
+  digit "3" of "30년 이상..." and rendered it at 3.4em — a visibly broken
+  standalone numeral, not the intended editorial dropcap effect on a
+  letter. Removed.
+
+**New CMS wiring** (`supabase/migrations/0018_advisory_sales_cms_wiring.sql`,
+10 new tables + RLS + explicit grants, following every existing
+singleton/list-table convention exactly): Challenge, the 4 Advisory
+Products, How We Work, Target Clients (+ its PE Portfolio Advisory
+callout), and Insights preview cards are now all admin-editable for the
+first time — previously hardcoded directly in `profile.js` with no
+Supabase path at all. New `src/lib/content/{challenge,howWeWork,
+targetClients,insights}.js` fetch modules and 5 new admin editor pages
+follow the same `fetchWithFallback()`/`useAdminForm()` pattern as every
+other Content section. Every new table starts empty — `fetchWithFallback`
+falls back to the existing `profile.js` copy exactly as before, so
+applying the migration changes nothing visible until an admin actually
+saves through the new screens.
+
+**Deliberately left out of scope** (unchanged, same as before this
+phase): Header nav/logo, Hero's credential line and `person.name`,
+Gallery's section heading/empty-state copy, and Footer's brand
+name/tagline/nav all remain direct `profile.js` reads by original
+design — these are identity/fixed-brand fields, not marketing copy.
+
+**Verified via a local mock backend:** logged into admin, edited and
+saved all 5 new sections plus a redesigned Advisory product name,
+confirmed each change appears on the public site in both KR/EN: the
+Advisory fix in particular was verified end-to-end (edit a product name
+in admin → save → reload the public site → the new name appears),
+proving the exact bug the site owner reported is fixed. Re-swept the 7
+untouched existing Content sections (Hero, Impact, About, Case Studies,
+Career, Contact, Footer) to confirm no regression, and the full public
+page (both languages) for horizontal overflow and console errors — none
+found beyond the pre-existing local-fallback-image 404, unrelated to
+this phase.
+
+**Production activation:** since this session cannot reach the real
+Supabase project, migration 0018 needs a one-time manual run in the
+Supabase SQL Editor — see the delivered report for the exact SQL. No
+production data is seeded or altered by it; every new table starts
+empty, matching every other content table's own bootstrap.
+
+**Build:** `npm run build` and `npx oxlint` both pass with zero errors.
+
 ## PHASE 3 COMPLETE — PRODUCTION READY
 
 All of Phase 3 (3-A through 3-H) is built, integration-tested, and

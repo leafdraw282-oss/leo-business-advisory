@@ -1,34 +1,39 @@
-import { advisorySection, advisoryProducts } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
+import { useSectionContent } from '../hooks/useSectionContent';
 import { useReveal } from '../hooks/useReveal';
+import { fetchAdvisory, advisoryFallback } from '../lib/content/advisory';
 import SectionTitle from '../components/SectionTitle';
 import AdvisoryCard from '../components/AdvisoryCard';
 import './Advisory.css';
 
 /**
- * "What We Do" (id: "advisory", matches src/data/navigation.js) — Advisory
- * Sales repositioning: the section formerly rendered `advisory.items` (a
- * flat 8-item CMS-backed list, still exported from profile.js and still
- * editable in the admin panel — see src/lib/content/advisory.js — but no
- * longer shown on the public site) and now renders the 4 named Advisory
- * Products instead. Not CMS-backed for the same reason as Challenge below:
- * these are 4 fixed, structured products (name/target/focus list/
- * deliverable), not a shape the existing advisory_items admin editor
- * supports — see this phase's report, "Remaining TODO".
+ * "What We Do" (id: "advisory", matches src/data/navigation.js) — the 4
+ * named Advisory Products. Content comes from Supabase (Content ->
+ * Advisory) when available, falling back to src/data/profile.js — see
+ * src/lib/content/advisory.js. Replaces the old flat advisory.items list
+ * this section rendered before the Advisory Sales repositioning; that
+ * list (and its advisory_items table) is untouched but no longer read
+ * anywhere.
  */
 function Advisory() {
   const { t } = useLanguage();
+  const advisory = useSectionContent(fetchAdvisory, advisoryFallback());
   const { ref, className: revealClassName } = useReveal();
 
   return (
-    <section id="advisory" ref={ref} className={`advisory ${revealClassName}`.trim()} aria-label={t(advisorySection.titleKo, advisorySection.titleEn)}>
+    <section
+      id="advisory"
+      ref={ref}
+      className={`advisory ${revealClassName}`.trim()}
+      aria-label={t(advisory.section.titleKo, advisory.section.titleEn)}
+    >
       <div className="container">
         <SectionTitle
-          eyebrow={t(advisorySection.eyebrowKo, advisorySection.eyebrowEn)}
-          title={t(advisorySection.titleKo, advisorySection.titleEn)}
+          eyebrow={t(advisory.section.eyebrowKo, advisory.section.eyebrowEn)}
+          title={t(advisory.section.titleKo, advisory.section.titleEn)}
         />
         <div className="advisory__grid">
-          {advisoryProducts.map((product) => (
+          {advisory.products.map((product) => (
             <AdvisoryCard
               key={product.id}
               name={t(product.nameKo, product.nameEn)}

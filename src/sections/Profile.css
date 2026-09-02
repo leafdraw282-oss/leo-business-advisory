@@ -43,18 +43,6 @@
   margin-top: var(--space-md);
 }
 
-/* Editorial dropcap on the bio's first letter — a founder-profile-essay
-   cue, entirely typographic, no new content. */
-.profile__bio::first-letter {
-  float: left;
-  font-family: var(--font-kr);
-  font-size: 3.4em;
-  line-height: 0.85;
-  font-weight: 600;
-  padding-right: 0.1em;
-  color: var(--color-primary);
-}
-
 @media (max-width: 1024px) {
   .profile__grid {
     grid-template-columns: 1fr;
