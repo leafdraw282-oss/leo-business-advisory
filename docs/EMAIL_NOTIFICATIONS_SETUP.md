@@ -126,6 +126,37 @@ function above:
    - **Edge Function**: select `notify-inquiry` from the dropdown.
 3. Save.
 
+### Step 4가 이 에러로 실패한다면 (Plan B)
+
+> Failed to create webhook: Failed to run sql query: ERROR: 3F000: schema
+> "supabase_functions" does not exist
+
+이건 일부 Supabase 프로젝트에 Database Webhooks 기능이 내부적으로 의존하는
+`supabase_functions` 스키마가 아예 프로비저닝되어 있지 않은, Supabase
+플랫폼 쪽의 알려진 문제입니다 — 이 저장소의 마이그레이션으로 고칠 수 있는
+부분이 아니에요 (그 스키마는 Supabase 서버 쪽에서 자동으로 만들어주는
+것이라, `pg_net` 확장 기능을 껐다 켜도 보통 해결되지 않습니다).
+
+다행히 Database Webhooks 기능 자체가 내부적으로 `pg_net`
+(Database → Extensions에서 이미 켜져 있는 걸 확인하셨죠) 위에 얇게 씌운
+편의 기능일 뿐이라, `pg_net`을 직접 호출하는 트리거를 만들면 완전히 같은
+결과를 낼 수 있습니다. 이 저장소에 이미 그 코드가
+`supabase/migrations/0016_inquiry_notify_trigger.sql`로 준비되어 있어요.
+
+1. Supabase Dashboard → **SQL Editor** → **New query**.
+2. `supabase/migrations/0016_inquiry_notify_trigger.sql` 파일 내용을 그대로
+   복사해서 붙여넣기.
+3. 붙여넣은 내용에서 **딱 2곳**을 실제 값으로 바꿔주세요 (파일 안에 있는
+   `<PROJECT_URL>`, `<ANON_KEY>` 자리):
+   - `<PROJECT_URL>` → Settings → API 페이지의 **Project URL**
+     (예: `https://xxxxxxxxxxxx.supabase.co`)
+   - `<ANON_KEY>` → 같은 페이지의 **anon / public** 키 (service_role 키가
+     아닙니다 — anon 키는 원래 공개해도 되는 키예요, `docs/FOUNDATION.md`
+     §19 참고)
+4. **Run** 클릭. 에러 없이 끝나면 완료입니다 — 이제 5번 "테스트하기"로
+   바로 넘어가시면 돼요. (이 경우 4번의 Dashboard Webhook은 만들 필요가
+   없습니다 — 이 SQL 트리거가 같은 역할을 대신합니다.)
+
 ## 5. 테스트하기 (Test it for real)
 
 1. Go to the live public site's Contact section and submit a real test
