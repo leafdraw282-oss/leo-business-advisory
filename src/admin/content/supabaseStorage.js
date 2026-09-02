@@ -42,7 +42,7 @@ export function validateImageFile(file) {
 // above, completely unchanged. A real video is a different kind of asset
 // from a still photo, so it gets its own, much larger size ceiling —
 // MAX_IMAGE_BYTES' 2MB is sized for a correctly-compressed photo and would
-// reject almost any real video clip. 20MB is generous for a short,
+// reject almost any real video clip. 25MB is generous for a short,
 // web-optimized clip without being unbounded.
 //
 // WebM and MP4/H.264 play natively in every current browser; QuickTime
@@ -58,7 +58,7 @@ export const VIDEO_MIME_TYPES = ['video/mp4', 'video/webm', 'video/quicktime', '
 // <img>, no <video> element involved, so it lives in ALLOWED_GALLERY_TYPES
 // as just another accepted image type, not alongside VIDEO_MIME_TYPES.
 export const ALLOWED_GALLERY_TYPES = [...ALLOWED_IMAGE_TYPES, 'image/gif', ...VIDEO_MIME_TYPES];
-export const MAX_VIDEO_BYTES = 20 * 1024 * 1024; // 20 MB
+export const MAX_VIDEO_BYTES = 25 * 1024 * 1024; // 25 MB
 
 /** Same as validateImageFile(), but also accepts GIF/MP4/WebM/MOV/AVI (Gallery only) — video formats get their own, larger size ceiling. */
 export function validateGalleryFile(file) {

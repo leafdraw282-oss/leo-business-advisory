@@ -308,13 +308,14 @@ Upload path (`src/admin/content/supabaseStorage.js`):
 - **Gallery only** also accepts GIF and video — `ALLOWED_GALLERY_TYPES`
   (`ALLOWED_IMAGE_TYPES` + `image/gif` + `VIDEO_MIME_TYPES`, where
   `VIDEO_MIME_TYPES = ['video/mp4', 'video/webm', 'video/quicktime',
-  'video/x-msvideo']`) and `MAX_VIDEO_BYTES` (20MB, video formats only —
+  'video/x-msvideo']`) and `MAX_VIDEO_BYTES` (25MB, video formats only —
   GIF still counts as a photo against `MAX_IMAGE_BYTES`), used only by
   `useGalleryImages.js`'s `validateGalleryFile()`. Hero/About/Case Studies
   keep validating against the original `ALLOWED_IMAGE_TYPES`/
   `MAX_IMAGE_BYTES`, unaffected. The bucket's own `file_size_limit`
-  (`0013_gallery_video_support.sql`) is a single bucket-wide ceiling —
-  Storage has no per-mime-type limit — so it's set to 20MB for the whole
+  (`0013_gallery_video_support.sql`, raised from 20MB to 25MB in
+  `0015_gallery_video_size_25mb.sql`) is a single bucket-wide ceiling —
+  Storage has no per-mime-type limit — so it's set to 25MB for the whole
   bucket; the tighter 2MB photo ceiling is enforced client-side only, same
   "client is the real gate, server is an outer ceiling" layering as
   `MAX_IMAGE_BYTES` itself. `allowed_mime_types` itself was extended again
