@@ -1,0 +1,162 @@
+# Email Notifications for New Inquiries
+
+This is a step-by-step guide for turning on email alerts: whenever
+someone submits the Contact Form on the site, a summary of that inquiry
+lands in your Gmail inbox automatically. Written for someone who has
+never done this before — every step says exactly what to click or type.
+
+**Nothing about this is active yet.** The code (`supabase/functions/notify-inquiry/index.ts`)
+is written and committed, but three things only you can do (steps 1, 2,
+and 4 below) haven't happened — this session can't sign up for a Resend
+account on your behalf, and it can never connect to your real production
+Supabase project (see `docs/FOUNDATION.md` for why). Until you finish this
+guide, the site behaves exactly as it does today: inquiries save to the
+database and show up in the admin Inquiries screen — nothing breaks by
+not doing this, you just don't get the email nudge yet.
+
+## How it works
+
+```
+Contact Form submitted
+  → saved to the `inquiries` table (already live today)
+  → a Database Webhook fires
+  → an Edge Function (`notify-inquiry`) formats the inquiry
+  → Resend (a free email-sending service) sends it to your Gmail
+```
+
+No new server was added — the "backend" here is entirely Supabase's own
+Edge Functions feature (a small piece of code Supabase runs for you) plus
+Resend, a service that exists specifically to let apps like this one send
+email reliably (a plain website can't send email directly the way a mail
+client can). If the email step ever fails for any reason, the inquiry
+itself is never lost — it's already safely saved to the database before
+the email is even attempted, and always stays visible in
+Admin → Inquiries regardless.
+
+## 1. Resend 계정 만들기 (Create a free Resend account)
+
+1. Go to [resend.com](https://resend.com) and sign up (no credit card
+   required for the free tier — 3,000 emails/month, 100/day, more than
+   enough for inquiry notifications).
+2. Once logged in, go to **API Keys** in the left sidebar → **Create API
+   Key**. Give it any name (e.g. "leo-business-advisory") and leave
+   permissions at the default (Full access / Sending access).
+3. Copy the key it shows you — it starts with `re_` and is only shown
+   **once**. Save it somewhere safe; you'll paste it into Supabase in
+   step 3.
+
+You don't need to verify a domain for this to work — Resend's shared
+`onboarding@resend.dev` sending address (already set as this function's
+default) works immediately with no setup. The one trade-off: mail from a
+shared address occasionally lands in Gmail's Spam/Promotions folder the
+first few times, especially before you've ever replied to or starred one.
+If that happens, open the message once and mark it "Not spam" — Gmail
+learns from that quickly. (Owning a custom domain later, per
+`docs/CUSTOM_DOMAIN_SETUP.md`, lets you verify it with Resend for a
+branded `noreply@yourdomain.com` sender that skips this entirely — not
+needed to get started.)
+
+## 2. Supabase에 Edge Function 배포하기 (Deploy the Edge Function)
+
+The function's code already exists in this repo at
+`supabase/functions/notify-inquiry/index.ts`. Deploy it to your Supabase
+project via the Dashboard (no command line needed):
+
+1. Open your project at [supabase.com/dashboard](https://supabase.com/dashboard).
+2. Go to **Edge Functions** in the left sidebar → **Deploy a new
+   function** (or **Create a function**, wording varies by Supabase
+   version).
+3. Name it exactly `notify-inquiry` (the webhook in step 4 will look for
+   this name).
+4. When it opens a code editor, delete the placeholder content and paste
+   in the entire contents of `supabase/functions/notify-inquiry/index.ts`
+   from this repo.
+5. Click **Deploy**. Leave "Verify JWT" / "Enforce JWT verification"
+   **turned on** (the default) — this is what stops random internet
+   traffic from calling your function directly; the webhook in step 4
+   authenticates automatically, so you don't need to do anything extra
+   for that.
+
+*(If your Supabase project's Dashboard doesn't offer an in-browser code
+editor for functions — older projects sometimes only show a CLI-based
+"Deploy a new function" screen — the alternative is the [Supabase
+CLI](https://supabase.com/docs/guides/cli): install it, run
+`supabase login`, `supabase link --project-ref <your-project-ref>` (found
+in Settings → General), then `supabase functions deploy notify-inquiry`
+from this repo's root. Either path deploys the same file.)*
+
+## 3. Secret 값 등록하기 (Set the function's secrets)
+
+The function needs two pieces of information it never hardcodes — your
+Resend API key and the Gmail address to notify. Set these as Edge
+Function secrets (separate from this repo's `.env.local`/GitHub
+secrets — these live only inside Supabase and are never bundled into the
+public website):
+
+1. In the Dashboard, go to **Edge Functions** → **Manage secrets** (or
+   **Secrets**, in the Edge Functions section).
+2. Add:
+   | Name | Value |
+   |---|---|
+   | `RESEND_API_KEY` | the `re_...` key from step 1 |
+   | `NOTIFY_EMAIL_TO` | the Gmail address that should receive inquiries |
+3. Save. No redeploy is needed — secrets are read fresh on every
+   invocation.
+
+*(Optional: `NOTIFY_EMAIL_FROM` overrides the default `onboarding@resend.dev`
+sender — only set this once you've verified your own domain with Resend,
+per the note in step 1.)*
+
+## 4. Database Webhook 연결하기 (Wire it to new inquiries)
+
+This is the step that actually makes an insert into `inquiries` call the
+function above:
+
+1. In the Dashboard, go to **Database** → **Webhooks** → **Create a new
+   webhook**.
+2. Fill in:
+   - **Name**: `notify-inquiry` (or anything recognizable).
+   - **Table**: `inquiries`.
+   - **Events**: check **Insert** only (leave Update/Delete unchecked —
+     the function is written to expect Insert and will just no-op on
+     anything else, but there's no reason to send it events it ignores).
+   - **Type**: choose **Supabase Edge Functions** (not "HTTP Request") —
+     this is what makes Supabase attach the right authentication
+     automatically, matching "Verify JWT: on" from step 2.
+   - **Edge Function**: select `notify-inquiry` from the dropdown.
+3. Save.
+
+## 5. 테스트하기 (Test it for real)
+
+1. Go to the live public site's Contact section and submit a real test
+   inquiry (any name/email/message — you can delete it from
+   Admin → Inquiries afterward).
+2. Within a few seconds, check the Gmail inbox you set in step 3 — the
+   notification should arrive with the subject
+   `[LEO BUSINESS ADVISORY] 새 문의 — <이름> (<문의 유형>)`.
+3. If it doesn't arrive after a minute or two:
+   - Check Gmail's Spam/Promotions folders first (see the note in step
+     1).
+   - In the Supabase Dashboard, go to **Edge Functions** → `notify-inquiry`
+     → **Logs**, and separately **Database** → **Webhooks** → your
+     webhook → its delivery log. Between the two you can see exactly
+     where it stopped (webhook never fired, function errored, or Resend
+     rejected the request) and the logged error message says why.
+   - The most common causes: `RESEND_API_KEY`/`NOTIFY_EMAIL_TO` not set
+     (step 3), or the webhook's Type set to "HTTP Request" instead of
+     "Supabase Edge Functions" (step 4) — the log messages spell out
+     both directly.
+4. Once confirmed working, delete the test inquiry from
+   Admin → Inquiries so it doesn't sit there as clutter.
+
+---
+
+## Quick reference
+
+| Piece | Where it lives | Who sets it up |
+|---|---|---|
+| `inquiries` table + RLS | `supabase/migrations/0005_inquiries.sql` | already done |
+| Edge Function code | `supabase/functions/notify-inquiry/index.ts` | already written — you deploy it (step 2) |
+| `RESEND_API_KEY` / `NOTIFY_EMAIL_TO` | Supabase Edge Function secrets | you (step 3) |
+| Database Webhook (insert → function) | Supabase Dashboard → Database → Webhooks | you (step 4) |
+| Resend account | resend.com | you (step 1) |

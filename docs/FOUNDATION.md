@@ -659,10 +659,17 @@ ignoring `is_admin()` and every other policy in §7. It:
   effectively public).
 - Must never appear in `.github/workflows/deploy.yml` or any GitHub repo
   secret consumed by a client build.
-- Has **no legitimate use anywhere in this repository** as it stands
-  today — there is no server-side code (no Edge Function, no backend) that
-  would need it. If a future phase ever adds one, the key belongs only in
-  that server-side config, never in anything Vite bundles.
+- Has **no legitimate use anywhere in this repository's client code** —
+  the one piece of server-side code that does exist,
+  `supabase/functions/notify-inquiry` (an Edge Function that emails a new
+  Contact Form submission out via Resend — see
+  `docs/EMAIL_NOTIFICATIONS_SETUP.md`), doesn't need it either: it only
+  reads the row a Database Webhook already handed it, never queries
+  Supabase itself, so its only secrets are `RESEND_API_KEY` and
+  `NOTIFY_EMAIL_TO` (both Edge Function secrets, set directly in the
+  Supabase Dashboard, never bundled by Vite). If a future function ever
+  did need the service_role key, it belongs only in that function's own
+  Supabase-side secrets, never in anything Vite bundles.
 
 Verified clean as of Phase 4-I's security audit: zero occurrences of
 `service_role` in `src/`, and zero occurrences in an actual built `dist/`
