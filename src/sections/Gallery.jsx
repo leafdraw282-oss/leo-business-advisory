@@ -34,18 +34,24 @@ function Gallery() {
           <p>{t(gallerySection.emptyKo, gallerySection.emptyEn)}</p>
         ) : (
           <ul className="gallery__grid">
-            {gallery.map((item) => (
-              <li key={item.id} className={`gallery__item ${item.wide ? 'gallery__item--wide' : ''}`}>
-                <ImagePlaceholder
-                  src={item.src}
-                  alt={t(item.captionKo, item.captionEn)}
-                  label={t(item.captionKo, item.captionEn)}
-                  aspectRatio={item.aspect || '4 / 3'}
-                  revealMotion
-                />
-                <p className="gallery__caption">{t(item.captionKo, item.captionEn)}</p>
-              </li>
-            ))}
+            {gallery.map((item) => {
+              const caption = t(item.captionKo, item.captionEn);
+              return (
+                <li key={item.id} className={`gallery__item ${item.wide ? 'gallery__item--wide' : ''}`}>
+                  <ImagePlaceholder
+                    src={item.src}
+                    // A caption-less photo still needs a real accessible name
+                    // (screen readers), but nothing visible — see label's own
+                    // comment in ImagePlaceholder.jsx.
+                    alt={caption || t('갤러리 사진', 'Gallery photo')}
+                    label={caption}
+                    aspectRatio={item.aspect || '4 / 3'}
+                    revealMotion
+                  />
+                  {caption && <p className="gallery__caption">{caption}</p>}
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>

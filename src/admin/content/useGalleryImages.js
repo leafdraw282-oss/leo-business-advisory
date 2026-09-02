@@ -3,7 +3,6 @@ import { gallery } from '../../data/profile.js';
 import { isSupabaseConfigured, supabase } from '../../lib/supabase.js';
 import { fetchList, upsertByNaturalKey, fetchRowById, saveListRow, deleteRow } from './supabaseTable.js';
 import { uploadImageFile, removeStorageFile, validateGalleryFile } from './supabaseStorage.js';
-import { requireFilled } from './validation.js';
 import { setDirtyState } from './dirtyTracker.js';
 import { recordSave } from './lastSaved.js';
 
@@ -274,16 +273,9 @@ export function useGalleryImages() {
   }
 
   async function save() {
-    try {
-      requireFilled(
-        items.map((item, i) => ({ label: `Gallery item ${i + 1} caption`, ko: item.captionKo, en: item.captionEn })),
-      );
-    } catch (err) {
-      setSaveState('error');
-      setSaveError(extractErrorMessage(err));
-      return;
-    }
-
+    // Captions are optional — a photo with no name simply renders with no
+    // visible label (ImagePlaceholder) and no caption line (Gallery.jsx),
+    // instead of being blocked from saving at all.
     if (!isSupabaseConfigured) {
       setSaveState('error');
       setSaveError('Supabase is not configured — cannot save. See supabase/README.md.');

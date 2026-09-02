@@ -59,7 +59,11 @@ function GalleryImages() {
         <>
           {items.map((item, index) => {
             const currentSrc = isSupabaseConfigured && item.storagePath ? publicUrlFor(item.storagePath) : undefined;
-            const label = item.captionEn || item.captionKo || `Photo ${index + 1}`;
+            const caption = item.captionEn || item.captionKo || '';
+            // Screen readers still need a real name even with no caption —
+            // only the VISIBLE placeholder text (`caption` below) should stay
+            // blank, so it doesn't flash "Photo 4" over a slow-loading photo.
+            const altText = caption || `Photo ${index + 1}`;
             // Phase 5-E — a `wide` tile spans two grid columns and renders
             // roughly twice as wide as a standard tile (measured on the
             // real page: ~596px vs ~278px at this site's container cap),
@@ -76,7 +80,7 @@ function GalleryImages() {
                   <div className="admin-image-compare admin-image-compare--stacked">
                     <div className="admin-image-compare-item">
                       <span className="admin-image-compare-label">현재 사진</span>
-                      <ImagePlaceholder src={currentSrc} alt={label} label={label} aspectRatio={item.aspectRatio} />
+                      <ImagePlaceholder src={currentSrc} alt={altText} label={caption} aspectRatio={item.aspectRatio} />
                       <ImageActualInfo url={currentSrc} recommendedWidth={guideline.width} recommendedHeight={guideline.height} />
                     </div>
                     {item.previewUrl && (
@@ -84,8 +88,8 @@ function GalleryImages() {
                         <span className="admin-image-compare-label">새 사진 (저장 전 미리보기)</span>
                         <ImagePlaceholder
                           src={item.previewUrl}
-                          alt={label}
-                          label={label}
+                          alt={altText}
+                          label={caption}
                           aspectRatio={item.aspectRatio}
                           // item.previewUrl is a blob: object URL (no file
                           // extension to auto-detect from), so this is the
@@ -141,7 +145,7 @@ function GalleryImages() {
                     </p>
                   )}
                   <BilingualField
-                    label="캡션 (Caption)"
+                    label="캡션 (Caption, 선택사항)"
                     ko={item.captionKo}
                     en={item.captionEn}
                     onKoChange={(v) => updateItem(index, { captionKo: v })}
@@ -199,13 +203,14 @@ function GalleryImages() {
                 </p>
                 {trashedItems.map((item) => {
                   const trashSrc = isSupabaseConfigured && item.storagePath ? publicUrlFor(item.storagePath) : undefined;
-                  const label = item.captionEn || item.captionKo || item.itemKey;
+                  const trashCaption = item.captionEn || item.captionKo || '';
+                  const trashAltText = trashCaption || item.itemKey;
                   const rs = trashRowState[item.id];
                   return (
                     <div className="admin-gallery-trash-item" key={item.id}>
-                      <ImagePlaceholder src={trashSrc} alt={label} label={label} aspectRatio={item.aspectRatio} />
+                      <ImagePlaceholder src={trashSrc} alt={trashAltText} label={trashCaption} aspectRatio={item.aspectRatio} />
                       <div className="admin-gallery-trash-item-body">
-                        <p className="admin-gallery-trash-item-caption">{label}</p>
+                        <p className="admin-gallery-trash-item-caption">{trashAltText}</p>
                         {rs?.error && (
                           <p className="admin-status-error" role="alert">
                             {rs.error}
@@ -226,7 +231,7 @@ function GalleryImages() {
                             onClick={() => {
                               if (
                                 window.confirm(
-                                  `"${label}" 사진을 영구 삭제할까요? 파일까지 완전히 삭제되며 되돌릴 수 없습니다.`,
+                                  `"${trashAltText}" 사진을 영구 삭제할까요? 파일까지 완전히 삭제되며 되돌릴 수 없습니다.`,
                                 )
                               ) {
                                 permanentlyDelete(item);

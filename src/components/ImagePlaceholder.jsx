@@ -10,7 +10,12 @@ import './ImagePlaceholder.css';
  *
  * @param {string} [src] - image path (e.g. from the `images` map)
  * @param {string} alt - accessible alt text, required even in placeholder state
- * @param {string} label - short text shown inside the placeholder (e.g. "LEO Portrait")
+ * @param {string} [label] - short text shown INSIDE the placeholder box (e.g.
+ *   "LEO Portrait") — visual only, never falls back to `alt`. Pass '' or
+ *   omit it to show an empty (but still correctly `aria-label`led via
+ *   `alt`) placeholder box — used by Gallery for photos with no caption,
+ *   so there's no identifier text to flash before the real photo/video
+ *   finishes loading.
  * @param {string} [aspectRatio] - CSS aspect-ratio value, e.g. "4 / 5"
  * @param {string} [className]
  * @param {'lazy'|'eager'} [loading] - defaults to 'lazy'; pass 'eager' for an
@@ -90,7 +95,7 @@ function ImagePlaceholder({
       aria-label={showPlaceholder ? alt : undefined}
     >
       {showPlaceholder ? (
-        <span className="image-placeholder__label">{label || alt}</span>
+        label && <span className="image-placeholder__label">{label}</span>
       ) : isVideoSrc ? (
         <video
           // Same remount-per-src rationale as the <img> below — see its own
