@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { defaultInquiryType } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
 import { useSectionContent } from '../hooks/useSectionContent';
 import { fetchContactForm, contactFormFallback } from '../lib/content/contactForm';
@@ -23,13 +22,11 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * never trigger that path. Basic format/length validation runs both here
  * and again at the database (supabase/migrations/0005_inquiries.sql).
  *
- * Advisory Sales repositioning: simplified to the 4 fields the brief asks
- * for (name / company / email / the visitor's current business problem).
- * The "문의 유형" dropdown is no longer shown — `inquiries.inquiry_type` is
- * still NOT NULL at the database level (supabase/migrations/0005_inquiries.sql,
- * never altered here), so every submission silently carries
- * `defaultInquiryType` (src/data/profile.js) in its place instead of
- * asking the visitor to pick one.
+ * The "문의 유형" dropdown asks which of the four Advisory Products
+ * (src/data/profile.js `inquiryTypes`, admin-editable via Content →
+ * Contact) the inquiry is about — the same four the Advisory section
+ * just showed the visitor, so this stays consistent with what the page
+ * actually offers instead of a separate, disconnected category list.
  */
 function ContactForm() {
   const { t } = useLanguage();
@@ -46,12 +43,13 @@ function ContactForm() {
     });
   }
 
-  function validate({ name, email, message }) {
+  function validate({ name, email, inquiryType, message }) {
     const errors = {};
     const required = t(contactForm.requiredKo, contactForm.requiredEn);
     if (!name) errors.name = required;
     if (!email) errors.email = required;
     else if (!EMAIL_PATTERN.test(email)) errors.email = t(contactForm.invalidEmailKo, contactForm.invalidEmailEn);
+    if (!inquiryType) errors.inquiryType = required;
     if (!message) errors.message = required;
     return errors;
   }
@@ -68,10 +66,10 @@ function ContactForm() {
     const name = data.get('name')?.toString().trim() || '';
     const company = data.get('company')?.toString().trim() || '';
     const email = data.get('email')?.toString().trim() || '';
-    const inquiryType = t(defaultInquiryType.ko, defaultInquiryType.en);
+    const inquiryType = data.get('inquiryType')?.toString().trim() || '';
     const message = data.get('message')?.toString().trim() || '';
 
-    const errors = validate({ name, email, message });
+    const errors = validate({ name, email, inquiryType, message });
     setFieldErrors(errors);
     if (Object.keys(errors).length > 0) return;
 
@@ -164,6 +162,37 @@ function ContactForm() {
         {fieldErrors.email && (
           <span className="contact-form__error" id="contact-email-error" role="alert">
             {fieldErrors.email}
+          </span>
+        )}
+      </div>
+
+      <div className="contact-form__field">
+        <label htmlFor="contact-inquiry-type">
+          {t(contactForm.labels.inquiryType.ko, contactForm.labels.inquiryType.en)}
+        </label>
+        <select
+          id="contact-inquiry-type"
+          name="inquiryType"
+          defaultValue=""
+          aria-invalid={Boolean(fieldErrors.inquiryType)}
+          aria-describedby={fieldErrors.inquiryType ? 'contact-inquiry-type-error' : undefined}
+          onChange={() => clearFieldError('inquiryType')}
+        >
+          <option value="" disabled>
+            {t(contactForm.inquiryPlaceholderKo, contactForm.inquiryPlaceholderEn)}
+          </option>
+          {contactForm.inquiryTypes.map((type) => {
+            const label = t(type.ko, type.en);
+            return (
+              <option key={label} value={label}>
+                {label}
+              </option>
+            );
+          })}
+        </select>
+        {fieldErrors.inquiryType && (
+          <span className="contact-form__error" id="contact-inquiry-type-error" role="alert">
+            {fieldErrors.inquiryType}
           </span>
         )}
       </div>

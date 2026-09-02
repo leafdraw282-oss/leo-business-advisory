@@ -626,25 +626,17 @@ export const contactCta = {
   finalLineEn: 'Your next stage of growth starts with a conversation.',
 };
 
+// Matches the four Advisory Products (`advisoryProducts` above) one to
+// one, plus a catch-all — so a visitor picking a type on the Contact
+// form is choosing among the exact same services the page just showed
+// them, not a separate, unrelated list.
 export const inquiryTypes = [
-  { ko: '브랜드 전략', en: 'Brand Strategy' },
-  { ko: '성장/턴어라운드', en: 'Growth / Turnaround' },
-  { ko: '신사업', en: 'New Business' },
-  { ko: '시장 진입', en: 'Market Entry' },
-  { ko: '리테일/DTC', en: 'Retail / DTC' },
-  { ko: '파트너십', en: 'Partnership' },
-  { ko: '경영진 자문', en: 'Executive Advisory' },
+  { ko: 'CEO Growth Advisory', en: 'CEO Growth Advisory' },
+  { ko: 'Brand Turnaround', en: 'Brand Turnaround' },
+  { ko: 'New Business / Brand Launch', en: 'New Business / Brand Launch' },
+  { ko: 'Global Expansion', en: 'Global Expansion' },
   { ko: '기타', en: 'Other' },
 ];
-
-// Advisory Sales repositioning: the contact form's own "문의 유형"
-// dropdown (still required by inquiries.inquiry_type NOT NULL — see
-// supabase/migrations/0005_inquiries.sql — never removed at the data
-// layer) is no longer shown as a visible field, to keep the form to the
-// four fields the brief asks for (name / company / email / the problem
-// itself). This default value is submitted silently in its place — see
-// src/components/ContactForm.jsx.
-export const defaultInquiryType = { ko: '일반 자문 문의', en: 'General Advisory Inquiry' };
 
 // Contact form copy (id: "contact"). Phase 3-C: submitting this form saves
 // the inquiry directly to the database (supabase/migrations/0005_inquiries.sql)
@@ -730,7 +722,6 @@ export const profile = {
   gallerySection,
   contactCta,
   inquiryTypes,
-  defaultInquiryType,
   contactForm,
   footer,
   images,
