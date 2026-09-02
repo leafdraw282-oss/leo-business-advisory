@@ -157,6 +157,45 @@ function above:
    바로 넘어가시면 돼요. (이 경우 4번의 Dashboard Webhook은 만들 필요가
    없습니다 — 이 SQL 트리거가 같은 역할을 대신합니다.)
 
+### Plan B를 했는데도 메일이 안 온다면 (Plan C)
+
+Plan B의 트리거는 실제로 작동하지만, `Authorization: Bearer <anon key>`
+헤더를 일부 프로젝트의 Edge Function 게이트웨이가 `Invalid JWT`로 거부하는
+경우가 확인됐습니다 — anon 키를 다시 정확히 복사해도 동일했습니다. 아래
+쿼리로 실제 응답을 직접 볼 수 있습니다:
+
+```sql
+select * from net._http_response order by created desc limit 3;
+```
+
+`status_code`가 401이고 `content`에 `"UNAUTHORIZED_INVALID_JWT_FORMAT"`이
+보이면 이 문제입니다. anon 키 대신, 이 저장소가 완전히 통제할 수 있는
+방식 — 직접 만든 비밀 문자열(shared secret)을 커스텀 헤더로 보내고,
+`notify-inquiry` 함수가 그 값을 스스로 검사하는 방식 — 으로 바꾸면
+해결됩니다.
+
+1. **`notify-inquiry` 함수를 최신 코드로 재배포** — Edge Functions →
+   `notify-inquiry` → 편집 화면 열기 → `supabase/functions/notify-inquiry/index.ts`의
+   **현재(최신)** 내용 전체로 덮어쓰기 (이제 `WEBHOOK_SECRET`이라는 값을
+   커스텀 헤더로 검사하는 코드가 추가되어 있습니다) → **Deploy**.
+   - 이번엔 **"Verify JWT" / "Enforce JWT Verification" 옵션을 꺼주세요**
+     (재배포 화면 또는 함수의 Settings/Details 쪽에 있습니다). 이 함수는
+     이제 Supabase JWT가 아니라 자체 비밀 값으로 인증을 확인하므로, 플랫폼
+     JWT 검증을 켜두면 오히려 우리 코드가 실행되기도 전에 막혀버립니다
+     (지금 겪은 문제와 동일한 증상).
+2. **`WEBHOOK_SECRET` 시크릿 추가** — Edge Functions → **Manage secrets** →
+   이름 `WEBHOOK_SECRET`, 값은 아무 긴 무작위 문자열이나 직접 정하시면
+   됩니다 (예: 비밀번호 생성기로 만든 32자 이상 문자열). 이 값은 anon
+   키와 달리 **본인만 아는 값**이어야 합니다 — 아무에게도 공유하지 마세요.
+3. **트리거 함수 업데이트** — SQL Editor → New query →
+   `supabase/migrations/0017_inquiry_notify_trigger_shared_secret.sql`
+   파일 내용을 그대로 붙여넣고, `<PROJECT_URL>`은 그대로 실제 프로젝트
+   URL로, `<WEBHOOK_SECRET>`은 **2번에서 정한 것과 정확히 같은 값**으로
+   바꿔서 **Run**.
+4. 사이트에서 테스트 문의를 다시 보내고, `select * from net._http_response
+   order by created desc limit 3;`로 최신 응답이 200인지, Gmail에 메일이
+   왔는지 확인합니다.
+
 ## 5. 테스트하기 (Test it for real)
 
 1. Go to the live public site's Contact section and submit a real test

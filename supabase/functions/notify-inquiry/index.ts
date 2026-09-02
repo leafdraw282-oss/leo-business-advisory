@@ -10,12 +10,20 @@
 // This is read-only with respect to the database — it only reads the row
 // the webhook already handed it. It never queries Supabase itself, so it
 // needs no service_role key (see docs/FOUNDATION.md §19): its only
-// secrets are RESEND_API_KEY and NOTIFY_EMAIL_TO, both Edge Function
-// secrets that never reach the client bundle.
+// secrets are RESEND_API_KEY, NOTIFY_EMAIL_TO, and WEBHOOK_SECRET, all
+// Edge Function secrets that never reach the client bundle.
+//
+// Auth: this function is deployed with JWT verification OFF (it's called
+// by a plain SQL trigger via pg_net — see
+// supabase/migrations/0016_inquiry_notify_trigger.sql — not by a
+// Dashboard-created Database Webhook, which is the only caller a
+// Supabase-issued JWT would actually apply to). Instead it checks its own
+// shared secret via a plain `x-webhook-secret` header, set by that same
+// trigger — see docs/EMAIL_NOTIFICATIONS_SETUP.md's Plan B for why.
 //
 // A failure here (missing secret, Resend outage, etc.) never loses the
 // inquiry itself — the row is already safely committed to `inquiries`
-// before the webhook fires, and stays visible in the admin Inquiries
+// before the trigger fires, and stays visible in the admin Inquiries
 // screen regardless of whether the notification email goes out.
 
 const RESEND_API_URL = 'https://api.resend.com/emails';
@@ -42,10 +50,17 @@ Deno.serve(async (req) => {
   const resendApiKey = Deno.env.get('RESEND_API_KEY');
   const toEmail = Deno.env.get('NOTIFY_EMAIL_TO');
   const fromEmail = Deno.env.get('NOTIFY_EMAIL_FROM') || DEFAULT_FROM;
+  const webhookSecret = Deno.env.get('WEBHOOK_SECRET');
 
-  if (!resendApiKey || !toEmail) {
-    console.error('notify-inquiry: missing RESEND_API_KEY or NOTIFY_EMAIL_TO secret');
+  if (!resendApiKey || !toEmail || !webhookSecret) {
+    console.error('notify-inquiry: missing RESEND_API_KEY, NOTIFY_EMAIL_TO, or WEBHOOK_SECRET secret');
     return new Response('Not configured', { status: 500 });
+  }
+
+  // Manual auth check, standing in for the platform JWT gateway this
+  // function deliberately runs without (see the header comment above).
+  if (req.headers.get('x-webhook-secret') !== webhookSecret) {
+    return new Response('Unauthorized', { status: 401 });
   }
 
   let payload: Record<string, unknown>;
