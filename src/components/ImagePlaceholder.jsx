@@ -26,6 +26,13 @@ import './ImagePlaceholder.css';
  *   global.css's [data-image-motion] rules. Never passed by Hero, which
  *   keeps its own separate, load-triggered fadeInOnLoad untouched — the two
  *   are mutually exclusive by caller, never combined on one instance.
+ * @param {boolean} [isVideo] - Gallery-only: renders a <video> instead of an
+ *   <img> for an uploaded MP4. Auto-detected from `src`'s file extension
+ *   (works for a saved Storage URL, which always has one) when omitted;
+ *   pass it explicitly for a blob: object-URL preview (an in-progress
+ *   admin upload), which has no extension to sniff — see GalleryImages.jsx.
+ *   Every other caller (Hero/About/Case Studies) never passes this and is
+ *   completely unaffected.
  */
 function ImagePlaceholder({
   src,
@@ -37,6 +44,7 @@ function ImagePlaceholder({
   fetchPriority,
   fadeInOnLoad = false,
   revealMotion = false,
+  isVideo,
 }) {
   // Tracks WHICH src last failed, not just whether "something" failed —
   // every section starts with a src that's guaranteed (or very likely) to
@@ -53,6 +61,7 @@ function ImagePlaceholder({
   const [loadedSrc, setLoadedSrc] = useState(null);
   const showPlaceholder = !src || failedSrc === src;
   const loaded = loadedSrc === src;
+  const isVideoSrc = isVideo ?? (typeof src === 'string' && /\.mp4($|\?)/i.test(src));
 
   // Always called (rules of hooks) but its ref/className are only wired
   // into the DOM below when revealMotion is actually true — an unused
@@ -80,6 +89,22 @@ function ImagePlaceholder({
     >
       {showPlaceholder ? (
         <span className="image-placeholder__label">{label || alt}</span>
+      ) : isVideoSrc ? (
+        <video
+          // Same remount-per-src rationale as the <img> below — see its own
+          // comment for the exact stale-event race this closes.
+          key={src}
+          className={imgClassName}
+          src={src}
+          aria-label={alt}
+          controls
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          onLoadedData={() => setLoadedSrc(src)}
+          onError={() => setFailedSrc(src)}
+        />
       ) : (
         <img
           // Keying by src forces React to mount a brand-new <img> DOM node

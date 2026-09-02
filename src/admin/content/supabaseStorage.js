@@ -37,6 +37,29 @@ export function validateImageFile(file) {
   return null;
 }
 
+// Gallery ("비주얼 스토리") only — every other image slot (Hero/About/Case
+// Studies) still validates against ALLOWED_IMAGE_TYPES/MAX_IMAGE_BYTES
+// above, completely unchanged. MP4 is a different kind of asset (video,
+// not a still photo), so it gets its own, much larger size ceiling —
+// MAX_IMAGE_BYTES' 2MB is sized for a correctly-compressed photo and would
+// reject almost any real video clip. 20MB is generous for a short,
+// web-optimized H.264 clip without being unbounded.
+export const ALLOWED_GALLERY_TYPES = [...ALLOWED_IMAGE_TYPES, 'video/mp4'];
+export const MAX_VIDEO_BYTES = 20 * 1024 * 1024; // 20 MB
+
+/** Same as validateImageFile(), but also accepts video/mp4 (Gallery only) with its own size ceiling. */
+export function validateGalleryFile(file) {
+  if (!ALLOWED_GALLERY_TYPES.includes(file.type)) {
+    return `Unsupported file type (${file.type || 'unknown'}). Use JPEG, PNG, WebP, SVG, or MP4.`;
+  }
+  const isVideo = file.type === 'video/mp4';
+  const maxBytes = isVideo ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES;
+  if (file.size > maxBytes) {
+    return `File is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max is ${maxBytes / 1024 / 1024} MB.`;
+  }
+  return null;
+}
+
 function extensionFor(file) {
   const fromName = file.name?.split('.').pop();
   if (fromName && fromName.length <= 5 && /^[a-zA-Z0-9]+$/.test(fromName)) return fromName.toLowerCase();

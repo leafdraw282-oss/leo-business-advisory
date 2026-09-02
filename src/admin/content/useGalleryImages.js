@@ -2,7 +2,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { gallery } from '../../data/profile.js';
 import { isSupabaseConfigured, supabase } from '../../lib/supabase.js';
 import { fetchList, upsertByNaturalKey, fetchRowById, saveListRow, deleteRow } from './supabaseTable.js';
-import { uploadImageFile, removeStorageFile, validateImageFile } from './supabaseStorage.js';
+import { uploadImageFile, removeStorageFile, validateGalleryFile } from './supabaseStorage.js';
 import { requireFilled } from './validation.js';
 import { setDirtyState } from './dirtyTracker.js';
 import { recordSave } from './lastSaved.js';
@@ -263,7 +263,7 @@ export function useGalleryImages() {
   }
 
   function selectFileForItem(index, file) {
-    const error = validateImageFile(file);
+    const error = validateGalleryFile(file);
     if (error) {
       setSaveState('error');
       setSaveError(error);

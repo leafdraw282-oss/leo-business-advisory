@@ -305,6 +305,20 @@ Upload path (`src/admin/content/supabaseStorage.js`):
   `media` row pointing at that path — Storage and the `media` table are
   always written together, never one without the other, from the save
   paths that exist today.
+- **Gallery only** also accepts `video/mp4` — `ALLOWED_GALLERY_TYPES`
+  (`ALLOWED_IMAGE_TYPES` + `'video/mp4'`) and `MAX_VIDEO_BYTES` (20MB),
+  used only by `useGalleryImages.js`'s `validateGalleryFile()`. Hero/
+  About/Case Studies keep validating against the original
+  `ALLOWED_IMAGE_TYPES`/`MAX_IMAGE_BYTES`, unaffected. The bucket's own
+  `file_size_limit` (`0013_gallery_video_support.sql`) is a single
+  bucket-wide ceiling — Storage has no per-mime-type limit — so it's set
+  to 20MB for the whole bucket; the tighter 2MB photo ceiling is enforced
+  client-side only, same "client is the real gate, server is an outer
+  ceiling" layering as `MAX_IMAGE_BYTES` itself. `ImagePlaceholder.jsx`
+  renders a video whenever `src` ends in `.mp4` (or the caller passes
+  `isVideo` explicitly, needed only for a blob: preview URL, which has no
+  extension to sniff) — no `media`/`gallery_items` schema change was
+  needed for this.
 
 **Replacing an image never deletes the old Storage file or `media` row** —
 by design (`docs/BACKUP_RECOVERY.md`'s Storage Strategy), a replaced image

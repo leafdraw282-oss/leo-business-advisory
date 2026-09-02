@@ -1,5 +1,5 @@
 import { isSupabaseConfigured } from '../../../lib/supabase.js';
-import { publicUrlFor, ALLOWED_IMAGE_TYPES, MAX_IMAGE_BYTES } from '../../content/supabaseStorage.js';
+import { publicUrlFor, ALLOWED_GALLERY_TYPES, MAX_IMAGE_BYTES, MAX_VIDEO_BYTES } from '../../content/supabaseStorage.js';
 import { useGalleryImages } from '../../content/useGalleryImages.js';
 import { recommendedSizeForRatio } from '../../content/imageGuidelines.js';
 import BilingualField from '../../components/BilingualField.jsx';
@@ -82,7 +82,17 @@ function GalleryImages() {
                     {item.previewUrl && (
                       <div className="admin-image-compare-item admin-image-compare-item--new">
                         <span className="admin-image-compare-label">새 사진 (저장 전 미리보기)</span>
-                        <ImagePlaceholder src={item.previewUrl} alt={label} label={label} aspectRatio={item.aspectRatio} />
+                        <ImagePlaceholder
+                          src={item.previewUrl}
+                          alt={label}
+                          label={label}
+                          aspectRatio={item.aspectRatio}
+                          // item.previewUrl is a blob: object URL (no file
+                          // extension to auto-detect from), so this is the
+                          // one case that must say explicitly whether the
+                          // pending file is a video.
+                          isVideo={item.pendingFile?.type === 'video/mp4'}
+                        />
                         <ImageActualInfo
                           url={item.previewUrl}
                           recommendedWidth={guideline.width}
@@ -113,7 +123,7 @@ function GalleryImages() {
                   )}
                   <input
                     type="file"
-                    accept={ALLOWED_IMAGE_TYPES.join(',')}
+                    accept={ALLOWED_GALLERY_TYPES.join(',')}
                     onChange={(event) => {
                       const file = event.target.files?.[0];
                       event.target.value = '';
@@ -121,7 +131,8 @@ function GalleryImages() {
                     }}
                   />
                   <p className="admin-image-hint">
-                    JPEG, PNG, WebP, SVG 파일만 가능 — 최대 {MAX_IMAGE_BYTES / 1024 / 1024}MB.
+                    JPEG, PNG, WebP, SVG 파일 — 최대 {MAX_IMAGE_BYTES / 1024 / 1024}MB. 동영상은 MP4만 가능 — 최대{' '}
+                    {MAX_VIDEO_BYTES / 1024 / 1024}MB.
                   </p>
                   {item.pendingFile && (
                     <p className="admin-image-pending">
