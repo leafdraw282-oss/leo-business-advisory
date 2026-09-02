@@ -39,20 +39,33 @@ export function validateImageFile(file) {
 
 // Gallery ("비주얼 스토리") only — every other image slot (Hero/About/Case
 // Studies) still validates against ALLOWED_IMAGE_TYPES/MAX_IMAGE_BYTES
-// above, completely unchanged. MP4 is a different kind of asset (video,
-// not a still photo), so it gets its own, much larger size ceiling —
+// above, completely unchanged. A real video is a different kind of asset
+// from a still photo, so it gets its own, much larger size ceiling —
 // MAX_IMAGE_BYTES' 2MB is sized for a correctly-compressed photo and would
 // reject almost any real video clip. 20MB is generous for a short,
-// web-optimized H.264 clip without being unbounded.
-export const ALLOWED_GALLERY_TYPES = [...ALLOWED_IMAGE_TYPES, 'video/mp4'];
+// web-optimized clip without being unbounded.
+//
+// WebM and MP4/H.264 play natively in every current browser; QuickTime
+// (.mov, common straight off an iPhone) plays in Safari and most Chromium
+// builds. AVI has never been a native web format — no major browser ships
+// a demuxer/codec for it — so an uploaded .avi is accepted and stored like
+// any other file, but ImagePlaceholder's <video> will very likely fail to
+// play it client-side and fall back to the labeled placeholder, same as
+// any other file a visitor's browser can't decode. Included because it
+// was explicitly asked for, not because playback is guaranteed.
+export const VIDEO_MIME_TYPES = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo'];
+// GIF is an image (animated or not) — a browser renders it via a plain
+// <img>, no <video> element involved, so it lives in ALLOWED_GALLERY_TYPES
+// as just another accepted image type, not alongside VIDEO_MIME_TYPES.
+export const ALLOWED_GALLERY_TYPES = [...ALLOWED_IMAGE_TYPES, 'image/gif', ...VIDEO_MIME_TYPES];
 export const MAX_VIDEO_BYTES = 20 * 1024 * 1024; // 20 MB
 
-/** Same as validateImageFile(), but also accepts video/mp4 (Gallery only) with its own size ceiling. */
+/** Same as validateImageFile(), but also accepts GIF/MP4/WebM/MOV/AVI (Gallery only) — video formats get their own, larger size ceiling. */
 export function validateGalleryFile(file) {
   if (!ALLOWED_GALLERY_TYPES.includes(file.type)) {
-    return `Unsupported file type (${file.type || 'unknown'}). Use JPEG, PNG, WebP, SVG, or MP4.`;
+    return `Unsupported file type (${file.type || 'unknown'}). Use JPEG, PNG, WebP, SVG, GIF, MP4, WebM, MOV, or AVI.`;
   }
-  const isVideo = file.type === 'video/mp4';
+  const isVideo = VIDEO_MIME_TYPES.includes(file.type);
   const maxBytes = isVideo ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES;
   if (file.size > maxBytes) {
     return `File is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max is ${maxBytes / 1024 / 1024} MB.`;
@@ -60,10 +73,22 @@ export function validateGalleryFile(file) {
   return null;
 }
 
+// Only matters as a fallback when the source filename has no usable
+// extension of its own (see below) — but two of the MIME types this file
+// accepts don't produce a sensible one via the naive "part after the
+// slash" fallback (`video/quicktime` -> "quicktime", `video/x-msvideo` ->
+// "x-msvideo", `image/svg+xml` -> "svg+xml"), so those three are mapped
+// explicitly to the extension a browser/OS actually expects.
+const MIME_EXTENSIONS = {
+  'video/quicktime': 'mov',
+  'video/x-msvideo': 'avi',
+  'image/svg+xml': 'svg',
+};
+
 function extensionFor(file) {
   const fromName = file.name?.split('.').pop();
   if (fromName && fromName.length <= 5 && /^[a-zA-Z0-9]+$/.test(fromName)) return fromName.toLowerCase();
-  return file.type.split('/').pop();
+  return MIME_EXTENSIONS[file.type] ?? file.type.split('/').pop();
 }
 
 /** Uploads a validated file under `folder/` with a generated unique name. Returns the storage path. */

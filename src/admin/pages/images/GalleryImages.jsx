@@ -1,5 +1,5 @@
 import { isSupabaseConfigured } from '../../../lib/supabase.js';
-import { publicUrlFor, ALLOWED_GALLERY_TYPES, MAX_IMAGE_BYTES, MAX_VIDEO_BYTES } from '../../content/supabaseStorage.js';
+import { publicUrlFor, ALLOWED_GALLERY_TYPES, VIDEO_MIME_TYPES, MAX_IMAGE_BYTES, MAX_VIDEO_BYTES } from '../../content/supabaseStorage.js';
 import { useGalleryImages } from '../../content/useGalleryImages.js';
 import { recommendedSizeForRatio } from '../../content/imageGuidelines.js';
 import BilingualField from '../../components/BilingualField.jsx';
@@ -91,7 +91,7 @@ function GalleryImages() {
                           // extension to auto-detect from), so this is the
                           // one case that must say explicitly whether the
                           // pending file is a video.
-                          isVideo={item.pendingFile?.type === 'video/mp4'}
+                          isVideo={VIDEO_MIME_TYPES.includes(item.pendingFile?.type)}
                         />
                         <ImageActualInfo
                           url={item.previewUrl}
@@ -131,8 +131,9 @@ function GalleryImages() {
                     }}
                   />
                   <p className="admin-image-hint">
-                    JPEG, PNG, WebP, SVG 파일 — 최대 {MAX_IMAGE_BYTES / 1024 / 1024}MB. 동영상은 MP4만 가능 — 최대{' '}
-                    {MAX_VIDEO_BYTES / 1024 / 1024}MB.
+                    JPEG, PNG, WebP, SVG, GIF 파일 — 최대 {MAX_IMAGE_BYTES / 1024 / 1024}MB. 동영상은 MP4, WebM, MOV,
+                    AVI 가능 — 최대 {MAX_VIDEO_BYTES / 1024 / 1024}MB (AVI는 파일 업로드는 되지만 브라우저에서 재생되지
+                    않을 수 있습니다).
                   </p>
                   {item.pendingFile && (
                     <p className="admin-image-pending">

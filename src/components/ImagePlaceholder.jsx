@@ -27,12 +27,14 @@ import './ImagePlaceholder.css';
  *   keeps its own separate, load-triggered fadeInOnLoad untouched — the two
  *   are mutually exclusive by caller, never combined on one instance.
  * @param {boolean} [isVideo] - Gallery-only: renders a <video> instead of an
- *   <img> for an uploaded MP4. Auto-detected from `src`'s file extension
- *   (works for a saved Storage URL, which always has one) when omitted;
- *   pass it explicitly for a blob: object-URL preview (an in-progress
- *   admin upload), which has no extension to sniff — see GalleryImages.jsx.
- *   Every other caller (Hero/About/Case Studies) never passes this and is
- *   completely unaffected.
+ *   <img> for an uploaded video (mp4/webm/mov/avi — see supabaseStorage.js's
+ *   VIDEO_MIME_TYPES; GIF is not included here, it's a still-vs-animated
+ *   image and always renders through the normal <img> below). Auto-detected
+ *   from `src`'s file extension (works for a saved Storage URL, which
+ *   always has one) when omitted; pass it explicitly for a blob: object-URL
+ *   preview (an in-progress admin upload), which has no extension to sniff
+ *   — see GalleryImages.jsx. Every other caller (Hero/About/Case Studies)
+ *   never passes this and is completely unaffected.
  */
 function ImagePlaceholder({
   src,
@@ -61,7 +63,7 @@ function ImagePlaceholder({
   const [loadedSrc, setLoadedSrc] = useState(null);
   const showPlaceholder = !src || failedSrc === src;
   const loaded = loadedSrc === src;
-  const isVideoSrc = isVideo ?? (typeof src === 'string' && /\.mp4($|\?)/i.test(src));
+  const isVideoSrc = isVideo ?? (typeof src === 'string' && /\.(mp4|webm|mov|avi)($|\?)/i.test(src));
 
   // Always called (rules of hooks) but its ref/className are only wired
   // into the DOM below when revealMotion is actually true — an unused
