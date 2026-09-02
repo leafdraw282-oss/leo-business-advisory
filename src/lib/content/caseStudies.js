@@ -29,6 +29,26 @@ function fallbackCase(fc) {
   };
 }
 
+/**
+ * Same shape as caseStudiesFallback(), but every item's imageUrl is null —
+ * used only as useSectionContent()'s first-paint value (see
+ * CaseStudies.jsx), before fetchCaseStudies() has resolved either way.
+ * Mirrors Hero's heroInitial() (src/lib/content/hero.js) and
+ * about.js's matching aboutInitial(): caseStudiesFallback()'s local
+ * fallback image paths are guaranteed to 404 on this deployment, so using
+ * them as the *initial* render value wasted one network round trip and an
+ * extra placeholder repaint per case, on every page load, before either
+ * the real Supabase image or (once fetchCaseStudies() concludes there's
+ * no CMS image) that same local path ever gets a chance to show.
+ * ImagePlaceholder already renders a null src as an immediate placeholder
+ * with no request at all — pure perceived-loading-speed win, no visual or
+ * behavioral change otherwise.
+ */
+export function caseStudiesInitial() {
+  const fallback = caseStudiesFallback();
+  return { section: fallback.section, items: fallback.items.map((item) => ({ ...item, imageUrl: null })) };
+}
+
 export async function fetchCaseStudies() {
   return fetchWithFallback(async () => {
     // Phase 4-H: sectionRow/caseRows are independent (neither's result

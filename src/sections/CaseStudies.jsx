@@ -1,7 +1,7 @@
 import { useLanguage } from '../context/languageContext';
 import { useSectionContent } from '../hooks/useSectionContent';
 import { useReveal } from '../hooks/useReveal';
-import { fetchCaseStudies, caseStudiesFallback } from '../lib/content/caseStudies';
+import { fetchCaseStudies, caseStudiesInitial } from '../lib/content/caseStudies';
 import SectionTitle from '../components/SectionTitle';
 import CaseStudy from '../components/CaseStudy';
 import './CaseStudies.css';
@@ -16,7 +16,7 @@ import './CaseStudies.css';
  */
 function CaseStudies() {
   const { t } = useLanguage();
-  const content = useSectionContent(fetchCaseStudies, caseStudiesFallback());
+  const content = useSectionContent(fetchCaseStudies, caseStudiesInitial());
   const { ref, className: revealClassName } = useReveal();
 
   return (

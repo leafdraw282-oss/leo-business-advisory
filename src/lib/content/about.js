@@ -17,6 +17,27 @@ export function aboutFallback() {
   };
 }
 
+/**
+ * Same text content as aboutFallback(), but with no image src — used only
+ * as useSectionContent()'s first-paint value (see Profile.jsx), before
+ * fetchAbout() has resolved either way. Mirrors Hero's own heroInitial()
+ * (src/lib/content/hero.js) and exists for the same reason: aboutFallback()'s
+ * local fallback image path is guaranteed to 404 on this deployment (no
+ * static photo file exists at it — real photos live in Supabase Storage
+ * once configured), so using it as the *initial* render value meant every
+ * page load fired that doomed request immediately, adding one wasted
+ * network round trip and an extra placeholder repaint before the real
+ * Supabase image (or, once fetchAbout() concludes there's no CMS image
+ * either, the same local fallback path — still requested then, just no
+ * longer wastefully first) ever has a chance to show. ImagePlaceholder
+ * already renders `src: null` as an immediate placeholder with no request
+ * at all, so this is a pure perceived-loading-speed win with no visual or
+ * behavioral change otherwise.
+ */
+export function aboutInitial() {
+  return { ...aboutFallback(), imageUrl: null };
+}
+
 export async function fetchAbout() {
   return fetchWithFallback(async () => {
     const row = await fetchSingletonRow('about_content');

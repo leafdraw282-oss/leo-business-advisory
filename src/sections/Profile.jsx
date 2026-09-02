@@ -1,7 +1,7 @@
 import { useLanguage } from '../context/languageContext';
 import { useSectionContent } from '../hooks/useSectionContent';
 import { useReveal } from '../hooks/useReveal';
-import { fetchAbout, aboutFallback } from '../lib/content/about';
+import { fetchAbout, aboutInitial } from '../lib/content/about';
 import SectionTitle from '../components/SectionTitle';
 import ImagePlaceholder from '../components/ImagePlaceholder';
 import './Profile.css';
@@ -13,7 +13,7 @@ import './Profile.css';
  */
 function Profile() {
   const { t } = useLanguage();
-  const about = useSectionContent(fetchAbout, aboutFallback());
+  const about = useSectionContent(fetchAbout, aboutInitial());
   const portraitLabel = t(about.imageAltKo, about.imageAltEn);
   const { ref, className: revealClassName } = useReveal();
 

@@ -2,7 +2,7 @@ import { gallerySection } from '../data/profile';
 import { useLanguage } from '../context/languageContext';
 import { useSectionContent } from '../hooks/useSectionContent';
 import { useReveal } from '../hooks/useReveal';
-import { fetchGallery, galleryFallback } from '../lib/content/gallery';
+import { fetchGallery, galleryInitial } from '../lib/content/gallery';
 import SectionTitle from '../components/SectionTitle';
 import ImagePlaceholder from '../components/ImagePlaceholder';
 import './Gallery.css';
@@ -18,7 +18,7 @@ import './Gallery.css';
  */
 function Gallery() {
   const { t } = useLanguage();
-  const gallery = useSectionContent(fetchGallery, galleryFallback());
+  const gallery = useSectionContent(fetchGallery, galleryInitial());
   const { ref, className: revealClassName } = useReveal();
 
   return (

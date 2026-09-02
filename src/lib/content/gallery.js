@@ -13,6 +13,27 @@ export function galleryFallback() {
   }));
 }
 
+/**
+ * Same items as galleryFallback(), but every item's src is null — used
+ * only as useSectionContent()'s first-paint value (see Gallery.jsx),
+ * before fetchGallery() has resolved either way. Mirrors Hero's
+ * heroInitial() (src/lib/content/hero.js) and the matching aboutInitial()/
+ * caseStudiesInitial(): galleryFallback()'s local fallback image paths
+ * are guaranteed to 404 on this deployment, so using them as the
+ * *initial* render value wasted one network round trip and an extra
+ * placeholder repaint per photo (and, now that Gallery accepts video —
+ * see supabaseStorage.js — per clip too, where that wasted round trip is
+ * relatively more noticeable given video files take longer to actually
+ * load once the real Storage URL is known). ImagePlaceholder already
+ * renders a null src as an immediate placeholder with no request at
+ * all — pure perceived-loading-speed win, no visual or behavioral change
+ * otherwise (captions, aspect ratio, wide-tile layout all stay exactly as
+ * galleryFallback() already provides them).
+ */
+export function galleryInitial() {
+  return galleryFallback().map((item) => ({ ...item, src: null }));
+}
+
 export async function fetchGallery() {
   return fetchWithFallback(async () => {
     const allRows = await fetchListRows('gallery_items');
