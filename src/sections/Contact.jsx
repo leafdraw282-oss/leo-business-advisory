@@ -17,7 +17,6 @@ import './Contact.css';
 function Contact() {
   const { t } = useLanguage();
   const contact = useSectionContent(fetchContactInfo, contactInfoFallback());
-  const formWrapperRef = useRef(null);
   const sectionRef = useRef(null);
   const { ref: revealRef, className: revealClassName } = useReveal();
 
@@ -28,10 +27,6 @@ function Contact() {
   function setSectionRefs(node) {
     sectionRef.current = node;
     revealRef.current = node;
-  }
-
-  function focusForm() {
-    formWrapperRef.current?.querySelector('input[name="name"]')?.focus();
   }
 
   // Fires once, the first time the section is actually scrolled into view
@@ -68,13 +63,13 @@ function Contact() {
               no Supabase-editable counterpart yet (contact_cta only stores
               headline/button — see src/lib/content/contactInfo.js), so
               these two read directly from profile.js, same pattern as
-              Challenge/HowWeWork/TargetClients/InsightsPreview above. */}
+              Challenge/HowWeWork/TargetClients/InsightsPreview above. No
+              button here — the form is right below on the same page, so a
+              button that only scrolled/focused it was a redundant extra
+              click, not a real second action. */}
           <p className="contact__eyebrow">{t(contactCta.eyebrowKo, contactCta.eyebrowEn)}</p>
           <h2 className="contact__headline">{t(contact.ctaHeadlineKo, contact.ctaHeadlineEn)}</h2>
           <p className="contact__intro">{t(contactCta.introKo, contactCta.introEn)}</p>
-          <button type="button" className="btn btn--primary" onClick={focusForm}>
-            {t(contact.ctaButtonKo, contact.ctaButtonEn)}
-          </button>
         </div>
 
         <div className="contact__grid">
@@ -97,21 +92,17 @@ function Contact() {
             <p className="contact__info-location">{t(contact.locationKo, contact.locationEn)}</p>
           </div>
 
-          <div className="contact__form-wrapper" ref={formWrapperRef}>
+          <div className="contact__form-wrapper">
             <ContactForm />
           </div>
         </div>
 
         {/* Closing line, repeated at the very bottom of the page — the
             site's last conversion point, per the brief's "페이지 맨 아래에
-            다시 한번 짧은 클로징 문구 + 버튼". Reuses the same button copy
-            (contact.ctaButtonKo/En) and focusForm() as the CTA above, so
-            both buttons do the exact same thing. */}
+            다시 한번 짧은 클로징 문구". No button here either, same reasoning
+            as the CTA above — the form is already on this page. */}
         <div className="contact__closing">
           <p className="contact__closing-line">{t(contactCta.finalLineKo, contactCta.finalLineEn)}</p>
-          <button type="button" className="btn btn--primary" onClick={focusForm}>
-            {t(contact.ctaButtonKo, contact.ctaButtonEn)}
-          </button>
         </div>
       </div>
     </section>

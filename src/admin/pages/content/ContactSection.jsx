@@ -238,13 +238,12 @@ function ContactSection() {
             onKoChange={(v) => updateCta({ headlineKo: v })}
             onEnChange={(v) => updateCta({ headlineEn: v })}
           />
-          <BilingualField
-            label="Contact 버튼 문구"
-            ko={values.cta.buttonKo}
-            en={values.cta.buttonEn}
-            onKoChange={(v) => updateCta({ buttonKo: v })}
-            onEnChange={(v) => updateCta({ buttonEn: v })}
-          />
+          {/* No "Contact 버튼 문구" field here — the public Contact section
+              dropped its CTA buttons (redundant with the form on the same
+              page), so values.cta.buttonKo/buttonEn have no visible effect
+              to edit. Still loaded/saved unchanged (contact_cta.button_ko/
+              button_en stay NOT NULL at the database level), just not
+              exposed as an editable field with nothing for it to control. */}
 
           <h3>문의 폼 문구</h3>
           <BilingualField
