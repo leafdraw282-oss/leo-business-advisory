@@ -32,6 +32,25 @@
   color: var(--color-text-muted);
 }
 
+/* Once a card has a real external link (src/admin/pages/content/InsightsSection.jsx),
+   its badge becomes a real button rather than a static "coming soon"
+   label — same border/hover-fill language as .btn--secondary
+   (styles/global.css), sized down to fit this compact card slot. */
+.insight-card__link {
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--card-radius);
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--color-primary);
+  transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+.insight-card__link:hover {
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+}
+
 @media (max-width: 1024px) {
   .insights-preview__grid {
     grid-template-columns: 1fr;

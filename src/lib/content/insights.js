@@ -12,7 +12,17 @@ export function insightsFallback() {
       comingSoonKo: insightsSection.comingSoonKo,
       comingSoonEn: insightsSection.comingSoonEn,
     },
-    items: insights.map((item) => ({ id: item.id, titleKo: item.titleKo, titleEn: item.titleEn })),
+    // linkUrl/linkLabel have no profile.js counterpart — they're purely
+    // admin-authored (see supabase/migrations/0019_insights_item_links.sql),
+    // so the fallback always has them unset, matching a fresh/empty row.
+    items: insights.map((item) => ({
+      id: item.id,
+      titleKo: item.titleKo,
+      titleEn: item.titleEn,
+      linkUrl: null,
+      linkLabelKo: null,
+      linkLabelEn: null,
+    })),
   };
 }
 
@@ -38,7 +48,14 @@ export async function fetchInsights() {
         : fallback.section,
       items:
         itemRows.length > 0
-          ? itemRows.map((r) => ({ id: r.id, titleKo: r.title_ko, titleEn: r.title_en }))
+          ? itemRows.map((r) => ({
+              id: r.id,
+              titleKo: r.title_ko,
+              titleEn: r.title_en,
+              linkUrl: r.link_url ?? null,
+              linkLabelKo: r.link_label_ko ?? null,
+              linkLabelEn: r.link_label_en ?? null,
+            }))
           : fallback.items,
     };
   }, insightsFallback());

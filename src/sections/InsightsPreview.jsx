@@ -37,6 +37,8 @@ function InsightsPreview() {
               <InsightCard
                 title={t(item.titleKo, item.titleEn)}
                 comingSoonLabel={t(insights.section.comingSoonKo, insights.section.comingSoonEn)}
+                linkUrl={item.linkUrl}
+                linkLabel={t(item.linkLabelKo, item.linkLabelEn) || t('자세히 보기', 'Learn more')}
               />
             </li>
           ))}

@@ -4,6 +4,7 @@ import { fetchSingleton, upsertSingleton, fetchList, saveListRow } from '../../c
 import { useAdminForm } from '../../content/useAdminForm.js';
 import { requireFilled } from '../../content/validation.js';
 import BilingualField from '../../components/BilingualField.jsx';
+import PlainField from '../../components/PlainField.jsx';
 import SectionStatus from '../../components/SectionStatus.jsx';
 
 function headingFallback() {
@@ -18,7 +19,14 @@ function headingFallback() {
 }
 
 function itemsFallback() {
-  return insights.map((item) => ({ id: null, titleKo: item.titleKo, titleEn: item.titleEn }));
+  return insights.map((item) => ({
+    id: null,
+    titleKo: item.titleKo,
+    titleEn: item.titleEn,
+    linkUrl: '',
+    linkLabelKo: '',
+    linkLabelEn: '',
+  }));
 }
 
 async function load() {
@@ -38,7 +46,16 @@ async function load() {
 
   const itemRows = await fetchList('insights_items');
   const items =
-    itemRows.length > 0 ? itemRows.map((r) => ({ id: r.id, titleKo: r.title_ko, titleEn: r.title_en })) : itemsFallback();
+    itemRows.length > 0
+      ? itemRows.map((r) => ({
+          id: r.id,
+          titleKo: r.title_ko,
+          titleEn: r.title_en,
+          linkUrl: r.link_url ?? '',
+          linkLabelKo: r.link_label_ko ?? '',
+          linkLabelEn: r.link_label_en ?? '',
+        }))
+      : itemsFallback();
 
   return { heading, items };
 }
@@ -49,6 +66,14 @@ async function save(values) {
     { label: 'Section title', ko: values.heading.titleKo, en: values.heading.titleEn },
     { label: 'Coming soon label', ko: values.heading.comingSoonKo, en: values.heading.comingSoonEn },
     ...values.items.map((item, i) => ({ label: `Insight ${i + 1} title`, ko: item.titleKo, en: item.titleEn })),
+    // Link URL/label are optional — a card can stay a "coming soon"
+    // placeholder forever — but if a URL IS set, its button text can't
+    // be blank (InsightsPreview.jsx already falls back to a generic
+    // label at render time, but requiring it here means the admin sees
+    // and fixes that themselves rather than relying on a silent default).
+    ...values.items
+      .filter((item) => item.linkUrl.trim())
+      .map((item, i) => ({ label: `Insight ${i + 1} button text`, ko: item.linkLabelKo, en: item.linkLabelEn })),
   ]);
 
   if (!isSupabaseConfigured) {
@@ -65,10 +90,14 @@ async function save(values) {
   });
 
   for (const [index, item] of values.items.entries()) {
+    const linkUrl = item.linkUrl.trim();
     await saveListRow('insights_items', item.id, {
       title_ko: item.titleKo,
       title_en: item.titleEn,
       sort_order: index,
+      link_url: linkUrl || null,
+      link_label_ko: linkUrl ? item.linkLabelKo.trim() : null,
+      link_label_en: linkUrl ? item.linkLabelEn.trim() : null,
     });
   }
 
@@ -125,7 +154,12 @@ function InsightsSection() {
             onEnChange={(v) => updateHeading({ comingSoonEn: v })}
           />
 
-          <h3>인사이트 카드 (제목만, 실제 글 없음)</h3>
+          <h3>인사이트 카드</h3>
+          <p className="admin-section-help">
+            링크 URL을 비워두면 위 &quot;준비 중&quot; 라벨이 그대로 표시됩니다. URL을 입력하면 그 카드만
+            버튼으로 바뀌어 새 창에서 링크가 열립니다 (네이버 블로그, 유튜브 등 외부 링크 가능). 버튼에 실제
+            URL은 보이지 않고, 아래에서 입력한 문구만 보입니다.
+          </p>
           {values.items.map((item, index) => (
             <div className="admin-list-row" key={item.id ?? `new-${index}`}>
               <BilingualField
@@ -135,6 +169,21 @@ function InsightsSection() {
                 onKoChange={(v) => updateItem(index, { titleKo: v })}
                 onEnChange={(v) => updateItem(index, { titleEn: v })}
               />
+              <PlainField
+                label="링크 URL (선택사항 — 비워두면 '준비 중'으로 표시)"
+                type="url"
+                value={item.linkUrl}
+                onChange={(v) => updateItem(index, { linkUrl: v })}
+              />
+              {item.linkUrl.trim() && (
+                <BilingualField
+                  label="버튼 문구 (예: 네이버 블로그에서 보기 / 유튜브에서 보기)"
+                  ko={item.linkLabelKo}
+                  en={item.linkLabelEn}
+                  onKoChange={(v) => updateItem(index, { linkLabelKo: v })}
+                  onEnChange={(v) => updateItem(index, { linkLabelEn: v })}
+                />
+              )}
             </div>
           ))}
         </>
