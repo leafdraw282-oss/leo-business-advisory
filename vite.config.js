@@ -2,10 +2,9 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
-// base matches the GitHub Pages project-site path for this repo
-// (https://<owner>.github.io/leo-business-advisory/). If a custom domain
-// is set up later, change this back to '/' — see README.md's deployment
-// section.
+// Custom domain (leobizadvisory.com) is live — base is root. If this site
+// ever moves back to the bare GitHub Pages project-site URL, change this
+// back to '/leo-business-advisory/' — see README.md's deployment section.
 //
 // Two independent HTML entry points (Vite's standard multi-page-app
 // pattern — see https://vite.dev/guide/build.html#multi-page-app): the
@@ -15,7 +14,7 @@ import { defineConfig } from 'vite'
 // public site's App.jsx or render tree.
 export default defineConfig({
   plugins: [react()],
-  base: '/leo-business-advisory/',
+  base: '/',
   build: {
     rollupOptions: {
       input: {

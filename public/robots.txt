@@ -6,4 +6,4 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 
-Sitemap: https://leafdraw282-oss.github.io/leo-business-advisory/sitemap.xml
+Sitemap: https://leobizadvisory.com/sitemap.xml
