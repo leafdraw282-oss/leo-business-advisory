@@ -3,10 +3,35 @@
   background-color: var(--color-surface);
 }
 
+/* Carousel wrapper — arrows flank the scrollable track. Only new element
+   added around the existing card grid; everything below this point
+   (card padding/border/gap, title, badge/link styles) is unchanged. */
+.insights-carousel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
 .insights-preview__grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   gap: var(--space-xl);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex: 1;
+  min-width: 0;
+}
+
+.insights-preview__grid::-webkit-scrollbar {
+  display: none;
+}
+
+.insights-preview__grid > li {
+  flex: 0 0 calc((100% - 2 * var(--space-xl)) / 3);
+  min-width: 0;
+  scroll-snap-align: start;
 }
 
 .insight-card {
@@ -51,15 +76,52 @@
   color: var(--color-secondary);
 }
 
+/* Thin, minimal prev/next controls — only rendered when the track actually
+   overflows the viewport (see InsightsPreview.jsx), so a short list never
+   shows a dead/disabled pair. */
+.insights-carousel__arrow {
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color var(--transition-base), color var(--transition-base);
+}
+
+.insights-carousel__arrow:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.insights-carousel__arrow:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 @media (max-width: 1024px) {
   .insights-preview__grid {
-    grid-template-columns: 1fr;
     gap: var(--space-lg);
+  }
+
+  .insights-preview__grid > li {
+    flex-basis: calc((100% - var(--space-lg)) / 2);
   }
 }
 
 @media (max-width: 768px) {
   .insights-preview {
     padding-block: var(--section-spacing-mobile);
+  }
+
+  .insights-preview__grid > li {
+    flex-basis: 100%;
   }
 }

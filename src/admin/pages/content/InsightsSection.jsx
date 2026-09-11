@@ -1,6 +1,7 @@
 import { insightsSection, insights } from '../../../data/profile.js';
 import { isSupabaseConfigured } from '../../../lib/supabase.js';
-import { fetchSingleton, upsertSingleton, fetchList, saveListRow } from '../../content/supabaseTable.js';
+import { isValidHttpUrl } from '../../../lib/urlValidation.js';
+import { fetchSingleton, upsertSingleton, fetchList, saveListRow, deleteRow } from '../../content/supabaseTable.js';
 import { useAdminForm } from '../../content/useAdminForm.js';
 import { requireFilled } from '../../content/validation.js';
 import BilingualField from '../../components/BilingualField.jsx';
@@ -18,19 +19,25 @@ function headingFallback() {
   };
 }
 
+// Card shape is deliberately just id/titleKo/titleEn/linkUrl — the button
+// text fields (link_label_ko/en) that used to live here are gone from this
+// form entirely (the public site now auto-generates the button's text from
+// the current language, see InsightsPreview.jsx). Any link_label_ko/en
+// already sitting in the database from before this change is left alone —
+// save() below never writes those two columns, so existing values are
+// neither read into this form nor overwritten by it.
 function itemsFallback() {
   return insights.map((item) => ({
-    id: null,
+    id: item.id,
+    clientKey: item.id,
     titleKo: item.titleKo,
     titleEn: item.titleEn,
     linkUrl: '',
-    linkLabelKo: '',
-    linkLabelEn: '',
   }));
 }
 
 async function load() {
-  if (!isSupabaseConfigured) return { heading: headingFallback(), items: itemsFallback() };
+  if (!isSupabaseConfigured) return { heading: headingFallback(), items: itemsFallback(), deletedIds: [] };
 
   const row = await fetchSingleton('insights_section');
   const heading = row
@@ -49,15 +56,14 @@ async function load() {
     itemRows.length > 0
       ? itemRows.map((r) => ({
           id: r.id,
+          clientKey: r.id,
           titleKo: r.title_ko,
           titleEn: r.title_en,
           linkUrl: r.link_url ?? '',
-          linkLabelKo: r.link_label_ko ?? '',
-          linkLabelEn: r.link_label_en ?? '',
         }))
       : itemsFallback();
 
-  return { heading, items };
+  return { heading, items, deletedIds: [] };
 }
 
 async function save(values) {
@@ -66,15 +72,12 @@ async function save(values) {
     { label: 'Section title', ko: values.heading.titleKo, en: values.heading.titleEn },
     { label: 'Coming soon label', ko: values.heading.comingSoonKo, en: values.heading.comingSoonEn },
     ...values.items.map((item, i) => ({ label: `Insight ${i + 1} title`, ko: item.titleKo, en: item.titleEn })),
-    // Link URL/label are optional — a card can stay a "coming soon"
-    // placeholder forever — but if a URL IS set, its button text can't
-    // be blank (InsightsPreview.jsx already falls back to a generic
-    // label at render time, but requiring it here means the admin sees
-    // and fixes that themselves rather than relying on a silent default).
-    ...values.items
-      .filter((item) => item.linkUrl.trim())
-      .map((item, i) => ({ label: `Insight ${i + 1} button text`, ko: item.linkLabelKo, en: item.linkLabelEn })),
   ]);
+
+  const invalidUrlItems = values.items.filter((item) => item.linkUrl.trim() && !isValidHttpUrl(item.linkUrl));
+  if (invalidUrlItems.length > 0) {
+    throw new Error('링크 URL은 http:// 또는 https://로 시작하는 형식이어야 합니다.');
+  }
 
   if (!isSupabaseConfigured) {
     throw new Error('Supabase is not configured — cannot save. See supabase/README.md.');
@@ -89,15 +92,16 @@ async function save(values) {
     coming_soon_en: values.heading.comingSoonEn,
   });
 
+  for (const id of values.deletedIds) {
+    await deleteRow('insights_items', id);
+  }
+
   for (const [index, item] of values.items.entries()) {
-    const linkUrl = item.linkUrl.trim();
     await saveListRow('insights_items', item.id, {
       title_ko: item.titleKo,
       title_en: item.titleEn,
       sort_order: index,
-      link_url: linkUrl || null,
-      link_label_ko: linkUrl ? item.linkLabelKo.trim() : null,
-      link_label_en: linkUrl ? item.linkLabelEn.trim() : null,
+      link_url: item.linkUrl.trim() || null,
     });
   }
 
@@ -114,6 +118,28 @@ function InsightsSection() {
 
   function updateItem(index, patch) {
     update((prev) => ({ ...prev, items: prev.items.map((it, i) => (i === index ? { ...it, ...patch } : it)) }));
+  }
+
+  function addCard() {
+    update((prev) => ({
+      ...prev,
+      items: [...prev.items, { id: null, clientKey: crypto.randomUUID(), titleKo: '', titleEn: '', linkUrl: '' }],
+    }));
+  }
+
+  // A never-yet-saved card (no id) just disappears from the draft — nothing
+  // was ever written, so there's nothing to delete. An already-saved card's
+  // id is queued into deletedIds and only actually deleted from the
+  // database when this whole form is saved (matching how every other edit
+  // here works: nothing is written until Save is pressed).
+  function removeCard(index) {
+    const item = values.items[index];
+    if (!window.confirm('이 인사이트 카드를 삭제하시겠습니까?')) return;
+    update((prev) => ({
+      ...prev,
+      items: prev.items.filter((_, i) => i !== index),
+      deletedIds: item.id ? [...prev.deletedIds, item.id] : prev.deletedIds,
+    }));
   }
 
   return (
@@ -147,7 +173,7 @@ function InsightsSection() {
             onEnChange={(v) => updateHeading({ titleEn: v })}
           />
           <BilingualField
-            label="'준비 중' 라벨 (실제 글이 없을 때 카드에 표시)"
+            label="'준비 중' 라벨 (링크 URL이 없는 카드에 표시)"
             ko={values.heading.comingSoonKo}
             en={values.heading.comingSoonEn}
             onKoChange={(v) => updateHeading({ comingSoonKo: v })}
@@ -157,13 +183,16 @@ function InsightsSection() {
           <h3>인사이트 카드</h3>
           <p className="admin-section-help">
             링크 URL을 비워두면 위 &quot;준비 중&quot; 라벨이 그대로 표시됩니다. URL을 입력하면 그 카드만
-            버튼으로 바뀌어 새 창에서 링크가 열립니다 (네이버 블로그, 유튜브 등 외부 링크 가능). 버튼에 실제
-            URL은 보이지 않고, 아래에서 입력한 문구만 보입니다.
+            버튼으로 바뀌어 새 창에서 링크가 열립니다 (네이버 블로그, 유튜브 등 외부 링크 가능). 버튼 문구는
+            직접 입력할 필요 없이 한국어/영어 페이지에 맞게 자동으로 표시됩니다 (예: &quot;블로그에서
+            보기&quot; / &quot;Read on the blog&quot;). 새 카드는 홈페이지의 가장 먼저 보이는 자리에
+            자동으로 노출됩니다.
           </p>
           {values.items.map((item, index) => (
-            <div className="admin-list-row" key={item.id ?? `new-${index}`}>
+            <div className="admin-list-row" key={item.clientKey}>
+              <p className="admin-list-row-title">카드 {index + 1}</p>
               <BilingualField
-                label={`카드 ${index + 1} 제목`}
+                label="제목"
                 ko={item.titleKo}
                 en={item.titleEn}
                 onKoChange={(v) => updateItem(index, { titleKo: v })}
@@ -175,17 +204,14 @@ function InsightsSection() {
                 value={item.linkUrl}
                 onChange={(v) => updateItem(index, { linkUrl: v })}
               />
-              {item.linkUrl.trim() && (
-                <BilingualField
-                  label="버튼 문구 (예: 네이버 블로그에서 보기 / 유튜브에서 보기)"
-                  ko={item.linkLabelKo}
-                  en={item.linkLabelEn}
-                  onKoChange={(v) => updateItem(index, { linkLabelKo: v })}
-                  onEnChange={(v) => updateItem(index, { linkLabelEn: v })}
-                />
-              )}
+              <button type="button" className="admin-image-reset" onClick={() => removeCard(index)}>
+                카드 삭제
+              </button>
             </div>
           ))}
+          <button type="button" className="admin-gallery-add" onClick={addCard}>
+            + 카드 추가
+          </button>
         </>
       )}
     </section>

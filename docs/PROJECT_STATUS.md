@@ -1,5 +1,56 @@
 # Project Status
 
+## Phase 6-D — Insights: unlimited cards, newest-first carousel, auto link buttons
+
+**Status: complete.** Insights management was fixed at exactly 3 cards
+with a manually-typed button label per card. Reworked to a real unbounded
+CMS list with a simpler admin form, following the site owner's explicit
+request to preserve existing design/data and touch only what this feature
+needs.
+
+- **Admin (`InsightsSection.jsx`):** cards are now a dynamic list — a
+  "+ 카드 추가" button appends a blank card, each card has its own "카드
+  삭제" (with a confirm prompt); deletions are staged locally and only
+  actually removed from the database on Save, matching how every other
+  edit on this screen already works. Per-card fields reduced to
+  한국어/영어 제목 + 링크 URL only — the KO/EN button-text fields are
+  gone from the form. A non-empty URL is validated as a well-formed
+  http(s) link before saving (surfaced as a save error otherwise).
+- **No schema change:** `insights_items` already had `link_label_ko/en`
+  columns (0019); `save()` simply stops writing them, so any existing
+  button-text data already in the database is left completely untouched,
+  just no longer read or relied on.
+- **Public site (`InsightCard.jsx`/`InsightsPreview.jsx`):** a card's
+  button text is no longer stored data — it's auto-picked from the
+  current language ("블로그에서 보기" / "Read on the blog") whenever the
+  card's URL passes a basic http(s) validity check (a new shared
+  `src/lib/urlValidation.js`); an empty or invalid URL still renders the
+  original "coming soon" badge, never a dead/empty link.
+- **Newest-first:** the admin keeps appending new cards at the bottom
+  (unchanged editing order); the public site simply renders that list
+  reversed, so the most recently added insight is always the first card
+  shown — no new column, no risk to existing rows.
+- **Carousel:** the fixed 3-card grid is now a horizontally-scrolling
+  track (native CSS scroll-snap — touch/trackpad swipe works with no
+  extra JS) with thin prev/next circular arrows that only appear once the
+  track actually overflows the viewport. Breakpoints reuse the project's
+  existing 1024/768 values: 3 cards per view desktop, ~2 tablet, 1
+  mobile. Card padding/border/gap/typography/button styling are
+  byte-for-byte unchanged from before this phase.
+
+**Verified via a local mock backend** seeded with the 3 real existing
+cards (one carrying legacy `link_label_ko/en` values, to prove they're no
+longer read): confirmed newest-first ordering, added a 4th card and
+confirmed it persists across a reload and appears first on the public
+site with an auto-generated button in both languages, confirmed an
+invalid URL is rejected on save with a clear message, confirmed deleting
+a card removes it from the public site once saved, and confirmed the
+carousel shows 3/2/1 cards with working arrows at 1440/900/390px with no
+horizontal overflow and no new console errors. Full-page regression swept
+afterward — all 12 public sections and the admin nav unaffected.
+
+**Build:** `npm run build` and `npx oxlint` both pass with zero errors.
+
 ## Phase 6-C — Advisory Sales CMS Wiring (closing the admin/public gap)
 
 **Status: complete.** An admin/public content audit (requested after the
