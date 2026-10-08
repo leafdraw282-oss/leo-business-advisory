@@ -44,10 +44,17 @@ function Hero() {
           <div className="hero__cta">
             {/* Tracked by the CTA's fixed role (primary/secondary), not its
                 admin-editable label text, which can change without notice —
-                see src/lib/analytics.js. */}
+                see src/lib/analytics.js. Primary CTA goes straight to the
+                site owner's KakaoTalk chat (heroStatic.ctaPrimaryUrl,
+                decoded from his real QR code) — a real external link, not
+                an in-page scroll, so it opens correctly on both desktop and
+                mobile. Not admin-editable by design (same reasoning as
+                `name` above); only the button's label text is. */}
             <a
               className="btn btn--primary"
-              href={`#${hero.ctaPrimaryTarget}`}
+              href={heroStatic.ctaPrimaryUrl}
+              target="_blank"
+              rel="noreferrer"
               onClick={() => trackEvent('explore_experience_click')}
             >
               {t(hero.ctaPrimaryKo, hero.ctaPrimaryEn)}

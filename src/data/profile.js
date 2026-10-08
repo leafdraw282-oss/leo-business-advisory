@@ -80,6 +80,11 @@ export const hero = {
   ctaPrimaryKo: '30분 자문 상담 신청',
   ctaPrimaryEn: 'Book a 30-Minute Consultation',
   ctaPrimaryTarget: 'contact',
+  // KakaoTalk 1:1 chat link — decoded directly from the site owner's own
+  // business-card QR code (http://qr.kakao.com/talk/...), not guessed or
+  // invented. Opens in a new tab on both desktop and mobile; works even
+  // without the KakaoTalk app installed (falls back to a web chat view).
+  ctaPrimaryUrl: 'http://qr.kakao.com/talk/jAMcbHfI6iPxyKnUDg82b21J6wc-',
   // No company brochure file/link exists in this project yet (checked
   // public/ and docs/) — per this phase's own instruction not to invent a
   // URL, this points at an on-page section that serves the same purpose
